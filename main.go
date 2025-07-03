@@ -7,7 +7,7 @@ import (
 )
 
 func testRuntime() {
-	tokens := el.Tokenize(`
+	tokens := el.TokenizeWithInplaceOperator(el.Transpile(`
 		// test recursion
 		(let
 			fib (lambda x (match (le x 1)
@@ -20,6 +20,20 @@ func testRuntime() {
 			))
 			(fib 20)
 		)
+		{											// { is the same as (let, } is the same as )
+			+ add - sub x mul / div % mod			// short hand for common operator
+			== eq != ne < le <= lt > gt >= ge
+
+			fib (lambda n (match [n <= 1]			// [n <= 1] is the same as (<= n 1)
+				true n 								// if n <= 1 then n
+				false {								// else p = fib(n-1), q = fib(n-2), p + q
+					p (fib [n - 1])
+					q (fib [n - 2])
+					[p + q]
+				}
+			))
+			(fib 20)
+		}
 
 		// test tail recursion
 		(let
@@ -67,7 +81,7 @@ func testRuntime() {
 			% mod
 			[1 + 2 - 3 + -4]
 		)
-	`)
+	`))
 
 	r := el.NewBasicRuntime()
 	var expr el.Expr

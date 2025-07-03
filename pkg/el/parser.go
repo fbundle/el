@@ -2,7 +2,6 @@ package el
 
 import (
 	"errors"
-	"slices"
 )
 
 // Expr : union of NameExpr, LambdaExpr
@@ -137,25 +136,27 @@ func ParseWithInplaceOperator(tokenList []Token) (Expr, []Token, error) {
 		}
 		var parseInplaceOperator func(argList []Expr) (Expr, error)
 		parseInplaceOperator = func(argList []Expr) (Expr, error) {
-			if len(argList) == 0 {
-				return nil, errors.New("empty InplaceOperator")
-			}
+			// len argList is either 1 3 5 ...
 			if len(argList) == 1 {
 				return argList[0], nil
 			}
-			if _, ok := argList[1].(NameExpr); !ok {
+			argList, cmdExpr, right := argList[:len(argList)-2], argList[len(argList)-2], argList[len(argList)-1]
+			if nameExpr, ok := cmdExpr.(NameExpr); ok {
+				cmd := Name(nameExpr)
+				left, err := parseInplaceOperator(argList)
+				if err != nil {
+					return nil, err
+				}
+				return LambdaExpr{
+					Cmd:  cmd,
+					Args: []Expr{left, right},
+				}, nil
+			} else {
 				return nil, errors.New("InplaceOperator must have a operator")
 			}
-			right, err := parseInplaceOperator(argList[2:])
-			if err != nil {
-				return nil, err
-			}
-			return LambdaExpr{
-				Cmd:  Name(argList[1].(NameExpr)),
-				Args: []Expr{argList[0], right},
-			}, nil
+
 		}
-		slices.Reverse(argList)
+
 		expr, err := parseInplaceOperator(argList)
 		if err != nil {
 			return nil, tokenList, err
