@@ -68,6 +68,38 @@ func parseUntilClose(tokenList []Token, close Token, parseOnce Parser) ([]Expr, 
 	return argList, tokenList, nil
 }
 
+func Parse(tokenList []Token) (Expr, []Token, error) {
+	tokenList, head, err := pop(tokenList)
+	if err != nil {
+		return nil, tokenList, err
+	}
+
+	if head == "(" {
+		// argList, tokenList, err := parseArgList("(", ")")
+		argList, tokenList, err := parseUntilClose(tokenList, ")", Parse)
+		if err != nil {
+			return nil, tokenList, err
+		}
+		switch len(argList) {
+		case 0:
+			return nil, tokenList, errors.New("empty LambdaExpr")
+		case 1:
+			return argList[0], tokenList, nil
+		default:
+			cmd, ok := argList[0].(NameExpr)
+			if !ok {
+				return nil, tokenList, errors.New("LambdaExpr must start with a name")
+			}
+			return LambdaExpr{
+				Cmd:  Name(cmd),
+				Args: argList[1:],
+			}, tokenList, nil
+		}
+	} else {
+		return NameExpr(head), tokenList, nil
+	}
+}
+
 func ParseWithInplaceOperator(tokenList []Token) (Expr, []Token, error) {
 	tokenList, head, err := pop(tokenList)
 	if err != nil {

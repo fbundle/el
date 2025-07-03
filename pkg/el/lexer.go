@@ -13,6 +13,14 @@ func Tokenize(str string) []Token {
 		'(': {},
 		')': {},
 		'*': {},
+	})
+}
+
+func TokenizeWithInplaceOperator(str string) []Token {
+	return tokenizeWithSplitCharacters(str, map[rune]struct{}{
+		'(': {},
+		')': {},
+		'*': {},
 		'[': {},
 		']': {},
 	})

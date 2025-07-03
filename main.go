@@ -88,5 +88,4 @@ func testRuntime() {
 
 func main() {
 	testRuntime()
-
 }
