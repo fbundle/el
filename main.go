@@ -10,11 +10,11 @@ func testRuntime() {
 	tokens := el.Tokenize(`
 		// test recursion
 		(let
-			fib (lambda x (match (sign (add x -2))
-				-1 x 								// if (x-2) < 0 then x
-				_ (let								// _ is the wildcard symbol
-					y (fib (add x -1))				// else y = fib(x-1), z = fib(x-2), y + z
-					z (fib (add x -2))
+			fib (lambda x (match (le x 1)
+				true x 								// if x <= 1 then x
+				false (let							// _ is the wildcard symbol
+					y (fib (sub x 1))				// else y = fib(x-1), z = fib(x-2), y + z
+					z (fib (sub x 2))
 					(add y z)
 				)
 			))
@@ -25,7 +25,7 @@ func testRuntime() {
 		(let
 			count (lambda n (match n
 				0 0
-				_ (add 1 (count (add n -1)))
+				_ (add 1 (count (sub n 1)))
 			))
 			count 2000
 		)

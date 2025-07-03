@@ -110,47 +110,6 @@ var matchModule = Module{
 	Man: "module: (match x 1 2 4 5) - match, if x=1 then return 3, if x=4 the return 5",
 }
 
-var addExtension = Extension{
-	Name: "add",
-	Exec: func(ctx context.Context, values ...Object) (Object, error) {
-		if len(values) < 1 {
-			return nil, fmt.Errorf("add requires at least 1 arguments")
-		}
-		var sum Int = 0
-		for i := 0; i < len(values); i++ {
-			v, ok := values[i].(Int)
-			if !ok {
-				return nil, fmt.Errorf("adding non-integer values")
-			}
-			sum += v
-		}
-		return sum, nil
-	},
-	Man: "module: (add 1 (add 2 3) 3) - exec a sequence of expressions and return the sum",
-}
-
-var signExtension = Extension{
-	Name: "sign",
-	Exec: func(ctx context.Context, values ...Object) (Object, error) {
-		if len(values) < 1 {
-			return nil, fmt.Errorf("sign requires at least 1 arguments")
-		}
-		v, ok := values[len(values)-1].(Int)
-		if !ok {
-			return nil, fmt.Errorf("sign non-integer value")
-		}
-		switch {
-		case v > 0:
-			return Int(+1), nil
-		case v < 0:
-			return Int(-1), nil
-		default:
-			return Int(0), nil
-		}
-	},
-	Man: "module: (sign 3) - exec an expression and return the sign",
-}
-
 var listExtension = Extension{
 	Name: "list",
 	Exec: func(ctx context.Context, values ...Object) (Object, error) {
@@ -301,3 +260,91 @@ var geExtension = makeCmpExtension("ge", func(i, j Int) Int {
 	}
 	return Int(0)
 })
+
+func makeArithExtension(name string, op func(vs ...Int) Int) Extension {
+	return Extension{
+		Name: name,
+		Exec: func(ctx context.Context, values ...Object) (Object, error) {
+			vs := make([]Int, 0)
+			for _, v := range values {
+				if v, ok := v.(Int); ok {
+					vs = append(vs, v)
+				} else {
+					return nil, fmt.Errorf("%s argument must be an integer", name)
+				}
+			}
+			return op(vs...), nil
+		},
+		Man: fmt.Sprintf("module: (%s 1 2 3)", name),
+	}
+}
+
+var addExtension = makeArithExtension("add", func(vs ...Int) Int {
+	output := Int(0)
+	for _, v := range vs {
+		output += v
+	}
+	return output
+})
+
+var subExtension = makeArithExtension("sub", func(vs ...Int) Int {
+	if len(vs) == 0 {
+		return Int(0)
+	}
+	output := vs[0]
+	for i := 1; i < len(vs); i++ {
+		v := vs[i]
+		output -= v
+	}
+	return output
+})
+
+var mulExtension = makeArithExtension("mul", func(vs ...Int) Int {
+	output := Int(1)
+	for _, v := range vs {
+		output *= v
+	}
+	return output
+})
+
+var divExtension = makeArithExtension("div", func(vs ...Int) Int {
+	if len(vs) == 0 {
+		return Int(0)
+	}
+	output := vs[0]
+	for i := 1; i < len(vs); i++ {
+		v := vs[i]
+		output /= v
+	}
+	return output
+})
+
+var modExtension = makeArithExtension("mod", func(vs ...Int) Int {
+	if len(vs) == 0 {
+		return Int(0)
+	}
+	output := vs[0]
+	for i := 1; i < len(vs); i++ {
+		v := vs[i]
+		output %= v
+	}
+	return output
+})
+
+var ifExtension = Extension{
+	Name: "if",
+	Exec: func(ctx context.Context, values ...Object) (Object, error) {
+		if len(values) != 3 {
+			return nil, fmt.Errorf("if requires 3 arguments")
+		}
+		cond, ok := values[0].(Int)
+		if !ok {
+			return nil, fmt.Errorf("if first argument must be an integer")
+		}
+		if cond == Int(0) {
+			return values[2], nil
+		}
+		return values[1], nil
+	},
+	Man: "module: (if x 1 2) - if x then return 1, else return 2",
+}

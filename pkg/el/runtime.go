@@ -40,6 +40,13 @@ func NewCoreRuntime() *Runtime {
 // NewBasicRuntime - NewCoreRuntime + minimal set of arithmetic extensions for Turing completeness
 func NewBasicRuntime() *Runtime {
 	return NewCoreRuntime().
-		LoadExtension(addExtension, signExtension, listExtension, lenExtension, rangeExtension, sliceExtension, unitExtension).
-		LoadExtension(eqExtension, neExtension, ltExtension, leExtension, gtExtension, geExtension)
+		// list extension
+		LoadExtension(listExtension, lenExtension, rangeExtension, sliceExtension, unitExtension).
+		// compare extension
+		LoadConstant("true", Int(1)).LoadConstant("false", Int(0)).
+		LoadExtension(eqExtension, neExtension, ltExtension, leExtension, gtExtension, geExtension).
+		// arithmetic extension
+		LoadExtension(addExtension, subExtension, mulExtension, divExtension, modExtension).
+		// extra
+		LoadExtension(ifExtension)
 }

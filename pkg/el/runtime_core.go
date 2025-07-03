@@ -32,6 +32,12 @@ func (r *Runtime) LoadModule(ms ...Module) *Runtime {
 	return r
 }
 
+func (r *Runtime) LoadConstant(name string, value Object) *Runtime {
+	_, frame := r.Stack.Pop()
+	frame[name] = value
+	return r
+}
+
 func (r *Runtime) searchOnStack(name string) (Object, error) {
 	var stack Stack = r.Stack
 	var frame Frame
