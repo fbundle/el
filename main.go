@@ -33,7 +33,7 @@ func testRuntime() {
 			get (lambda l i (unit * (slice l (range i (add i 1))))) 	// define get function from unit, slice, range
 			second (get l 1)
 			
-			// map
+			// implement map -> hence for loop
 			map (lambda l f (match (le (len l) 0)
 				true (list) 											// if l is empty then return empty list
 				false (let
@@ -45,7 +45,7 @@ func testRuntime() {
 				)
 			))
 
-			another (map (range 0 10) (lambda x [x mul 2]))				// implement map -> hence for loop
+			another (map (range 0 10) (lambda x [x mul 2]))				
 			
 			(list length sublist second another)
 		)
