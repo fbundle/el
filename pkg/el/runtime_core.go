@@ -88,6 +88,16 @@ func (r *Runtime) Step(ctx context.Context, expr Expr) (Object, error) {
 	case <-ctx.Done():
 		return nil, InterruptError
 	default:
+		/*
+			the whole language is every simple
+				1. parse literal or search on stack
+				2. apply function: push a new frame, exec the function, pop
+				3. builtin module
+					a. lambda binding: capture the current frame and save the implementation
+					b. let binding: push a new frame, exec the function, pop
+					c. match binding: eval and match
+		*/
+
 		switch expr := expr.(type) {
 		case NameExpr:
 			var v Object
