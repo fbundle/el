@@ -3,7 +3,6 @@ package runtime
 import (
 	"context"
 	"el/pkg/el/expr"
-	obj "el/pkg/el/obj"
 	"errors"
 	"fmt"
 	"maps"
@@ -11,16 +10,16 @@ import (
 
 var InternalError = errors.New("internal")
 
-var letModule = obj.Module[Runtime]{
+var letModule = Module{
 	Name: "let",
-	Exec: func(ctx context.Context, r *Runtime, e expr.Lambda) (obj.Object, error) {
+	Exec: func(ctx context.Context, r *Runtime, e expr.Lambda) (Object, error) {
 		if e.Cmd.(expr.Name) != "let" {
 			return nil, InternalError
 		}
 		if len(e.Args) < 1 {
 			return nil, fmt.Errorf("let requires at least 1 arguments")
 		}
-		r.Stack.Push(obj.Frame{})
+		r.Stack.Push(Frame{})
 		defer r.Stack.Pop()
 
 		for i := 0; i < len(e.Args)-1; i += 2 {
@@ -32,7 +31,7 @@ var letModule = obj.Module[Runtime]{
 			if err != nil {
 				return nil, err
 			}
-			name := obj.Name(lvalue)
+			name := Name(lvalue)
 			// update stack
 			head := r.Stack.Pop()
 			head[name] = rvalue
@@ -47,16 +46,16 @@ var letModule = obj.Module[Runtime]{
 	Man: "module: (let x 3) - assign value 3 to local variable x",
 }
 
-var lambdaModule = obj.Module[Runtime]{
+var lambdaModule = Module{
 	Name: "lambda",
-	Exec: func(ctx context.Context, r *Runtime, e expr.Lambda) (obj.Object, error) {
+	Exec: func(ctx context.Context, r *Runtime, e expr.Lambda) (Object, error) {
 		if e.Cmd.(expr.Name) != "lambda" {
 			return nil, InternalError
 		}
 		if len(e.Args) < 1 {
 			return nil, fmt.Errorf("lambda requires at least 1 arguments")
 		}
-		v := obj.Lambda{
+		v := Lambda{
 			Params:  nil,
 			Impl:    nil,
 			Closure: nil,
@@ -66,7 +65,7 @@ var lambdaModule = obj.Module[Runtime]{
 			if !ok {
 				return nil, fmt.Errorf("lvalue must be a name")
 			}
-			name := obj.Name(lvalue)
+			name := Name(lvalue)
 			v.Params = append(v.Params, name)
 		}
 		v.Impl = e.Args[len(e.Args)-1]
@@ -79,9 +78,9 @@ var lambdaModule = obj.Module[Runtime]{
 	Man: "module: (lambda x y (add x y) - declare a function",
 }
 
-var matchModule = obj.Module[Runtime]{
+var matchModule = Module{
 	Name: "match",
-	Exec: func(ctx context.Context, r *Runtime, e expr.Lambda) (obj.Object, error) {
+	Exec: func(ctx context.Context, r *Runtime, e expr.Lambda) (Object, error) {
 		if e.Cmd.(expr.Name) != "match" {
 			return nil, InternalError
 		}
@@ -99,7 +98,7 @@ var matchModule = obj.Module[Runtime]{
 				if err != nil {
 					return 0, err
 				}
-				if _, ok := comp.(obj.Wildcard); ok || comp == cond {
+				if _, ok := comp.(Wildcard); ok || comp == cond {
 					return i, nil
 				}
 			}

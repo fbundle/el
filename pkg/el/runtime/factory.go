@@ -1,7 +1,6 @@
 package runtime
 
 import (
-	"el/pkg/el/obj"
 	"encoding/json"
 	"errors"
 	"strconv"
@@ -10,31 +9,31 @@ import (
 // NewCoreRuntime - Runtime and core control flow extensions
 func NewCoreRuntime() *Runtime {
 	return (&Runtime{
-		ParseLiteral: func(lit string) (obj.Object, error) {
+		ParseLiteral: func(lit string) (Object, error) {
 			if len(lit) == 0 {
 				return nil, errors.New("empty literal")
 			}
 			if lit == "_" {
-				return obj.Wildcard{}, nil
+				return Wildcard{}, nil
 			}
 			if lit == "*" {
-				return obj.Unwrap{}, nil
+				return Unwrap{}, nil
 			}
 			if lit[0] == '"' && lit[len(lit)-1] == '"' {
 				str := ""
 				if err := json.Unmarshal([]byte(lit), &str); err != nil {
 					return nil, err
 				}
-				strList := obj.List{}
+				strList := List{}
 				for _, ch := range []rune(str) {
-					strList = append(strList, obj.Int(ch))
+					strList = append(strList, Int(ch))
 				}
 				return strList, nil
 			}
 			i, err := strconv.Atoi(lit)
-			return obj.Int(i), err
+			return Int(i), err
 		},
-		Stack: obj.NewFrameStack(),
+		Stack: newFrameStack(),
 	}).LoadModule(letModule, lambdaModule, matchModule)
 }
 
@@ -44,7 +43,7 @@ func NewBasicRuntime() *Runtime {
 		// list extension
 		LoadExtension(listExtension, lenExtension, rangeExtension, sliceExtension).
 		// arithmetic extension
-		LoadConstant("true", obj.True).LoadConstant("false", obj.False).
+		LoadConstant("true", True).LoadConstant("false", False).
 		LoadExtension(eqExtension, neExtension, ltExtension, leExtension, gtExtension, geExtension).
 		LoadExtension(addExtension, subExtension, mulExtension, divExtension, modExtension)
 	// extra

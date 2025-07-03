@@ -1,4 +1,4 @@
-package obj
+package runtime
 
 import (
 	"context"
@@ -58,17 +58,17 @@ func (l Lambda) String() string {
 
 func (l Lambda) MustTypeObject() {}
 
-type Module[Runtime any] struct {
+type Module struct {
 	Name Name `json:"name,omitempty"`
 	Exec func(ctx context.Context, r *Runtime, e expr.Lambda) (Object, error)
 	Man  string `json:"man,omitempty"`
 }
 
-func (m Module[Runtime]) String() string {
+func (m Module) String() string {
 	return fmt.Sprintf("[%s]", m.Man)
 }
 
-func (m Module[Runtime]) MustTypeObject() {}
+func (m Module) MustTypeObject() {}
 
 type List []Object
 
