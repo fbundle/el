@@ -238,3 +238,66 @@ var unitExtension = Extension{
 	},
 	Man: "module: (unit 1) - wrap a value in unit",
 }
+
+func makeCmpExtension(name string, cmp func(Int, Int) Int) Extension {
+	return Extension{
+		Name: name,
+		Exec: func(ctx context.Context, values ...Object) (Object, error) {
+			if len(values) != 2 {
+				return nil, fmt.Errorf("%s requires 2 arguments", name)
+			}
+			i, ok := values[0].(Int)
+			if !ok {
+				return nil, fmt.Errorf("%s first argument not an integer", name)
+			}
+			j, ok := values[1].(Int)
+			if !ok {
+				return nil, fmt.Errorf("%s second argument not an integer", name)
+			}
+			return cmp(i, j), nil
+		},
+		Man: fmt.Sprintf("module: (%s 1 2) - compare two integers", name),
+	}
+}
+
+var eqExtension = makeCmpExtension("eq", func(i, j Int) Int {
+	if i == j {
+		return Int(1)
+	}
+	return Int(0)
+})
+
+var neExtension = makeCmpExtension("ne", func(i, j Int) Int {
+	if i != j {
+		return Int(1)
+	}
+	return Int(0)
+})
+
+var ltExtension = makeCmpExtension("lt", func(i, j Int) Int {
+	if i < j {
+		return Int(1)
+	}
+	return Int(0)
+})
+
+var leExtension = makeCmpExtension("le", func(i, j Int) Int {
+	if i <= j {
+		return Int(1)
+	}
+	return Int(0)
+})
+
+var gtExtension = makeCmpExtension("gt", func(i, j Int) Int {
+	if i > j {
+		return Int(1)
+	}
+	return Int(0)
+})
+
+var geExtension = makeCmpExtension("ge", func(i, j Int) Int {
+	if i >= j {
+		return Int(1)
+	}
+	return Int(0)
+})

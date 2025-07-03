@@ -24,9 +24,11 @@ type Runtime struct {
 	Stack        Stack
 }
 
-func (r *Runtime) LoadModule(m Module) *Runtime {
+func (r *Runtime) LoadModule(ms ...Module) *Runtime {
 	_, frame := r.Stack.Pop()
-	frame[m.Name] = m
+	for _, m := range ms {
+		frame[m.Name] = m
+	}
 	return r
 }
 

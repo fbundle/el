@@ -11,7 +11,14 @@ type Extension struct {
 	Man  string
 }
 
-func MakeModuleFromExtension(e Extension) Module {
+func (r *Runtime) LoadExtension(es ...Extension) *Runtime {
+	for _, e := range es {
+		r.LoadModule(makeModuleFromExtension(e))
+	}
+	return r
+}
+
+func makeModuleFromExtension(e Extension) Module {
 	return Module{
 		Name: e.Name,
 		Exec: func(ctx context.Context, r *Runtime, expr LambdaExpr) (Object, error) {

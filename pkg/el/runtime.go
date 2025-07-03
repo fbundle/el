@@ -34,20 +34,12 @@ func NewCoreRuntime() *Runtime {
 			return Int(i), err
 		},
 		Stack: newFrameStack(),
-	}).
-		LoadModule(letModule).
-		LoadModule(lambdaModule).
-		LoadModule(matchModule)
+	}).LoadModule(letModule, lambdaModule, matchModule)
 }
 
 // NewBasicRuntime - NewCoreRuntime + minimal set of arithmetic extensions for Turing completeness
 func NewBasicRuntime() *Runtime {
 	return NewCoreRuntime().
-		LoadModule(MakeModuleFromExtension(addExtension)).
-		LoadModule(MakeModuleFromExtension(signExtension)).
-		LoadModule(MakeModuleFromExtension(listExtension)).
-		LoadModule(MakeModuleFromExtension(lenExtension)).
-		LoadModule(MakeModuleFromExtension(rangeExtension)).
-		LoadModule(MakeModuleFromExtension(sliceExtension)).
-		LoadModule(MakeModuleFromExtension(unitExtension))
+		LoadExtension(addExtension, signExtension, listExtension, lenExtension, rangeExtension, sliceExtension, unitExtension).
+		LoadExtension(eqExtension, neExtension, ltExtension, leExtension, gtExtension, geExtension)
 }
