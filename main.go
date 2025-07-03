@@ -50,6 +50,14 @@ func testRuntime() {
 			second (get l 1)
 			(list length sublist second)
 		)
+		// some tests from chatgpt
+		(let f (lambda n (match (eq n 0) true 1 false (mul n (f (sub n 1)))))
+			 (f 5))
+
+		(let even (lambda x (match x 0 1 _ (odd (sub x 1))))
+			 odd  (lambda x (match x 0 0 _ (even (sub x 1))))
+			 (even 10))
+
 	`)
 
 	r := el.NewBasicRuntime()
