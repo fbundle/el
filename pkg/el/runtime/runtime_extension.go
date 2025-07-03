@@ -27,11 +27,11 @@ func (r *Runtime) LoadExtension(es ...Extension) *Runtime {
 	return r
 }
 
-func makeModuleFromExtension(e Extension) Module {
+func makeModuleFromExtension(ext Extension) Module {
 	return Module{
-		Name: e.Name,
-		Exec: func(ctx context.Context, r *Runtime, expr parser.Lambda) (Object, error) {
-			args, err := r.stepMany(ctx, expr.Args...)
+		Name: ext.Name,
+		Exec: func(ctx context.Context, r *Runtime, e parser.Lambda) (Object, error) {
+			args, err := r.stepMany(ctx, e.Args...)
 			if err != nil {
 				return nil, err
 			}
@@ -39,9 +39,10 @@ func makeModuleFromExtension(e Extension) Module {
 			if err != nil {
 				return nil, err
 			}
-			return e.Exec(ctx, args...)
+
+			return ext.Exec(ctx, args...)
 		},
-		Man: e.Man,
+		Man: ext.Man,
 	}
 }
 

@@ -58,7 +58,7 @@ func setOptionsToContext(ctx context.Context, o *stepOptions) context.Context {
 }
 
 // Step -
-func (r *Runtime) Step(ctx context.Context, expr parser.Expr) (Object, error) {
+func (r *Runtime) Step(ctx context.Context, e parser.Expr) (Object, error) {
 	if ctx.Err() != nil {
 		return nil, ctx.Err()
 	}
@@ -91,16 +91,16 @@ func (r *Runtime) Step(ctx context.Context, expr parser.Expr) (Object, error) {
 					bind parameters and previously captured variables in lambda
 		*/
 
-		switch expr := expr.(type) {
+		switch e := e.(type) {
 		case parser.Name:
 			var v Object
 			// load literal
-			v, err := r.ParseLiteral(string(expr))
+			v, err := r.ParseLiteral(string(e))
 			if err == nil {
 				return v, nil
 			}
 			// find in stack for variable
-			v, err = r.searchOnStack(Name(expr))
+			v, err = r.searchOnStack(Name(e))
 			if err != nil {
 				return nil, err
 			}
@@ -108,7 +108,7 @@ func (r *Runtime) Step(ctx context.Context, expr parser.Expr) (Object, error) {
 
 		case parser.Lambda:
 			getLambda := func(cmd parser.Expr) (Object, error) {
-				switch cmd := expr.Cmd.(type) {
+				switch cmd := e.Cmd.(type) {
 				case parser.Name:
 					return r.searchOnStack(Name(cmd))
 				case parser.Lambda:
@@ -117,20 +117,20 @@ func (r *Runtime) Step(ctx context.Context, expr parser.Expr) (Object, error) {
 					return nil, fmt.Errorf("lambda: invalid command")
 				}
 			}
-			lambda, err := getLambda(expr.Cmd)
+			lambda, err := getLambda(e.Cmd)
 			if err != nil {
 				return nil, err
 			}
 			switch lambda := lambda.(type) {
 			case Module:
-				o, err := lambda.Exec(ctx, r, expr)
+				o, err := lambda.Exec(ctx, r, e)
 				if err != nil {
 					return nil, err
 				}
 				return o, nil
 			case Lambda:
 				// 1. evaluate arguments
-				args, err := r.stepMany(ctx, expr.Args...)
+				args, err := r.stepMany(ctx, e.Args...)
 				if err != nil {
 					return nil, err
 				}
@@ -169,7 +169,7 @@ func (r *Runtime) Step(ctx context.Context, expr parser.Expr) (Object, error) {
 				}
 				return v, nil
 			default:
-				return nil, fmt.Errorf("expression cannot be executed: %s", expr.String())
+				return nil, fmt.Errorf("expression cannot be executed: %s", e.String())
 			}
 		default:
 			return nil, fmt.Errorf("unknown expression type")
@@ -177,15 +177,15 @@ func (r *Runtime) Step(ctx context.Context, expr parser.Expr) (Object, error) {
 	}
 }
 
-func (r *Runtime) stepMany(ctx context.Context, exprList ...parser.Expr) ([]Object, error) {
-	outputs := make([]Object, len(exprList))
-	for i, expr := range exprList {
-		if i == len(exprList)-1 && TAIL_CALL_OPTIMIZATION {
+func (r *Runtime) stepMany(ctx context.Context, eList ...parser.Expr) ([]Object, error) {
+	outputs := make([]Object, len(eList))
+	for i, e := range eList {
+		if i == len(eList)-1 && TAIL_CALL_OPTIMIZATION {
 			ctx = setOptionsToContext(ctx, &stepOptions{
 				tailCall: true,
 			})
 		}
-		value, err := r.Step(ctx, expr)
+		value, err := r.Step(ctx, e)
 		if err != nil {
 			return nil, err
 		}

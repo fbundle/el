@@ -60,7 +60,7 @@ func (l Lambda) MustTypeObject() {}
 
 type Module struct {
 	Name Name `json:"name,omitempty"`
-	Exec func(ctx context.Context, r *Runtime, expr parser.Lambda) (Object, error)
+	Exec func(ctx context.Context, r *Runtime, e parser.Lambda) (Object, error)
 	Man  string `json:"man,omitempty"`
 }
 
