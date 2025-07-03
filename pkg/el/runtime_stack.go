@@ -5,20 +5,20 @@ type Name string
 // Frame - a collection of bindings NameExpr -> Object
 type Frame = map[Name]Object
 
-func newFrameStack() FrameStack {
-	return &frameStack{
-		stack: []Frame{
-			{},
-		},
-	}
-}
-
 // FrameStack - stack of frames
 type FrameStack interface {
 	Push(Frame)
 	Pop() Frame
 	Depth() uint
 	Iter(func(Frame) bool)
+}
+
+func newFrameStack() FrameStack {
+	return &frameStack{
+		stack: []Frame{
+			{},
+		},
+	}
 }
 
 type frameStack struct {
