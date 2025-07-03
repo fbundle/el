@@ -198,70 +198,7 @@ var unitExtension = Extension{
 	Man: "module: (unit 1) - wrap a value in unit",
 }
 
-func makeCmpExtension(name string, cmp func(Int, Int) Int) Extension {
-	return Extension{
-		Name: name,
-		Exec: func(ctx context.Context, values ...Object) (Object, error) {
-			if len(values) != 2 {
-				return nil, fmt.Errorf("%s requires 2 arguments", name)
-			}
-			i, ok := values[0].(Int)
-			if !ok {
-				return nil, fmt.Errorf("%s first argument not an integer", name)
-			}
-			j, ok := values[1].(Int)
-			if !ok {
-				return nil, fmt.Errorf("%s second argument not an integer", name)
-			}
-			return cmp(i, j), nil
-		},
-		Man: fmt.Sprintf("module: (%s 1 2) - compare two integers", name),
-	}
-}
-
-var eqExtension = makeCmpExtension("eq", func(i, j Int) Int {
-	if i == j {
-		return Int(1)
-	}
-	return Int(0)
-})
-
-var neExtension = makeCmpExtension("ne", func(i, j Int) Int {
-	if i != j {
-		return Int(1)
-	}
-	return Int(0)
-})
-
-var ltExtension = makeCmpExtension("lt", func(i, j Int) Int {
-	if i < j {
-		return Int(1)
-	}
-	return Int(0)
-})
-
-var leExtension = makeCmpExtension("le", func(i, j Int) Int {
-	if i <= j {
-		return Int(1)
-	}
-	return Int(0)
-})
-
-var gtExtension = makeCmpExtension("gt", func(i, j Int) Int {
-	if i > j {
-		return Int(1)
-	}
-	return Int(0)
-})
-
-var geExtension = makeCmpExtension("ge", func(i, j Int) Int {
-	if i >= j {
-		return Int(1)
-	}
-	return Int(0)
-})
-
-func makeArithExtension(name string, op func(vs ...Int) Int) Extension {
+func makeArithExtension(name string, op func(vs ...Int) (Int, error)) Extension {
 	return Extension{
 		Name: name,
 		Exec: func(ctx context.Context, values ...Object) (Object, error) {
@@ -273,78 +210,110 @@ func makeArithExtension(name string, op func(vs ...Int) Int) Extension {
 					return nil, fmt.Errorf("%s argument must be an integer", name)
 				}
 			}
-			return op(vs...), nil
+			return op(vs...)
 		},
 		Man: fmt.Sprintf("module: (%s 1 2 3)", name),
 	}
 }
 
-var addExtension = makeArithExtension("add", func(vs ...Int) Int {
+func boolToBool(b bool) Int {
+	if b {
+		return True
+	} else {
+		return False
+	}
+}
+
+var eqExtension = makeArithExtension("eq", func(vs ...Int) (Int, error) {
+	if len(vs) != 2 {
+		return False, errors.New("eq requires 2 arguments")
+	}
+	return boolToBool(vs[0] == vs[1]), nil
+})
+
+var neExtension = makeArithExtension("ne", func(vs ...Int) (Int, error) {
+	if len(vs) != 2 {
+		return False, errors.New("ne requires 2 arguments")
+	}
+	return boolToBool(vs[0] != vs[1]), nil
+})
+
+var ltExtension = makeArithExtension("lt", func(vs ...Int) (Int, error) {
+	if len(vs) != 2 {
+		return False, errors.New("lt requires 2 arguments")
+	}
+	return boolToBool(vs[0] < vs[1]), nil
+})
+
+var leExtension = makeArithExtension("le", func(vs ...Int) (Int, error) {
+	if len(vs) != 2 {
+		return False, errors.New("le requires 2 arguments")
+	}
+	return boolToBool(vs[0] <= vs[1]), nil
+})
+
+var gtExtension = makeArithExtension("gt", func(vs ...Int) (Int, error) {
+	if len(vs) != 2 {
+		return False, errors.New("gt requires 2 arguments")
+	}
+	return boolToBool(vs[0] > vs[1]), nil
+})
+
+var geExtension = makeArithExtension("ge", func(vs ...Int) (Int, error) {
+	if len(vs) != 2 {
+		return False, errors.New("ge requires 2 arguments")
+	}
+	return boolToBool(vs[0] >= vs[1]), nil
+})
+
+var addExtension = makeArithExtension("add", func(vs ...Int) (Int, error) {
 	output := Int(0)
 	for _, v := range vs {
 		output += v
 	}
-	return output
+	return output, nil
 })
 
-var subExtension = makeArithExtension("sub", func(vs ...Int) Int {
+var subExtension = makeArithExtension("sub", func(vs ...Int) (Int, error) {
 	if len(vs) == 0 {
-		return Int(0)
+		return Int(0), errors.New("sub requires at least 1 argument")
 	}
 	output := vs[0]
 	for i := 1; i < len(vs); i++ {
 		v := vs[i]
 		output -= v
 	}
-	return output
+	return output, nil
 })
 
-var mulExtension = makeArithExtension("mul", func(vs ...Int) Int {
+var mulExtension = makeArithExtension("mul", func(vs ...Int) (Int, error) {
 	output := Int(1)
 	for _, v := range vs {
 		output *= v
 	}
-	return output
+	return output, nil
 })
 
-var divExtension = makeArithExtension("div", func(vs ...Int) Int {
+var divExtension = makeArithExtension("div", func(vs ...Int) (Int, error) {
 	if len(vs) == 0 {
-		return Int(0)
+		return Int(0), errors.New("div requires at least 1 argument")
 	}
 	output := vs[0]
 	for i := 1; i < len(vs); i++ {
 		v := vs[i]
 		output /= v
 	}
-	return output
+	return output, nil
 })
 
-var modExtension = makeArithExtension("mod", func(vs ...Int) Int {
+var modExtension = makeArithExtension("mod", func(vs ...Int) (Int, error) {
 	if len(vs) == 0 {
-		return Int(0)
+		return Int(0), errors.New("mod requires at least 1 argument")
 	}
 	output := vs[0]
 	for i := 1; i < len(vs); i++ {
 		v := vs[i]
 		output %= v
 	}
-	return output
+	return output, nil
 })
-
-var ifExtension = Extension{
-	Name: "if",
-	Exec: func(ctx context.Context, values ...Object) (Object, error) {
-		if len(values) != 3 {
-			return nil, fmt.Errorf("if requires 3 arguments")
-		}
-		cond, ok := values[0].(Int)
-		if !ok {
-			return nil, fmt.Errorf("if first argument must be an integer")
-		}
-		if cond == Int(0) {
-			return values[2], nil
-		}
-		return values[1], nil
-	},
-	Man: "module: (if x 1 2) - if x then return 1, else return 2",
-}

@@ -19,6 +19,9 @@ func (i Int) String() string {
 
 func (i Int) MustTypeObject() {}
 
+var True = Int(1)
+var False = Int(0)
+
 type Unwrap struct{}
 
 func (u Unwrap) String() string {
