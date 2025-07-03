@@ -35,7 +35,7 @@ func testRuntime() {
 			
 			// map
 			map (lambda l f (match (le (len l) 0)
-				true (list) 							// if l is empty then return empty list
+				true (list) 											// if l is empty then return empty list
 				false (let
 					first_elem (get l 0)
 					first_value (f first_elem)
@@ -45,7 +45,7 @@ func testRuntime() {
 				)
 			))
 
-			another (map (range 0 10) (lambda x [x mul 2]))
+			another (map (range 0 10) (lambda x [x mul 2]))				// implement map
 			
 			(list length sublist second another)
 		)
