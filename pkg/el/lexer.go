@@ -23,7 +23,6 @@ func TokenizeWithInfixOperator(str string) []Token {
 		'*': {},
 		'[': {},
 		']': {},
-		',': {},
 	})
 }
 
