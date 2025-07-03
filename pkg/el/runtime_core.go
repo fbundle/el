@@ -9,7 +9,8 @@ import (
 )
 
 const (
-	MAX_STACK_DEPTH = 1000
+	TAIL_CALL_OPTIMIZATION = true
+	MAX_STACK_DEPTH        = 1000
 )
 
 var NameNotFoundError = func(name string) error {
@@ -156,6 +157,11 @@ func (r *Runtime) Step(ctx context.Context, expr Expr) (Object, error) {
 func (r *Runtime) stepMany(ctx context.Context, exprList ...Expr) ([]Object, error) {
 	outputs := make([]Object, len(exprList))
 	for i, expr := range exprList {
+		if i == len(exprList)-1 && TAIL_CALL_OPTIMIZATION {
+			ctx = setOptionsToContext(ctx, &stepOptions{
+				tailCall: true,
+			})
+		}
 		value, err := r.Step(ctx, expr)
 		if err != nil {
 			return nil, err

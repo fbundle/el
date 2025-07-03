@@ -23,11 +23,11 @@ func testRuntime() {
 
 		// test tail recursion
 		(let
-			count (lambda n (match n
-				0 0
-				_ (add 1 (count (sub n 1)))
+			count (lambda n (match (le n 0)
+				true 0
+				false (add 1 (count (sub n 1)))
 			))
-			count 2000
+			(list (count 2000) (count -1000))
 		)
 
 		// simple example
