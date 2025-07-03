@@ -3,6 +3,7 @@ package el
 import (
 	"context"
 	"fmt"
+	"strings"
 )
 
 // Object : union - TODO : introduce new data types
@@ -71,13 +72,14 @@ func (m Module) MustTypeObject() {}
 type List []Object
 
 func (l List) String() string {
-	s := ""
-	s += "["
-	for _, obj := range l {
-		s += fmt.Sprintf("%v,", obj)
+	ls := make([]string, 0, len(l))
+	for _, o := range l {
+		ls = append(ls, o.String())
 	}
-	s += "]"
+	s := strings.Join(ls, ",")
+	s = fmt.Sprintf("[%s]", s)
 	return s
+
 }
 
 func (l List) MustTypeObject() {}
