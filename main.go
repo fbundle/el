@@ -8,35 +8,6 @@ import (
 
 func testRuntime() {
 	tokens := el.TokenizeWithInfixOperator(el.Transpile(`
-		// test recursion
-		(let
-			fib (lambda x (match (le x 1)
-				true x 								// if x <= 1 then x
-				false (let							// _ is the wildcard symbol
-					y (fib (sub x 1))				// else y = fib(x-1), z = fib(x-2), y + z
-					z (fib (sub x 2))
-					(add y z)
-				)
-			))
-			(fib 20)
-		)
-
-		// syntactic sugar for infix operator and let binding
-		{											// { is the same as (let, } is the same as )
-			+ add - sub x mul / div % mod			// short hand for common operator
-			== eq != ne <= le < lt > gt >= ge
-
-			fib (lambda n (match [n <= 1]			// [n <= 1] is the same as (<= n 1)
-				true n 								// if n <= 1 then n
-				false {								// else p = fib(n-1), q = fib(n-2), p + q
-					p (fib [n - 1])
-					q (fib [n - 2])
-					[p + q]
-				}
-			))
-			(fib 20)
-		}
-
 		// simple example
 		(let
 			y 20
@@ -57,15 +28,40 @@ func testRuntime() {
 			second (get l 1)
 			(list length sublist second)
 		)
-		// some tests from chatgpt
-		(let f (lambda n (match (eq n 0) true 1 false (mul n (f (sub n 1)))))
-			 (f 5))
 
-		(let even (lambda x (match x 0 1 _ (odd (sub x 1))))
-			 odd  (lambda x (match x 0 0 _ (even (sub x 1))))
-			 (even 10))
-		
-		// inplace operator
+		// test recursion
+		(let
+			fib (lambda x (match (le x 1)
+				true x 								// if x <= 1 then x
+				false (let							// _ is the wildcard symbol
+					y (fib (sub x 1))				// else y = fib(x-1), z = fib(x-2), y + z
+					z (fib (sub x 2))
+					(add y z)
+				)
+			))
+			(fib 20)
+		)
+
+		// syntactic sugar for list
+		[[ 1 2 3 4 5 ]]
+
+		// rewrite fib
+		{											// { is the same as (let, } is the same as )
+			+ add - sub x mul / div % mod			// short hand for common operator
+			== eq != ne <= le < lt > gt >= ge
+
+			fib (lambda n (match [n <= 1]			// [n <= 1] is the same as (<= n 1)
+				true n 								// if n <= 1 then n
+				false {								// else p = fib(n-1), q = fib(n-2), p + q
+					p (fib [n - 1])
+					q (fib [n - 2])
+					[p + q]
+				}
+			))
+			(fib 20)
+		}
+
+		// more infix operator
 		(let
 			+ add
 			- sub
