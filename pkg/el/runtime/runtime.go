@@ -2,7 +2,8 @@ package runtime
 
 import (
 	"context"
-	"el/pkg/el/ast"
+	"el/pkg/el/expr"
+	obj "el/pkg/el/obj"
 	"errors"
 	"fmt"
 	"maps"
@@ -14,29 +15,29 @@ const (
 	MAX_STACK_DEPTH        = 1000
 )
 
-var NameNotFoundError = func(name Name) error {
-	return fmt.Errorf("object not found %s", name)
+var NameNotFoundError = func(name obj.Name) error {
+	return fmt.Errorf("obj not found %s", name)
 }
 var InterruptError = errors.New("interrupt")
 var TimeoutError = errors.New("timeout")
 var StackOverflowError = errors.New("stackoverflow")
 
 type Runtime struct {
-	ParseLiteral func(lit string) (Object, error)
-	Stack        FrameStack
+	ParseLiteral func(lit string) (obj.Object, error)
+	Stack        obj.FrameStack
 }
 
-func (r *Runtime) searchOnStack(name Name) (obj Object, err error) {
+func (r *Runtime) searchOnStack(name obj.Name) (out obj.Object, err error) {
 	err = NameNotFoundError(name)
-	r.Stack.Iter(func(frame Frame) bool {
+	r.Stack.Iter(func(frame obj.Frame) bool {
 		if o, ok := frame[name]; ok {
-			obj = o
+			out = o
 			err = nil
 			return false
 		}
 		return true
 	})
-	return obj, err
+	return out, err
 }
 
 type stepOptions struct {
@@ -58,7 +59,7 @@ func setOptionsToContext(ctx context.Context, o *stepOptions) context.Context {
 }
 
 // Step -
-func (r *Runtime) Step(ctx context.Context, e ast.Expr) (Object, error) {
+func (r *Runtime) Step(ctx context.Context, e expr.Expr) (obj.Object, error) {
 	if ctx.Err() != nil {
 		return nil, ctx.Err()
 	}
@@ -92,26 +93,26 @@ func (r *Runtime) Step(ctx context.Context, e ast.Expr) (Object, error) {
 		*/
 
 		switch e := e.(type) {
-		case ast.Name:
-			var v Object
+		case expr.Name:
+			var v obj.Object
 			// load literal
 			v, err := r.ParseLiteral(string(e))
 			if err == nil {
 				return v, nil
 			}
 			// find in stack for variable
-			v, err = r.searchOnStack(Name(e))
+			v, err = r.searchOnStack(obj.Name(e))
 			if err != nil {
 				return nil, err
 			}
 			return v, nil
 
-		case ast.Lambda:
-			getLambda := func(cmd ast.Expr) (Object, error) {
+		case expr.Lambda:
+			getLambda := func(cmd expr.Expr) (obj.Object, error) {
 				switch cmd := e.Cmd.(type) {
-				case ast.Name:
-					return r.searchOnStack(Name(cmd))
-				case ast.Lambda:
+				case expr.Name:
+					return r.searchOnStack(obj.Name(cmd))
+				case expr.Lambda:
 					return lambdaModule.Exec(ctx, r, cmd)
 				default:
 					return nil, fmt.Errorf("lambda: invalid command")
@@ -122,13 +123,13 @@ func (r *Runtime) Step(ctx context.Context, e ast.Expr) (Object, error) {
 				return nil, err
 			}
 			switch lambda := lambda.(type) {
-			case Module:
+			case obj.Module[Runtime]:
 				o, err := lambda.Exec(ctx, r, e)
 				if err != nil {
 					return nil, err
 				}
 				return o, nil
-			case Lambda:
+			case obj.Lambda:
 				// 1. evaluate arguments
 				args, err := r.stepMany(ctx, e.Args...)
 				if err != nil {
@@ -177,8 +178,8 @@ func (r *Runtime) Step(ctx context.Context, e ast.Expr) (Object, error) {
 	}
 }
 
-func (r *Runtime) stepMany(ctx context.Context, eList ...ast.Expr) ([]Object, error) {
-	outputs := make([]Object, len(eList))
+func (r *Runtime) stepMany(ctx context.Context, eList ...expr.Expr) ([]obj.Object, error) {
+	outputs := make([]obj.Object, len(eList))
 	for i, e := range eList {
 		if i == len(eList)-1 && TAIL_CALL_OPTIMIZATION {
 			ctx = setOptionsToContext(ctx, &stepOptions{
@@ -194,7 +195,7 @@ func (r *Runtime) stepMany(ctx context.Context, eList ...ast.Expr) ([]Object, er
 	return outputs, nil
 }
 
-func (r *Runtime) LoadModule(ms ...Module) *Runtime {
+func (r *Runtime) LoadModule(ms ...obj.Module[Runtime]) *Runtime {
 	head := r.Stack.Pop()
 	for _, m := range ms {
 		head[m.Name] = m
@@ -203,23 +204,23 @@ func (r *Runtime) LoadModule(ms ...Module) *Runtime {
 	return r
 }
 
-func unwrapArgs(args []Object) ([]Object, error) {
-	var unwrapArgsLoop func(args []Object) ([]Object, bool, error)
-	unwrapArgsLoop = func(args []Object) ([]Object, bool, error) {
+func unwrapArgs(args []obj.Object) ([]obj.Object, error) {
+	var unwrapArgsLoop func(args []obj.Object) ([]obj.Object, bool, error)
+	unwrapArgsLoop = func(args []obj.Object) ([]obj.Object, bool, error) {
 		unwrapped := false
-		unwrappedArgs := make([]Object, 0, len(args))
+		unwrappedArgs := make([]obj.Object, 0, len(args))
 		for len(args) > 0 {
 			head := args[0]
-			if _, ok := head.(Unwrap); ok {
+			if _, ok := head.(obj.Unwrap); ok {
 				if len(args) <= 1 {
 					return unwrappedArgs, unwrapped, errors.New("unwrapping argument empty")
 				}
 				switch next := args[1].(type) {
-				case List:
+				case obj.List:
 					unwrappedArgs = append(unwrappedArgs, next...)
 					args = args[2:]
 					unwrapped = true
-				case Unwrap: // nested unwrap
+				case obj.Unwrap: // nested unwrap
 					unwrappedArgs = append(unwrappedArgs, head)
 					args = args[1:]
 				default:

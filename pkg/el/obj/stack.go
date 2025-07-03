@@ -1,4 +1,4 @@
-package runtime
+package obj
 
 type Name string
 
@@ -13,7 +13,7 @@ type FrameStack interface {
 	Iter(func(Frame) bool)
 }
 
-func newFrameStack() FrameStack {
+func NewFrameStack() FrameStack {
 	return &frameStack{
 		stack: []Frame{
 			{},

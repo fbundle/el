@@ -2,7 +2,8 @@ package runtime
 
 import (
 	"context"
-	"el/pkg/el/ast"
+	"el/pkg/el/expr"
+	obj "el/pkg/el/obj"
 	"errors"
 	"fmt"
 	"maps"
@@ -10,20 +11,20 @@ import (
 
 var InternalError = errors.New("internal")
 
-var letModule = Module{
+var letModule = obj.Module[Runtime]{
 	Name: "let",
-	Exec: func(ctx context.Context, r *Runtime, e ast.Lambda) (Object, error) {
-		if e.Cmd.(ast.Name) != "let" {
+	Exec: func(ctx context.Context, r *Runtime, e expr.Lambda) (obj.Object, error) {
+		if e.Cmd.(expr.Name) != "let" {
 			return nil, InternalError
 		}
 		if len(e.Args) < 1 {
 			return nil, fmt.Errorf("let requires at least 1 arguments")
 		}
-		r.Stack.Push(Frame{})
+		r.Stack.Push(obj.Frame{})
 		defer r.Stack.Pop()
 
 		for i := 0; i < len(e.Args)-1; i += 2 {
-			lvalue, ok := e.Args[i].(ast.Name)
+			lvalue, ok := e.Args[i].(expr.Name)
 			if !ok {
 				return nil, fmt.Errorf("lvalue must be a name")
 			}
@@ -31,7 +32,7 @@ var letModule = Module{
 			if err != nil {
 				return nil, err
 			}
-			name := Name(lvalue)
+			name := obj.Name(lvalue)
 			// update stack
 			head := r.Stack.Pop()
 			head[name] = rvalue
@@ -46,26 +47,26 @@ var letModule = Module{
 	Man: "module: (let x 3) - assign value 3 to local variable x",
 }
 
-var lambdaModule = Module{
+var lambdaModule = obj.Module[Runtime]{
 	Name: "lambda",
-	Exec: func(ctx context.Context, r *Runtime, e ast.Lambda) (Object, error) {
-		if e.Cmd.(ast.Name) != "lambda" {
+	Exec: func(ctx context.Context, r *Runtime, e expr.Lambda) (obj.Object, error) {
+		if e.Cmd.(expr.Name) != "lambda" {
 			return nil, InternalError
 		}
 		if len(e.Args) < 1 {
 			return nil, fmt.Errorf("lambda requires at least 1 arguments")
 		}
-		v := Lambda{
+		v := obj.Lambda{
 			Params:  nil,
 			Impl:    nil,
 			Closure: nil,
 		}
 		for i := 0; i < len(e.Args)-1; i++ {
-			lvalue, ok := e.Args[i].(ast.Name)
+			lvalue, ok := e.Args[i].(expr.Name)
 			if !ok {
 				return nil, fmt.Errorf("lvalue must be a name")
 			}
-			name := Name(lvalue)
+			name := obj.Name(lvalue)
 			v.Params = append(v.Params, name)
 		}
 		v.Impl = e.Args[len(e.Args)-1]
@@ -78,10 +79,10 @@ var lambdaModule = Module{
 	Man: "module: (lambda x y (add x y) - declare a function",
 }
 
-var matchModule = Module{
+var matchModule = obj.Module[Runtime]{
 	Name: "match",
-	Exec: func(ctx context.Context, r *Runtime, e ast.Lambda) (Object, error) {
-		if e.Cmd.(ast.Name) != "match" {
+	Exec: func(ctx context.Context, r *Runtime, e expr.Lambda) (obj.Object, error) {
+		if e.Cmd.(expr.Name) != "match" {
 			return nil, InternalError
 		}
 		if len(e.Args) < 2 {
@@ -98,7 +99,7 @@ var matchModule = Module{
 				if err != nil {
 					return 0, err
 				}
-				if _, ok := comp.(Wildcard); ok || comp == cond {
+				if _, ok := comp.(obj.Wildcard); ok || comp == cond {
 					return i, nil
 				}
 			}
