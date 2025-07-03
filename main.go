@@ -29,6 +29,15 @@ func testRuntime() {
 			(list length sublist second)
 		)
 
+		// test tco
+		(let
+			count (lambda n (match (le n 0)
+				true 0 								// if n <= 0 then 0
+				false (add n (count (sub n 1)))		// else n + count(n-1)
+			))
+			count 2000
+		)
+
 		// test recursion
 		(let
 			fib (lambda x (match (le x 1)
