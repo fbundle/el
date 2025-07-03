@@ -57,7 +57,16 @@ func testRuntime() {
 		(let even (lambda x (match x 0 1 _ (odd (sub x 1))))
 			 odd  (lambda x (match x 0 0 _ (even (sub x 1))))
 			 (even 10))
-
+		
+		// inplace operator
+		(let
+			+ add
+			- sub
+			x mul
+			/ div
+			% mod
+			[ 1 + 2 - 3 + 4 ]
+		)
 	`)
 
 	r := el.NewBasicRuntime()
@@ -65,7 +74,7 @@ func testRuntime() {
 	var err error
 	ctx := context.Background()
 	for len(tokens) > 0 {
-		expr, tokens, err = el.Parse(tokens)
+		expr, tokens, err = el.ParseWithInplaceOperator(tokens)
 		if err != nil {
 			panic(err)
 		}
