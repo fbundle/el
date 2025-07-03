@@ -1,6 +1,6 @@
 package el
 
-type Frame = map[string]Object
+type Frame = map[NameExpr]Object
 
 func newFrameStack() Stack {
 	return &frameStack{

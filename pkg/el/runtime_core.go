@@ -13,7 +13,7 @@ const (
 	MAX_STACK_DEPTH        = 1000
 )
 
-var NameNotFoundError = func(name string) error {
+var NameNotFoundError = func(name NameExpr) error {
 	return fmt.Errorf("object not found %s", name)
 }
 var InterruptError = errors.New("interrupt")
@@ -33,13 +33,13 @@ func (r *Runtime) LoadModule(ms ...Module) *Runtime {
 	return r
 }
 
-func (r *Runtime) LoadConstant(name string, value Object) *Runtime {
+func (r *Runtime) LoadConstant(name NameExpr, value Object) *Runtime {
 	_, frame := r.Stack.Pop()
 	frame[name] = value
 	return r
 }
 
-func (r *Runtime) searchOnStack(name string) (Object, error) {
+func (r *Runtime) searchOnStack(name NameExpr) (Object, error) {
 	var stack Stack = r.Stack
 	var frame Frame
 	for stack.Depth() > 0 {
@@ -112,7 +112,7 @@ func (r *Runtime) Step(ctx context.Context, expr Expr) (Object, error) {
 				return v, nil
 			}
 			// find in stack for variable
-			v, err = r.searchOnStack(string(expr))
+			v, err = r.searchOnStack(expr)
 			if err != nil {
 				return nil, err
 			}
