@@ -107,17 +107,13 @@ func ParseWithInfixOperator(tokenList []Token) (Expr, []Token, error) {
 		if err != nil {
 			return nil, tokenList, err
 		}
-		switch len(argList) {
-		case 0:
+		if len(argList) == 0 {
 			return nil, tokenList, errors.New("empty LambdaExpr")
-		case 1:
-			return argList[0], tokenList, nil
-		default:
-			return LambdaExpr{
-				Cmd:  argList[0],
-				Args: argList[1:],
-			}, tokenList, nil
 		}
+		return LambdaExpr{
+			Cmd:  argList[0],
+			Args: argList[1:],
+		}, tokenList, nil
 	} else if head == "[" {
 		argList, tokenList, err := parseUntilClose(tokenList, "]", ParseWithInfixOperator)
 		if err != nil {
