@@ -10,8 +10,7 @@ type Expr interface {
 	MustTypeExpr() // for type-safety every Expr must implement this
 }
 
-// NameExpr : a name, a number, a string, etc.
-// e.g. name
+// NameExpr - a name, a number, a string, etc.
 type NameExpr string
 
 func (e NameExpr) String() string {
