@@ -55,9 +55,9 @@ var lambdaModule = Module{
 			return nil, fmt.Errorf("lambda requires at least 1 arguments")
 		}
 		v := Lambda{
-			Params: nil,
-			Impl:   nil,
-			Frame:  nil,
+			Params:  nil,
+			Impl:    nil,
+			Closure: nil,
 		}
 		for i := 0; i < len(expr.Args)-1; i++ {
 			lvalue, ok := expr.Args[i].(NameExpr)
@@ -70,7 +70,7 @@ var lambdaModule = Module{
 		v.Impl = expr.Args[len(expr.Args)-1]
 		// capture only the top of Stack
 		_, frame := r.Stack.Pop()
-		v.Frame = maps.Clone(frame)
+		v.Closure = maps.Clone(frame)
 		return v, nil
 	},
 	Man: "module: (lambda x y (add x y) - declare a function",

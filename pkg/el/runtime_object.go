@@ -40,13 +40,13 @@ func (w Wildcard) String() string {
 func (w Wildcard) MustTypeObject() {}
 
 type Lambda struct {
-	Params []string `json:"params,omitempty"`
-	Impl   Expr     `json:"impl,omitempty"`
-	Frame  Frame    `json:"frame,omitempty"`
+	Params  []string `json:"params,omitempty"`
+	Impl    Expr     `json:"impl,omitempty"`
+	Closure Frame    `json:"closure,omitempty"`
 }
 
 func (l Lambda) String() string {
-	s := fmt.Sprintf("(<frame_%p>; lambda ", l.Frame)
+	s := fmt.Sprintf("(<closure_%p>; lambda ", l.Closure)
 	for _, param := range l.Params {
 		s += param + " "
 	}

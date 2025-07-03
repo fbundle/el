@@ -122,7 +122,7 @@ func (r *Runtime) Step(ctx context.Context, expr Expr) (Object, error) {
 					return nil, err
 				}
 				// 2. make local frame from captured frame and arguments
-				localFrame := maps.Clone(lambda.Frame)
+				localFrame := maps.Clone(lambda.Closure)
 				for i, paramName := range lambda.Params {
 					localFrame[paramName] = args[i]
 				}
@@ -139,7 +139,7 @@ func (r *Runtime) Step(ctx context.Context, expr Expr) (Object, error) {
 				if err != nil {
 					return nil, err
 				}
-				// 5. pop Frame from Stack
+				// 5. pop Closure from Stack
 				if options.tailCall {
 				} else {
 					r.Stack, _ = r.Stack.Pop()
