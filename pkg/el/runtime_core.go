@@ -117,6 +117,9 @@ func (r *Runtime) Step(ctx context.Context, expr Expr) (Object, error) {
 				return o, nil
 			case Lambda:
 				// 1. evaluate arguments
+				if len(expr.Args) != len(lambda.Params) {
+					return nil, fmt.Errorf("lambda: expected %d arguments, got %d", len(lambda.Params), len(expr.Args))
+				}
 				args, err := r.stepMany(ctx, expr.Args...)
 				if err != nil {
 					return nil, err
