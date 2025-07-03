@@ -2,7 +2,7 @@ package runtime
 
 import (
 	"context"
-	"el/pkg/el/parser"
+	"el/pkg/el/expr"
 	"errors"
 	"fmt"
 )
@@ -30,7 +30,7 @@ func (r *Runtime) LoadExtension(es ...Extension) *Runtime {
 func makeModuleFromExtension(ext Extension) Module {
 	return Module{
 		Name: ext.Name,
-		Exec: func(ctx context.Context, r *Runtime, e parser.Lambda) (Object, error) {
+		Exec: func(ctx context.Context, r *Runtime, e expr.Lambda) (Object, error) {
 			args, err := r.stepMany(ctx, e.Args...)
 			if err != nil {
 				return nil, err
