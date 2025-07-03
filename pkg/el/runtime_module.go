@@ -30,9 +30,10 @@ var letModule = Module{
 			if err != nil {
 				return nil, err
 			}
+			name := Name(lvalue)
 			// update stack
 			head := r.Stack.Pop()
-			head[lvalue] = rvalue
+			head[name] = rvalue
 			r.Stack.Push(head)
 		}
 		value, err := r.Step(ctx, expr.Args[len(expr.Args)-1])
@@ -63,10 +64,11 @@ var lambdaModule = Module{
 			if !ok {
 				return nil, fmt.Errorf("lvalue must be a name")
 			}
-			v.Params = append(v.Params, lvalue)
+			name := Name(lvalue)
+			v.Params = append(v.Params, name)
 		}
 		v.Impl = expr.Args[len(expr.Args)-1]
-		// capture only the top of Stack
+		// capture only the top of FrameStack
 		head := r.Stack.Pop()
 		v.Closure = maps.Clone(head)
 		r.Stack.Push(head)
@@ -197,7 +199,7 @@ var unitExtension = Extension{
 	Man: "module: (unit 1) - wrap a value in unit",
 }
 
-func makeArithExtension(name NameExpr, op func(vs ...Int) (Int, error)) Extension {
+func makeArithExtension(name Name, op func(vs ...Int) (Int, error)) Extension {
 	return Extension{
 		Name: name,
 		Exec: func(ctx context.Context, values ...Object) (Object, error) {

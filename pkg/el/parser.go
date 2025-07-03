@@ -23,7 +23,7 @@ func (e NameExpr) MustTypeExpr() {}
 // LambdaExpr : S-expression - every enclosed by a pair of parentheses
 // e.g. (cmd ...)
 type LambdaExpr struct {
-	Cmd  NameExpr
+	Cmd  Name
 	Args []Expr
 }
 
@@ -78,7 +78,7 @@ func Parse(tokenList []Token) (Expr, []Token, error) {
 		argList = append(argList, arg)
 	}
 	expr := LambdaExpr{
-		Cmd:  NameExpr(cmd),
+		Cmd:  Name(cmd),
 		Args: argList,
 	}
 	return expr, tokenList, err

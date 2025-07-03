@@ -6,7 +6,7 @@ import (
 )
 
 type Extension struct {
-	Name NameExpr
+	Name Name
 	Exec func(ctx context.Context, values ...Object) (Object, error)
 	Man  string
 }

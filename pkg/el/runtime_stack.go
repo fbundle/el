@@ -1,8 +1,11 @@
 package el
 
-type Frame = map[NameExpr]Object
+type Name string
 
-func newFrameStack() Stack {
+// Frame - a collection of bindings NameExpr -> Object
+type Frame = map[Name]Object
+
+func newFrameStack() FrameStack {
 	return &frameStack{
 		stack: []Frame{
 			{},
@@ -10,8 +13,8 @@ func newFrameStack() Stack {
 	}
 }
 
-// Stack - call stack
-type Stack interface {
+// FrameStack - stack of frames
+type FrameStack interface {
 	Push(Frame)
 	Pop() Frame
 	Depth() uint

@@ -13,7 +13,7 @@ const (
 	MAX_STACK_DEPTH        = 1000
 )
 
-var NameNotFoundError = func(name NameExpr) error {
+var NameNotFoundError = func(name Name) error {
 	return fmt.Errorf("object not found %s", name)
 }
 var InterruptError = errors.New("interrupt")
@@ -22,7 +22,7 @@ var StackOverflowError = errors.New("stackoverflow")
 
 type Runtime struct {
 	ParseLiteral func(lit string) (Object, error)
-	Stack        Stack
+	Stack        FrameStack
 }
 
 func (r *Runtime) LoadModule(ms ...Module) *Runtime {
@@ -34,14 +34,14 @@ func (r *Runtime) LoadModule(ms ...Module) *Runtime {
 	return r
 }
 
-func (r *Runtime) LoadConstant(name NameExpr, value Object) *Runtime {
+func (r *Runtime) LoadConstant(name Name, value Object) *Runtime {
 	head := r.Stack.Pop()
 	head[name] = value
 	r.Stack.Push(head)
 	return r
 }
 
-func (r *Runtime) searchOnStack(name NameExpr) (obj Object, err error) {
+func (r *Runtime) searchOnStack(name Name) (obj Object, err error) {
 	err = NameNotFoundError(name)
 	r.Stack.Iter(func(frame Frame) bool {
 		if o, ok := frame[name]; ok {
@@ -115,7 +115,7 @@ func (r *Runtime) Step(ctx context.Context, expr Expr) (Object, error) {
 				return v, nil
 			}
 			// find in stack for variable
-			v, err = r.searchOnStack(expr)
+			v, err = r.searchOnStack(Name(expr))
 			if err != nil {
 				return nil, err
 			}
@@ -156,7 +156,7 @@ func (r *Runtime) Step(ctx context.Context, expr Expr) (Object, error) {
 					r.Stack.Push(localFrame)
 				}
 				defer func() {
-					// 5. pop Closure from Stack
+					// 5. pop Closure from FrameStack
 					if options.tailCall {
 					} else {
 						r.Stack.Pop()
