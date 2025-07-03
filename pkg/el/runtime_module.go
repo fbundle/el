@@ -188,17 +188,6 @@ var sliceExtension = Extension{
 	Man: "module: (get (list 1 2 3) (list 0 2)) - get the 0th and 2nd element of a list",
 }
 
-var unitExtension = Extension{
-	Name: "unit",
-	Exec: func(ctx context.Context, values ...Object) (Object, error) {
-		if len(values) != 1 {
-			return nil, fmt.Errorf("unit requires 1 argument")
-		}
-		return values[0], nil
-	},
-	Man: "module: (unit 1) - wrap a value in unit",
-}
-
 func makeArithExtension(name Name, op func(vs ...Int) (Int, error)) Extension {
 	return Extension{
 		Name: name,

@@ -135,17 +135,21 @@ func (r *Runtime) Step(ctx context.Context, expr Expr) (Object, error) {
 				return o, nil
 			case Lambda:
 				// 1. evaluate arguments
-				if len(expr.Args) != len(lambda.Params) {
-					return nil, fmt.Errorf("lambda: expected %d arguments, got %d", len(lambda.Params), len(expr.Args))
-				}
 				args, err := r.stepMany(ctx, expr.Args...)
 				if err != nil {
 					return nil, err
 				}
+				unwrappedArgs, err := unwrapArgs(args)
+				if err != nil {
+					return nil, err
+				}
+				if len(unwrappedArgs) != len(lambda.Params) {
+					return nil, fmt.Errorf("lambda: expected %d arguments, got %d", len(lambda.Params), len(unwrappedArgs))
+				}
 				// 2. make local frame from captured frame and arguments
 				localFrame := maps.Clone(lambda.Closure)
 				for i, paramName := range lambda.Params {
-					localFrame[paramName] = args[i]
+					localFrame[paramName] = unwrappedArgs[i]
 				}
 				// 3. push local frame to stack if not tail call
 				if options.tailCall {

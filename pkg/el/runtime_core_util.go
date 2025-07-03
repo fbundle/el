@@ -26,28 +26,34 @@ func makeModuleFromExtension(e Extension) Module {
 			if err != nil {
 				return nil, err
 			}
-			var unwrappedArgs []Object
-			i := 0
-			for i < len(args) {
-				if _, ok := args[i].(Unwrap); ok {
-					if i+1 >= len(args) {
-						return nil, errors.New("unwrapping arguments must be a list")
-					}
-					argsList, ok := args[i+1].(List)
-					if !ok {
-						return nil, errors.New("unwrapping arguments must be a list")
-					}
-					for _, elem := range argsList {
-						unwrappedArgs = append(unwrappedArgs, elem)
-					}
-					i += 2
-				} else {
-					unwrappedArgs = append(unwrappedArgs, args[i])
-					i++
-				}
+			unwrappedArgs, err := unwrapArgs(args)
+			if err != nil {
+				return nil, err
 			}
 			return e.Exec(ctx, unwrappedArgs...)
 		},
 		Man: e.Man,
 	}
+}
+
+func unwrapArgs(args []Object) ([]Object, error) {
+	unwrappedArgs := make([]Object, 0, len(args))
+	for len(args) > 0 {
+		head := args[0]
+		if _, ok := head.(Unwrap); ok {
+			if len(args) <= 1 {
+				return unwrappedArgs, errors.New("unwrapping argument empty")
+			}
+			next, ok := args[1].(List)
+			if !ok {
+				return unwrappedArgs, errors.New("unwrapping argument must be a list")
+			}
+			unwrappedArgs = append(unwrappedArgs, next...)
+			args = args[2:]
+		} else {
+			unwrappedArgs = append(unwrappedArgs, head)
+			args = args[1:]
+		}
+	}
+	return unwrappedArgs, nil
 }

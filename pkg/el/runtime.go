@@ -41,7 +41,7 @@ func NewCoreRuntime() *Runtime {
 func NewBasicRuntime() *Runtime {
 	return NewCoreRuntime().
 		// list extension
-		LoadExtension(listExtension, lenExtension, rangeExtension, sliceExtension, unitExtension).
+		LoadExtension(listExtension, lenExtension, rangeExtension, sliceExtension).
 		// arithmetic extension
 		LoadConstant("true", True).LoadConstant("false", False).
 		LoadExtension(eqExtension, neExtension, ltExtension, leExtension, gtExtension, geExtension).
