@@ -39,8 +39,8 @@ func testRuntime() {
 				false (let
 					first_elem (get l 0)
 					first_value (f first_elem)
-					rest_list (slice l (range 1 (len l)))
-					rest_values (map rest_list f)
+					rest (slice l (range 1 (len l)))
+					rest_values (map rest f)
 					(list first_value *rest_values)
 				)
 			))
