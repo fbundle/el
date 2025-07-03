@@ -27,8 +27,8 @@ func (r *Runtime) LoadExtension(es ...Extension) *Runtime {
 	return r
 }
 
-func makeModuleFromExtension(ext Extension) Module {
-	return Module{
+func makeModuleFromExtension(ext Extension) Module[Exec] {
+	return Module[Exec]{
 		Name: ext.Name,
 		Exec: func(ctx context.Context, r *Runtime, e expr.Lambda) (Object, error) {
 			args, err := r.stepMany(ctx, e.Args...)

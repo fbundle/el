@@ -126,7 +126,7 @@ func testRuntime() {
 		if err != nil {
 			panic(err)
 		}
-		fmt.Println("e\t", e)
+		fmt.Println("expr\t", e)
 		fmt.Println("output\t", o)
 		fmt.Println()
 	}

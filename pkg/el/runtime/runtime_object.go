@@ -1,7 +1,6 @@
 package runtime
 
 import (
-	"context"
 	"el/pkg/el/expr"
 	"fmt"
 	"strings"
@@ -58,17 +57,17 @@ func (l Lambda) String() string {
 
 func (l Lambda) MustTypeObject() {}
 
-type Module struct {
+type Module[T any] struct {
 	Name Name `json:"name,omitempty"`
-	Exec func(ctx context.Context, r *Runtime, e expr.Lambda) (Object, error)
+	Exec T
 	Man  string `json:"man,omitempty"`
 }
 
-func (m Module) String() string {
+func (m Module[T]) String() string {
 	return fmt.Sprintf("[%s]", m.Man)
 }
 
-func (m Module) MustTypeObject() {}
+func (m Module[T]) MustTypeObject() {}
 
 type List []Object
 

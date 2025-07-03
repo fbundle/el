@@ -8,9 +8,11 @@ import (
 	"maps"
 )
 
+type Exec = func(ctx context.Context, r *Runtime, e expr.Lambda) (Object, error)
+
 var InternalError = errors.New("internal")
 
-var letModule = Module{
+var letModule = Module[Exec]{
 	Name: "let",
 	Exec: func(ctx context.Context, r *Runtime, e expr.Lambda) (Object, error) {
 		if e.Cmd.(expr.Name) != "let" {
@@ -46,7 +48,7 @@ var letModule = Module{
 	Man: "module: (let x 3) - assign value 3 to local variable x",
 }
 
-var lambdaModule = Module{
+var lambdaModule = Module[Exec]{
 	Name: "lambda",
 	Exec: func(ctx context.Context, r *Runtime, e expr.Lambda) (Object, error) {
 		if e.Cmd.(expr.Name) != "lambda" {
@@ -78,7 +80,7 @@ var lambdaModule = Module{
 	Man: "module: (lambda x y (add x y) - declare a function",
 }
 
-var matchModule = Module{
+var matchModule = Module[Exec]{
 	Name: "match",
 	Exec: func(ctx context.Context, r *Runtime, e expr.Lambda) (Object, error) {
 		if e.Cmd.(expr.Name) != "match" {

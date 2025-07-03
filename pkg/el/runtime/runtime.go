@@ -122,7 +122,7 @@ func (r *Runtime) Step(ctx context.Context, e expr.Expr) (Object, error) {
 				return nil, err
 			}
 			switch lambda := lambda.(type) {
-			case Module:
+			case Module[Exec]:
 				o, err := lambda.Exec(ctx, r, e)
 				if err != nil {
 					return nil, err
@@ -194,7 +194,7 @@ func (r *Runtime) stepMany(ctx context.Context, eList ...expr.Expr) ([]Object, e
 	return outputs, nil
 }
 
-func (r *Runtime) LoadModule(ms ...Module) *Runtime {
+func (r *Runtime) LoadModule(ms ...Module[Exec]) *Runtime {
 	head := r.Stack.Pop()
 	for _, m := range ms {
 		head[m.Name] = m
