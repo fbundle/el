@@ -192,44 +192,6 @@ func (r *Runtime) LoadModule(ms ...Module) *Runtime {
 	return r
 }
 
-func (r *Runtime) LoadConstant(name Name, value Object) *Runtime {
-	head := r.Stack.Pop()
-	head[name] = value
-	r.Stack.Push(head)
-	return r
-}
-
-type Extension struct {
-	Name Name
-	Exec func(ctx context.Context, values ...Object) (Object, error)
-	Man  string
-}
-
-func (r *Runtime) LoadExtension(es ...Extension) *Runtime {
-	for _, e := range es {
-		r.LoadModule(makeModuleFromExtension(e))
-	}
-	return r
-}
-
-func makeModuleFromExtension(e Extension) Module {
-	return Module{
-		Name: e.Name,
-		Exec: func(ctx context.Context, r *Runtime, expr LambdaExpr) (Object, error) {
-			args, err := r.stepMany(ctx, expr.Args...)
-			if err != nil {
-				return nil, err
-			}
-			unwrappedArgs, err := unwrapArgs(args)
-			if err != nil {
-				return nil, err
-			}
-			return e.Exec(ctx, unwrappedArgs...)
-		},
-		Man: e.Man,
-	}
-}
-
 func unwrapArgs(args []Object) ([]Object, error) {
 	unwrappedArgs := make([]Object, 0, len(args))
 	for len(args) > 0 {
