@@ -91,11 +91,15 @@ func (r *Runtime) Step(ctx context.Context, expr Expr) (Object, error) {
 		/*
 			the whole language is every simple
 				1. parse literal or search on stack
-				2. apply function: push a new frame, exec the function, pop
+				2. function application: push a new frame, exec the function, pop
 				3. builtin module
-					a. lambda binding: capture the current frame and save the implementation
-					b. let binding: push a new frame, exec the function, pop
-					c. match binding: eval and match
+					a. lambda: capture the current frame and save the implementation
+					b. let: push a new frame, exec the function, pop
+					c. match: eval and match
+
+			only let and function application push a new frame since
+				- let requires local scope to isolate variable bindings
+				- function application requires local scope since it previously captured variables in lambda
 		*/
 
 		switch expr := expr.(type) {
