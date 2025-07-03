@@ -62,14 +62,11 @@ func testRuntime() {
 		}
 
 		// more infix operator
-		(let
-			+ add
-			- sub
-			x mul
-			/ div
-			% mod
+		{
+			+ add - sub x mul / div % mod			// short hand for common operator
+			== eq != ne <= le < lt > gt >= ge
 			[1 + 2 - 3 + -4]
-		)
+		}
 	`))
 
 	r := el.NewBasicRuntime()
