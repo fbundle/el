@@ -26,29 +26,32 @@ type Runtime struct {
 }
 
 func (r *Runtime) LoadModule(ms ...Module) *Runtime {
-	_, frame := r.Stack.Pop()
+	head := r.Stack.Pop()
 	for _, m := range ms {
-		frame[m.Name] = m
+		head[m.Name] = m
 	}
+	r.Stack.Push(head)
 	return r
 }
 
 func (r *Runtime) LoadConstant(name NameExpr, value Object) *Runtime {
-	_, frame := r.Stack.Pop()
-	frame[name] = value
+	head := r.Stack.Pop()
+	head[name] = value
+	r.Stack.Push(head)
 	return r
 }
 
-func (r *Runtime) searchOnStack(name NameExpr) (Object, error) {
-	var stack Stack = r.Stack
-	var frame Frame
-	for stack.Depth() > 0 {
-		stack, frame = stack.Pop()
+func (r *Runtime) searchOnStack(name NameExpr) (obj Object, err error) {
+	err = NameNotFoundError(name)
+	r.Stack.Iter(func(frame Frame) bool {
 		if o, ok := frame[name]; ok {
-			return o, nil
+			obj = o
+			err = nil
+			return false
 		}
-	}
-	return nil, NameNotFoundError(name)
+		return true
+	})
+	return obj, err
 }
 
 type stepOptions struct {
@@ -146,16 +149,17 @@ func (r *Runtime) Step(ctx context.Context, expr Expr) (Object, error) {
 				}
 				// 3. push local frame to stack if not tail call
 				if options.tailCall {
-					_, frame := r.Stack.Pop()
-					maps.Copy(frame, localFrame)
+					head := r.Stack.Pop()
+					maps.Copy(head, localFrame)
+					r.Stack.Push(head)
 				} else {
-					r.Stack = r.Stack.Push(localFrame)
+					r.Stack.Push(localFrame)
 				}
 				defer func() {
 					// 5. pop Closure from Stack
 					if options.tailCall {
 					} else {
-						r.Stack, _ = r.Stack.Pop()
+						r.Stack.Pop()
 					}
 				}()
 

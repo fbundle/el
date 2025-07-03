@@ -18,10 +18,8 @@ var letModule = Module{
 		if len(expr.Args) < 1 {
 			return nil, fmt.Errorf("let requires at least 1 arguments")
 		}
-		r.Stack = r.Stack.Push(Frame{})
-		defer func() {
-			r.Stack, _ = r.Stack.Pop()
-		}()
+		r.Stack.Push(Frame{})
+		defer r.Stack.Pop()
 
 		for i := 0; i < len(expr.Args)-1; i += 2 {
 			lvalue, ok := expr.Args[i].(NameExpr)
@@ -33,8 +31,9 @@ var letModule = Module{
 				return nil, err
 			}
 			// update stack
-			_, frame := r.Stack.Pop()
-			frame[lvalue] = rvalue
+			head := r.Stack.Pop()
+			head[lvalue] = rvalue
+			r.Stack.Push(head)
 		}
 		value, err := r.Step(ctx, expr.Args[len(expr.Args)-1])
 		if err != nil {
@@ -68,8 +67,9 @@ var lambdaModule = Module{
 		}
 		v.Impl = expr.Args[len(expr.Args)-1]
 		// capture only the top of Stack
-		_, frame := r.Stack.Pop()
-		v.Closure = maps.Clone(frame)
+		head := r.Stack.Pop()
+		v.Closure = maps.Clone(head)
+		r.Stack.Push(head)
 		return v, nil
 	},
 	Man: "module: (lambda x y (add x y) - declare a function",
