@@ -151,16 +151,18 @@ func (r *Runtime) Step(ctx context.Context, expr Expr) (Object, error) {
 				} else {
 					r.Stack = r.Stack.Push(localFrame)
 				}
+				defer func() {
+					// 5. pop Closure from Stack
+					if options.tailCall {
+					} else {
+						r.Stack, _ = r.Stack.Pop()
+					}
+				}()
 
 				// 4. exec function
 				v, err := r.Step(ctx, lambda.Impl)
 				if err != nil {
 					return nil, err
-				}
-				// 5. pop Closure from Stack
-				if options.tailCall {
-				} else {
-					r.Stack, _ = r.Stack.Pop()
 				}
 				return v, nil
 			default:

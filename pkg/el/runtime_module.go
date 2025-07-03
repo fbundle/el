@@ -19,6 +19,9 @@ var letModule = Module{
 			return nil, fmt.Errorf("let requires at least 1 arguments")
 		}
 		r.Stack = r.Stack.Push(Frame{})
+		defer func() {
+			r.Stack, _ = r.Stack.Pop()
+		}()
 
 		for i := 0; i < len(expr.Args)-1; i += 2 {
 			lvalue, ok := expr.Args[i].(NameExpr)
@@ -38,8 +41,6 @@ var letModule = Module{
 		if err != nil {
 			return nil, err
 		}
-
-		r.Stack, _ = r.Stack.Pop()
 		return value, nil
 	},
 	Man: "module: (let x 3) - assign value 3 to local variable x",
