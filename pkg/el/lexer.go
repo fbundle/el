@@ -8,6 +8,16 @@ import (
 
 type Token = string
 
+func Tokenize(str string) []Token {
+	return tokenizeWithSplitCharacters(str, map[rune]struct{}{
+		'(': {},
+		')': {},
+		'*': {},
+		'[': {},
+		']': {},
+	})
+}
+
 func removeComments(str string) string {
 	lines := strings.Split(str, "\n")
 	var newLines []string
@@ -17,7 +27,7 @@ func removeComments(str string) string {
 	return strings.Join(newLines, "\n")
 }
 
-func Tokenize(str string) []Token {
+func tokenizeWithSplitCharacters(str string, splitCharacters map[rune]struct{}) []Token {
 	str = removeComments(str)
 
 	const (
@@ -25,12 +35,6 @@ func Tokenize(str string) []Token {
 		STATE_INSTRING
 		STATE_INSTRING_ESCAPE
 	)
-
-	specialChars := map[rune]struct{}{
-		'(': struct{}{},
-		')': struct{}{},
-		'*': struct{}{},
-	}
 
 	var tokens []Token
 	state := STATE_OUTSTRING
@@ -45,10 +49,10 @@ func Tokenize(str string) []Token {
 		switch state {
 		case STATE_OUTSTRING: // outside string
 			if unicode.IsSpace(ch) {
-				// flush buffer if seeing a whitespace
+				// flush buffer if seeing whitespace
 				flushBuffer()
-			} else if _, ok := specialChars[ch]; ok {
-				// special character is a separate token
+			} else if _, ok := splitCharacters[ch]; ok {
+				// split characters are tokenized immediately
 				flushBuffer()
 				buffer += string(ch)
 				flushBuffer()
