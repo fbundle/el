@@ -7,7 +7,7 @@ import (
 )
 
 func testRuntime() {
-	tokens := el.TokenizeWithInplaceOperator(el.Transpile(`
+	tokens := el.TokenizeWithInfixOperator(el.Transpile(`
 		// test recursion
 		(let
 			fib (lambda x (match (le x 1)
@@ -20,6 +20,8 @@ func testRuntime() {
 			))
 			(fib 20)
 		)
+
+		// syntactic sugar for infix operator and let binding
 		{											// { is the same as (let, } is the same as )
 			+ add - sub x mul / div % mod			// short hand for common operator
 			== eq != ne <= le < lt > gt >= ge
@@ -79,7 +81,7 @@ func testRuntime() {
 	var err error
 	ctx := context.Background()
 	for len(tokens) > 0 {
-		expr, tokens, err = el.ParseWithInplaceOperator(tokens)
+		expr, tokens, err = el.ParseWithInfixOperator(tokens)
 		if err != nil {
 			panic(err)
 		}

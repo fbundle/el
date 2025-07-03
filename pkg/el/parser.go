@@ -99,7 +99,7 @@ func Parse(tokenList []Token) (Expr, []Token, error) {
 	}
 }
 
-func ParseWithInplaceOperator(tokenList []Token) (Expr, []Token, error) {
+func ParseWithInfixOperator(tokenList []Token) (Expr, []Token, error) {
 	tokenList, head, err := pop(tokenList)
 	if err != nil {
 		return nil, tokenList, err
@@ -107,7 +107,7 @@ func ParseWithInplaceOperator(tokenList []Token) (Expr, []Token, error) {
 
 	if head == "(" {
 		// argList, tokenList, err := parseArgList("(", ")")
-		argList, tokenList, err := parseUntilClose(tokenList, ")", ParseWithInplaceOperator)
+		argList, tokenList, err := parseUntilClose(tokenList, ")", ParseWithInfixOperator)
 		if err != nil {
 			return nil, tokenList, err
 		}
@@ -127,15 +127,15 @@ func ParseWithInplaceOperator(tokenList []Token) (Expr, []Token, error) {
 			}, tokenList, nil
 		}
 	} else if head == "[" {
-		argList, tokenList, err := parseUntilClose(tokenList, "]", ParseWithInplaceOperator)
+		argList, tokenList, err := parseUntilClose(tokenList, "]", ParseWithInfixOperator)
 		if err != nil {
 			return nil, tokenList, err
 		}
 		if len(argList)%2 == 0 {
-			return nil, tokenList, errors.New("InplaceOperator must have an odd number of arguments")
+			return nil, tokenList, errors.New("InfixOperator must have an odd number of arguments")
 		}
-		var parseInplaceOperator func(argList []Expr) (Expr, error)
-		parseInplaceOperator = func(argList []Expr) (Expr, error) {
+		var parseInfixOperator func(argList []Expr) (Expr, error)
+		parseInfixOperator = func(argList []Expr) (Expr, error) {
 			// len argList is either 1 3 5 ...
 			if len(argList) == 1 {
 				return argList[0], nil
@@ -143,7 +143,7 @@ func ParseWithInplaceOperator(tokenList []Token) (Expr, []Token, error) {
 			argList, cmdExpr, right := argList[:len(argList)-2], argList[len(argList)-2], argList[len(argList)-1]
 			if nameExpr, ok := cmdExpr.(NameExpr); ok {
 				cmd := Name(nameExpr)
-				left, err := parseInplaceOperator(argList)
+				left, err := parseInfixOperator(argList)
 				if err != nil {
 					return nil, err
 				}
@@ -152,12 +152,12 @@ func ParseWithInplaceOperator(tokenList []Token) (Expr, []Token, error) {
 					Args: []Expr{left, right},
 				}, nil
 			} else {
-				return nil, errors.New("InplaceOperator must have a operator")
+				return nil, errors.New("InfixOperator must have a operator")
 			}
 
 		}
 
-		expr, err := parseInplaceOperator(argList)
+		expr, err := parseInfixOperator(argList)
 		if err != nil {
 			return nil, tokenList, err
 		}
