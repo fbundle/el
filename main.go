@@ -17,7 +17,8 @@ func testRuntime() {
 		)
 		
 		// list unwrapping
-		(add *(list 1 2 3) 4 *(list 5 6))		// equivalent to (add 1 2 3 4 5 6)
+		(add *(list 1 2 3) 4 *(list 5 6))				// equivalent to (add 1 2 3 4 5 6)
+		(add * * (list (list 2 3)) 4 *(list 5 6))		// nested unwrap
 
 		// list
 		(let

@@ -34,11 +34,11 @@ func makeModuleFromExtension(e Extension) Module {
 			if err != nil {
 				return nil, err
 			}
-			unwrappedArgs, err := unwrapArgs(args)
+			args, err = unwrapArgs(args)
 			if err != nil {
 				return nil, err
 			}
-			return e.Exec(ctx, unwrappedArgs...)
+			return e.Exec(ctx, args...)
 		},
 		Man: e.Man,
 	}

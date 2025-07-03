@@ -123,17 +123,17 @@ func (r *Runtime) Step(ctx context.Context, expr Expr) (Object, error) {
 				if err != nil {
 					return nil, err
 				}
-				unwrappedArgs, err := unwrapArgs(args)
+				args, err = unwrapArgs(args)
 				if err != nil {
 					return nil, err
 				}
-				if len(unwrappedArgs) != len(lambda.Params) {
-					return nil, fmt.Errorf("lambda: expected %d arguments, got %d", len(lambda.Params), len(unwrappedArgs))
+				if len(args) != len(lambda.Params) {
+					return nil, fmt.Errorf("lambda: expected %d arguments, got %d", len(lambda.Params), len(args))
 				}
 				// 2. make local frame from captured frame and arguments
 				localFrame := maps.Clone(lambda.Closure)
 				for i, paramName := range lambda.Params {
-					localFrame[paramName] = unwrappedArgs[i]
+					localFrame[paramName] = args[i]
 				}
 				// 3. push local frame to stack if not tail call
 				if options.tailCall {
@@ -193,23 +193,43 @@ func (r *Runtime) LoadModule(ms ...Module) *Runtime {
 }
 
 func unwrapArgs(args []Object) ([]Object, error) {
-	unwrappedArgs := make([]Object, 0, len(args))
-	for len(args) > 0 {
-		head := args[0]
-		if _, ok := head.(Unwrap); ok {
-			if len(args) <= 1 {
-				return unwrappedArgs, errors.New("unwrapping argument empty")
+	var unwrapArgsLoop func(args []Object) ([]Object, bool, error)
+	unwrapArgsLoop = func(args []Object) ([]Object, bool, error) {
+		unwrapped := false
+		unwrappedArgs := make([]Object, 0, len(args))
+		for len(args) > 0 {
+			head := args[0]
+			if _, ok := head.(Unwrap); ok {
+				if len(args) <= 1 {
+					return unwrappedArgs, unwrapped, errors.New("unwrapping argument empty")
+				}
+				switch next := args[1].(type) {
+				case List:
+					unwrappedArgs = append(unwrappedArgs, next...)
+					args = args[2:]
+					unwrapped = true
+				case Unwrap: // nested unwrap
+					unwrappedArgs = append(unwrappedArgs, head)
+					args = args[1:]
+				default:
+					return unwrappedArgs, unwrapped, errors.New("unwrapping argument must be a list or an unwrap")
+				}
+			} else {
+				unwrappedArgs = append(unwrappedArgs, head)
+				args = args[1:]
 			}
-			next, ok := args[1].(List)
-			if !ok {
-				return unwrappedArgs, errors.New("unwrapping argument must be a list")
-			}
-			unwrappedArgs = append(unwrappedArgs, next...)
-			args = args[2:]
-		} else {
-			unwrappedArgs = append(unwrappedArgs, head)
-			args = args[1:]
+		}
+		return unwrappedArgs, unwrapped, nil
+	}
+	var unwrapped bool
+	var err error
+	for { // keep unwrapping
+		args, unwrapped, err = unwrapArgsLoop(args)
+		if err != nil {
+			return nil, err
+		}
+		if !unwrapped {
+			return args, nil
 		}
 	}
-	return unwrappedArgs, nil
 }
