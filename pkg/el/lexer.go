@@ -8,16 +8,22 @@ import (
 
 type Token = string
 
-func Tokenize(str string) []Token {
-	return tokenizeWithSplitCharacters(str, map[rune]struct{}{
+func Tokenize(s string) []Token {
+	return tokenizeWithSplitCharacters(s, map[rune]struct{}{
 		'(': {},
 		')': {},
 		'*': {},
 	})
 }
 
-func TokenizeWithInfixOperator(str string) []Token {
-	return tokenizeWithSplitCharacters(str, map[rune]struct{}{
+func TokenizeWithInfixOperator(s string) []Token {
+	// transpile first
+	s = strings.ReplaceAll(s, "[[", " (list ")
+	s = strings.ReplaceAll(s, "]]", " ) ")
+	s = strings.ReplaceAll(s, "{", " (let ")
+	s = strings.ReplaceAll(s, "}", " ) ")
+
+	return tokenizeWithSplitCharacters(s, map[rune]struct{}{
 		'(': {},
 		')': {},
 		'*': {},

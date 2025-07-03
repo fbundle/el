@@ -7,7 +7,7 @@ import (
 )
 
 func testRuntime() {
-	tokens := el.TokenizeWithInfixOperator(el.Transpile(`
+	tokens := el.TokenizeWithInfixOperator(`
 		// simple example
 		(let
 			y 20
@@ -90,7 +90,7 @@ func testRuntime() {
 			== eq != ne <= le < lt > gt >= ge
 			[1 + 2 - 3 + -4]
 		}
-	`))
+	`)
 
 	r := el.NewBasicRuntime()
 	var expr el.Expr
