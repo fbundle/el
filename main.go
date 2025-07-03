@@ -45,7 +45,7 @@ func testRuntime() {
 				)
 			))
 
-			another (map (range 0 10) (lambda x [x mul 2]))				// implement map
+			another (map (range 0 10) (lambda x [x mul 2]))				// implement map -> hence for loop
 			
 			(list length sublist second another)
 		)
