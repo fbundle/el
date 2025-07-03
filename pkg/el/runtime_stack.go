@@ -10,7 +10,7 @@ func newFrameStack() Stack {
 	}
 }
 
-// Stack - read-only stack
+// Stack - call stack
 type Stack interface {
 	Push(Frame)
 	Pop() Frame
