@@ -2,7 +2,7 @@ package runtime
 
 import (
 	"context"
-	"el/pkg/el/expr"
+	"el/pkg/el/ast"
 	"fmt"
 	"strings"
 )
@@ -41,9 +41,9 @@ func (w Wildcard) String() string {
 func (w Wildcard) MustTypeObject() {}
 
 type Lambda struct {
-	Params  []Name    `json:"params,omitempty"`
-	Impl    expr.Expr `json:"impl,omitempty"`
-	Closure Frame     `json:"closure,omitempty"`
+	Params  []Name   `json:"params,omitempty"`
+	Impl    ast.Expr `json:"impl,omitempty"`
+	Closure Frame    `json:"closure,omitempty"`
 }
 
 func (l Lambda) String() string {
@@ -60,7 +60,7 @@ func (l Lambda) MustTypeObject() {}
 
 type Module struct {
 	Name Name `json:"name,omitempty"`
-	Exec func(ctx context.Context, r *Runtime, e expr.Lambda) (Object, error)
+	Exec func(ctx context.Context, r *Runtime, e ast.Lambda) (Object, error)
 	Man  string `json:"man,omitempty"`
 }
 

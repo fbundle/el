@@ -2,13 +2,13 @@ package main
 
 import (
 	"context"
-	"el/pkg/el/expr"
+	"el/pkg/el/ast"
 	"el/pkg/el/runtime"
 	"fmt"
 )
 
 func testRuntime() {
-	tokens := expr.TokenizeWithInfixOperator(`
+	tokens := ast.TokenizeWithInfixOperator(`
 		// simple example
 		(let
 			y 20
@@ -114,11 +114,11 @@ func testRuntime() {
 	`)
 
 	r := runtime.NewBasicRuntime()
-	var e expr.Expr
+	var e ast.Expr
 	var err error
 	ctx := context.Background()
 	for len(tokens) > 0 {
-		e, tokens, err = expr.ParseWithInfixOperator(tokens)
+		e, tokens, err = ast.ParseWithInfixOperator(tokens)
 		if err != nil {
 			panic(err)
 		}

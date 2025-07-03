@@ -2,7 +2,7 @@ package runtime
 
 import (
 	"context"
-	"el/pkg/el/expr"
+	"el/pkg/el/ast"
 	"errors"
 	"fmt"
 	"maps"
@@ -12,8 +12,8 @@ var InternalError = errors.New("internal")
 
 var letModule = Module{
 	Name: "let",
-	Exec: func(ctx context.Context, r *Runtime, e expr.Lambda) (Object, error) {
-		if e.Cmd.(expr.Name) != "let" {
+	Exec: func(ctx context.Context, r *Runtime, e ast.Lambda) (Object, error) {
+		if e.Cmd.(ast.Name) != "let" {
 			return nil, InternalError
 		}
 		if len(e.Args) < 1 {
@@ -23,7 +23,7 @@ var letModule = Module{
 		defer r.Stack.Pop()
 
 		for i := 0; i < len(e.Args)-1; i += 2 {
-			lvalue, ok := e.Args[i].(expr.Name)
+			lvalue, ok := e.Args[i].(ast.Name)
 			if !ok {
 				return nil, fmt.Errorf("lvalue must be a name")
 			}
@@ -48,8 +48,8 @@ var letModule = Module{
 
 var lambdaModule = Module{
 	Name: "lambda",
-	Exec: func(ctx context.Context, r *Runtime, e expr.Lambda) (Object, error) {
-		if e.Cmd.(expr.Name) != "lambda" {
+	Exec: func(ctx context.Context, r *Runtime, e ast.Lambda) (Object, error) {
+		if e.Cmd.(ast.Name) != "lambda" {
 			return nil, InternalError
 		}
 		if len(e.Args) < 1 {
@@ -61,7 +61,7 @@ var lambdaModule = Module{
 			Closure: nil,
 		}
 		for i := 0; i < len(e.Args)-1; i++ {
-			lvalue, ok := e.Args[i].(expr.Name)
+			lvalue, ok := e.Args[i].(ast.Name)
 			if !ok {
 				return nil, fmt.Errorf("lvalue must be a name")
 			}
@@ -80,8 +80,8 @@ var lambdaModule = Module{
 
 var matchModule = Module{
 	Name: "match",
-	Exec: func(ctx context.Context, r *Runtime, e expr.Lambda) (Object, error) {
-		if e.Cmd.(expr.Name) != "match" {
+	Exec: func(ctx context.Context, r *Runtime, e ast.Lambda) (Object, error) {
+		if e.Cmd.(ast.Name) != "match" {
 			return nil, InternalError
 		}
 		if len(e.Args) < 2 {

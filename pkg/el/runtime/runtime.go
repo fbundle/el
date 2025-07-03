@@ -2,7 +2,7 @@ package runtime
 
 import (
 	"context"
-	"el/pkg/el/expr"
+	"el/pkg/el/ast"
 	"errors"
 	"fmt"
 	"maps"
@@ -58,7 +58,7 @@ func setOptionsToContext(ctx context.Context, o *stepOptions) context.Context {
 }
 
 // Step -
-func (r *Runtime) Step(ctx context.Context, e expr.Expr) (Object, error) {
+func (r *Runtime) Step(ctx context.Context, e ast.Expr) (Object, error) {
 	if ctx.Err() != nil {
 		return nil, ctx.Err()
 	}
@@ -92,7 +92,7 @@ func (r *Runtime) Step(ctx context.Context, e expr.Expr) (Object, error) {
 		*/
 
 		switch e := e.(type) {
-		case expr.Name:
+		case ast.Name:
 			var v Object
 			// load literal
 			v, err := r.ParseLiteral(string(e))
@@ -106,12 +106,12 @@ func (r *Runtime) Step(ctx context.Context, e expr.Expr) (Object, error) {
 			}
 			return v, nil
 
-		case expr.Lambda:
-			getLambda := func(cmd expr.Expr) (Object, error) {
+		case ast.Lambda:
+			getLambda := func(cmd ast.Expr) (Object, error) {
 				switch cmd := e.Cmd.(type) {
-				case expr.Name:
+				case ast.Name:
 					return r.searchOnStack(Name(cmd))
-				case expr.Lambda:
+				case ast.Lambda:
 					return lambdaModule.Exec(ctx, r, cmd)
 				default:
 					return nil, fmt.Errorf("lambda: invalid command")
@@ -177,7 +177,7 @@ func (r *Runtime) Step(ctx context.Context, e expr.Expr) (Object, error) {
 	}
 }
 
-func (r *Runtime) stepMany(ctx context.Context, eList ...expr.Expr) ([]Object, error) {
+func (r *Runtime) stepMany(ctx context.Context, eList ...ast.Expr) ([]Object, error) {
 	outputs := make([]Object, len(eList))
 	for i, e := range eList {
 		if i == len(eList)-1 && TAIL_CALL_OPTIMIZATION {

@@ -1,4 +1,6 @@
-package expr
+package ast
+
+// A very simple AST, each node is either an Expr or a list of Expr
 
 // Expr : union of Name, Lambda
 type Expr interface {
