@@ -20,7 +20,7 @@ func (e NameExpr) String() string {
 
 func (e NameExpr) MustTypeExpr() {}
 
-// LambdaExpr : S-expression - every enclosed by a pair of parentheses
+// LambdaExpr - S-expression - every enclosed by a pair of parentheses
 // e.g. (cmd ...)
 type LambdaExpr struct {
 	Cmd  Name
