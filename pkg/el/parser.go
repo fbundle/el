@@ -23,14 +23,14 @@ func (e NameExpr) MustTypeExpr() {}
 // LambdaExpr - S-expression - every enclosed by a pair of parentheses
 // e.g. (cmd ...)
 type LambdaExpr struct {
-	Cmd  Name
+	Cmd  Expr
 	Args []Expr
 }
 
 func (e LambdaExpr) String() string {
 	s := ""
 	s += "("
-	s += string(e.Cmd)
+	s += e.Cmd.String()
 	for _, arg := range e.Args {
 		s += " " + arg.String()
 	}
@@ -85,12 +85,8 @@ func Parse(tokenList []Token) (Expr, []Token, error) {
 		case 1:
 			return argList[0], tokenList, nil
 		default:
-			cmd, ok := argList[0].(NameExpr)
-			if !ok {
-				return nil, tokenList, errors.New("LambdaExpr must start with a name")
-			}
 			return LambdaExpr{
-				Cmd:  Name(cmd),
+				Cmd:  argList[0],
 				Args: argList[1:],
 			}, tokenList, nil
 		}
@@ -117,12 +113,8 @@ func ParseWithInfixOperator(tokenList []Token) (Expr, []Token, error) {
 		case 1:
 			return argList[0], tokenList, nil
 		default:
-			cmd, ok := argList[0].(NameExpr)
-			if !ok {
-				return nil, tokenList, errors.New("LambdaExpr must start with a name")
-			}
 			return LambdaExpr{
-				Cmd:  Name(cmd),
+				Cmd:  argList[0],
 				Args: argList[1:],
 			}, tokenList, nil
 		}
@@ -141,19 +133,14 @@ func ParseWithInfixOperator(tokenList []Token) (Expr, []Token, error) {
 				return argList[0], nil
 			}
 			argList, cmdExpr, right := argList[:len(argList)-2], argList[len(argList)-2], argList[len(argList)-1]
-			if nameExpr, ok := cmdExpr.(NameExpr); ok {
-				cmd := Name(nameExpr)
-				left, err := parseInfixOperator(argList)
-				if err != nil {
-					return nil, err
-				}
-				return LambdaExpr{
-					Cmd:  cmd,
-					Args: []Expr{left, right},
-				}, nil
-			} else {
-				return nil, errors.New("InfixOperator must have a operator")
+			left, err := parseInfixOperator(argList)
+			if err != nil {
+				return nil, err
 			}
+			return LambdaExpr{
+				Cmd:  cmdExpr,
+				Args: []Expr{left, right},
+			}, nil
 
 		}
 

@@ -12,7 +12,7 @@ var InternalError = errors.New("internal")
 var letModule = Module{
 	Name: "let",
 	Exec: func(ctx context.Context, r *Runtime, expr LambdaExpr) (Object, error) {
-		if expr.Cmd != "let" {
+		if expr.Cmd.(NameExpr) != "let" {
 			return nil, InternalError
 		}
 		if len(expr.Args) < 1 {
@@ -48,7 +48,7 @@ var letModule = Module{
 var lambdaModule = Module{
 	Name: "lambda",
 	Exec: func(ctx context.Context, r *Runtime, expr LambdaExpr) (Object, error) {
-		if expr.Cmd != "lambda" {
+		if expr.Cmd.(NameExpr) != "lambda" {
 			return nil, InternalError
 		}
 		if len(expr.Args) < 1 {
@@ -80,7 +80,7 @@ var lambdaModule = Module{
 var matchModule = Module{
 	Name: "match",
 	Exec: func(ctx context.Context, r *Runtime, expr LambdaExpr) (Object, error) {
-		if expr.Cmd != "match" {
+		if expr.Cmd.(NameExpr) != "match" {
 			return nil, InternalError
 		}
 		if len(expr.Args) < 2 {

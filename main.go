@@ -20,6 +20,9 @@ func testRuntime() {
 		(add *(list 1 2 3) 4 *(list 5 6))				// equivalent to (add 1 2 3 4 5 6)
 		(add * * (list (list 2 3)) 4 *(list 5 6))		// nested unwrap
 
+		// function call
+		((lambda x (add x 1)) 20)
+
 		// list
 		(let
 			l (list 3 4 5 6 7)
