@@ -61,7 +61,7 @@ func testRuntime() {
 				true false 							// if n <= 0 then false
 				false (even (sub n 1))				// else even(n-1)
 			))
-			[[ (odd 10) (even 10) (odd 11) (even 11) (odd 12) (even 12)]]
+			[[ (odd 10) (even 10) (odd 11) (even 11) (odd 12) (even 12) ]]
 		)
 
 		// syntactic sugar for list
