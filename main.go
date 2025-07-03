@@ -40,6 +40,16 @@ func testRuntime() {
 		
 		// list unwrapping
 		(add *(list 1 2 3) 4 *(list 5 6))		// equivalent to (add 1 2 3 4 5 6)
+
+		// list
+		(let
+			l (list 3 4 5 6 7)
+			length (len l)
+			sublist (slice l (range 2 (len l)))
+			get (lambda l i (unit * (slice l (range i (add i 1))))) 	// define get function from unit, slice, range
+			second (get l 1)
+			(list length sublist second)
+		)
 	`)
 
 	r := el.NewBasicRuntime()

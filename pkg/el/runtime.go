@@ -44,7 +44,10 @@ func NewCoreRuntime() *Runtime {
 func NewBasicRuntime() *Runtime {
 	return NewCoreRuntime().
 		LoadModule(MakeModuleFromExtension(addExtension)).
-		LoadModule(MakeModuleFromExtension(listExtension)).
 		LoadModule(MakeModuleFromExtension(signExtension)).
-		LoadModule(MakeModuleFromExtension(getExtension))
+		LoadModule(MakeModuleFromExtension(listExtension)).
+		LoadModule(MakeModuleFromExtension(lenExtension)).
+		LoadModule(MakeModuleFromExtension(rangeExtension)).
+		LoadModule(MakeModuleFromExtension(sliceExtension)).
+		LoadModule(MakeModuleFromExtension(unitExtension))
 }

@@ -163,21 +163,78 @@ var listExtension = Extension{
 	Man: "module: (list 1 2 (lambda x (add x 1))) - make a list",
 }
 
-var getExtension = Extension{
-	Name: "get",
+var lenExtension = Extension{
+	Name: "len",
 	Exec: func(ctx context.Context, values ...Object) (Object, error) {
-		if len(values) < 2 {
-			return nil, fmt.Errorf("get requires at least 2 arguments")
+		if len(values) != 1 {
+			return nil, fmt.Errorf("len requires 1 argument")
 		}
 		l, ok := values[0].(List)
 		if !ok {
-			return nil, fmt.Errorf("get non-list value")
+			return nil, fmt.Errorf("len argument must be a list")
 		}
-		i, ok := values[1].(Int)
-		if !ok {
-			return nil, fmt.Errorf("get non-integer index")
-		}
-		return l[i], nil
+		return Int(len(l)), nil
 	},
-	Man: "module: (get (list 1 2 3) 1) - get the i-th element of a list",
+	Man: "module: (len (list 1 2 3)) - get the length of a list",
+}
+
+var rangeExtension = Extension{
+	Name: "range",
+	Exec: func(ctx context.Context, values ...Object) (Object, error) {
+		if len(values) != 2 {
+			return nil, fmt.Errorf("range requires 2 arguments")
+		}
+		i, ok := values[0].(Int)
+		if !ok {
+			return nil, fmt.Errorf("range beg non-list value")
+		}
+		j, ok := values[1].(Int)
+		if !ok {
+			return nil, fmt.Errorf("range end non-list value")
+		}
+		output := make(List, 0)
+		for k := i; k < j; k++ {
+			output = append(output, k)
+		}
+		return output, nil
+	},
+	Man: "module: (range m n) - make a list of integers from m to n-1",
+}
+
+var sliceExtension = Extension{
+	Name: "slice",
+	Exec: func(ctx context.Context, values ...Object) (Object, error) {
+		if len(values) != 2 {
+			return nil, fmt.Errorf("slice requires 2 arguments")
+		}
+		l, ok := values[0].(List)
+		if !ok {
+			return nil, fmt.Errorf("slice first argument not a list")
+		}
+		i, ok := values[1].(List)
+		if !ok {
+			return nil, fmt.Errorf("slice first argument not a list")
+		}
+		output := make(List, 0)
+		for _, index := range i {
+			if index, ok := index.(Int); ok {
+				output = append(output, l[index])
+			} else {
+				return nil, fmt.Errorf("slice index must be an integer")
+			}
+		}
+		return output, nil
+	},
+	Man: "module: (get (list 1 2 3) (list 0 2)) - get the 0th and 2nd element of a list",
+}
+
+var unitExtension = Extension{
+	Name: "unit",
+	Exec: func(ctx context.Context, values ...Object) (Object, error) {
+		if len(values) != 1 {
+			return nil, fmt.Errorf("unit requires 1 argument")
+		}
+		return values[0], nil
+	},
+	Man: "module: (unit 1) - wrap a value in unit",
 }
