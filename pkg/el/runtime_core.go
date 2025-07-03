@@ -8,6 +8,11 @@ import (
 	"time"
 )
 
+const (
+	TAIL_CALL_OPTIMIZATION = true
+	MAX_STACK_DEPTH        = 1000
+)
+
 var NameNotFoundError = func(name Name) error {
 	return fmt.Errorf("object not found %s", name)
 }
@@ -73,9 +78,14 @@ func (r *Runtime) Step(ctx context.Context, expr Expr) (Object, error) {
 		return nil, ctx.Err()
 	}
 
+	options, _ := getOptionsFromContext(ctx)
+
 	deadline, ok := ctx.Deadline()
 	if ok && time.Now().After(deadline) {
 		return nil, TimeoutError
+	}
+	if r.Stack.Depth() > MAX_STACK_DEPTH {
+		return nil, StackOverflowError
 	}
 	select {
 	case <-ctx.Done():
@@ -138,8 +148,20 @@ func (r *Runtime) Step(ctx context.Context, expr Expr) (Object, error) {
 					localFrame[paramName] = args[i]
 				}
 				// 3. push local frame to stack if not tail call
-				r.Stack.Push(localFrame)
-				defer r.Stack.Pop() // 5. pop Closure from FrameStack
+				if options.tailCall {
+					head := r.Stack.Pop()
+					maps.Copy(head, localFrame)
+					r.Stack.Push(head)
+				} else {
+					r.Stack.Push(localFrame)
+				}
+				defer func() {
+					// 5. pop Closure from FrameStack
+					if options.tailCall {
+					} else {
+						r.Stack.Pop()
+					}
+				}()
 
 				// 4. exec function
 				v, err := r.Step(ctx, lambda.Impl)
@@ -159,6 +181,11 @@ func (r *Runtime) Step(ctx context.Context, expr Expr) (Object, error) {
 func (r *Runtime) stepMany(ctx context.Context, exprList ...Expr) ([]Object, error) {
 	outputs := make([]Object, len(exprList))
 	for i, expr := range exprList {
+		if i == len(exprList)-1 && TAIL_CALL_OPTIMIZATION {
+			ctx = setOptionsToContext(ctx, &stepOptions{
+				tailCall: true,
+			})
+		}
 		value, err := r.Step(ctx, expr)
 		if err != nil {
 			return nil, err

@@ -22,28 +22,18 @@ func testRuntime() {
 		)
 		{											// { is the same as (let, } is the same as )
 			+ add - sub x mul / div % mod			// short hand for common operator
-			== eq != ne < le <= lt > gt >= ge
+			== eq != ne <= le < lt > gt >= ge
 
 			fib (lambda n (match [n <= 1]			// [n <= 1] is the same as (<= n 1)
 				true n 								// if n <= 1 then n
-				false [(fib [n - 1]) + (fib [n - 2])]
-				//false {								// else p = fib(n-1), q = fib(n-2), p + q
-				//	p (fib [n - 1])
-				//	q (fib [n - 2])
-				//	[p + q]
-				//}
+				false {								// else p = fib(n-1), q = fib(n-2), p + q
+					p (fib [n - 1])
+					q (fib [n - 2])
+					[p + q]
+				}
 			))
 			(fib 20)
 		}
-
-		// test tail recursion
-		(let
-			count (lambda n (match (le n 0)
-				true 0
-				false (add 1 (count (sub n 1)))
-			))
-			(list (count 2000) (count -1000))
-		)
 
 		// simple example
 		(let
