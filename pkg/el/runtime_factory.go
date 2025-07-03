@@ -6,7 +6,7 @@ import (
 	"strconv"
 )
 
-// NewCoreRuntime - Runtime + core control flow extensions
+// NewCoreRuntime - Runtime and core control flow extensions
 func NewCoreRuntime() *Runtime {
 	return (&Runtime{
 		ParseLiteral: func(lit string) (Object, error) {
@@ -37,7 +37,7 @@ func NewCoreRuntime() *Runtime {
 	}).LoadModule(letModule, lambdaModule, matchModule)
 }
 
-// NewBasicRuntime - NewCoreRuntime + minimal set of arithmetic extensions for Turing completeness
+// NewBasicRuntime - NewCoreRuntime and minimal set of arithmetic extensions for Turing completeness
 func NewBasicRuntime() *Runtime {
 	return NewCoreRuntime().
 		// list extension
