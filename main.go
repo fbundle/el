@@ -26,11 +26,12 @@ func testRuntime() {
 
 			fib (lambda n (match [n <= 1]			// [n <= 1] is the same as (<= n 1)
 				true n 								// if n <= 1 then n
-				false {								// else p = fib(n-1), q = fib(n-2), p + q
-					p (fib [n - 1])
-					q (fib [n - 2])
-					[p + q]
-				}
+				false [(fib [n - 1]) + (fib [n - 2])]
+				//false {								// else p = fib(n-1), q = fib(n-2), p + q
+				//	p (fib [n - 1])
+				//	q (fib [n - 2])
+				//	[p + q]
+				//}
 			))
 			(fib 20)
 		}
