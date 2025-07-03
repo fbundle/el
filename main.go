@@ -104,7 +104,9 @@ func testRuntime() {
 		if err != nil {
 			panic(err)
 		}
-		fmt.Printf("%s -> %s\n", expr.String(), o.String())
+		fmt.Println("expr\t", expr)
+		fmt.Println("output\t", o)
+		fmt.Println()
 	}
 }
 
