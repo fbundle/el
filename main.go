@@ -51,6 +51,19 @@ func testRuntime() {
 			(fib 20)
 		)
 
+		// test mutual recursion
+		(let
+			even (lambda n (match (le n 0)
+				true true 							// if n <= 0 then true
+				false (odd (sub n 1))				// else odd(n-1)
+			))
+			odd (lambda n (match (le n 0)
+				true false 							// if n <= 0 then false
+				false (even (sub n 1))				// else even(n-1)
+			))
+			[[ (odd 10) (even 10) (odd 11) (even 11) (odd 12) (even 12)]]
+		)
+
 		// syntactic sugar for list
 		[[ 1 2 3 4 5 ]]
 
