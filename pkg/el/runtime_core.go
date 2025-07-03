@@ -98,8 +98,9 @@ func (r *Runtime) Step(ctx context.Context, expr Expr) (Object, error) {
 					c. match: eval and match
 
 			only let and function application push a new frame since
-				- let requires local scope to isolate variable bindings
-				- function application requires local scope since it previously captured variables in lambda
+				- let requires local scope to bind new variables
+				- function application requires local scope to
+					bind parameters and previously captured variables in lambda
 		*/
 
 		switch expr := expr.(type) {
