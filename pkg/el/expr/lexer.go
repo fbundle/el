@@ -116,7 +116,7 @@ func tokenize(str string, pList ...preprocessor) []Token {
 			buffer += string(ch)
 			state = STATE_INSTRING
 		default:
-			panic(fmt.Sprintf("invalid state: %d", state))
+			panic(fmt.Sprintf("unreachable state: %d", state))
 		}
 	}
 	flushBuffer()
