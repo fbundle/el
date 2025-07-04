@@ -9,16 +9,19 @@ import (
 type Token = string
 
 func Tokenize(s string) []Token {
-	return tokenize(s, removeComments, splitString([]string{
-		"(",
-		")",
-		"*",
-	}))
+	return tokenize(s,
+		removeComment("#"),
+		splitString([]string{
+			"(",
+			")",
+			"*",
+		}),
+	)
 }
 
 func TokenizeWithInfixOperator(s string) []Token {
 	return tokenize(s,
-		removeComments,
+		removeComment("#"),
 		mapping(map[string]string{
 			"[[": " (list ",
 			"]]": " ) ",
@@ -46,13 +49,15 @@ var mapping = func(stringMap map[string]string) preprocessor {
 	}
 }
 
-var removeComments preprocessor = func(str string) string {
-	lines := strings.Split(str, "\n")
-	var newLines []string
-	for _, line := range lines {
-		newLines = append(newLines, strings.Split(line, "//")[0])
+var removeComment = func(sep string) preprocessor {
+	return func(str string) string {
+		lines := strings.Split(str, "\n")
+		var newLines []string
+		for _, line := range lines {
+			newLines = append(newLines, strings.SplitN(line, sep, 2)[0])
+		}
+		return strings.Join(newLines, "\n")
 	}
-	return strings.Join(newLines, "\n")
 }
 
 var splitString = func(sepString []string) preprocessor {
