@@ -112,7 +112,7 @@ func (r *Runtime) Step(ctx context.Context, e expr.Expr) (Object, error) {
 				case expr.Name:
 					return r.searchOnStack(Name(cmd))
 				case expr.Lambda:
-					return lambdaModule.Exec(ctx, r, cmd)
+					return r.Step(ctx, cmd)
 				default:
 					return nil, fmt.Errorf("lambda: invalid command")
 				}
@@ -138,12 +138,12 @@ func (r *Runtime) Step(ctx context.Context, e expr.Expr) (Object, error) {
 				if err != nil {
 					return nil, err
 				}
-				if len(args) != len(lambda.Params) {
-					return nil, fmt.Errorf("lambda: expected %d arguments, got %d", len(lambda.Params), len(args))
+				if len(args) != len(lambda.ParamNameList) {
+					return nil, fmt.Errorf("lambda: expected %d arguments, got %d", len(lambda.ParamNameList), len(args))
 				}
 				// 2. make local frame from captured frame and arguments
 				localFrame := maps.Clone(lambda.Closure)
-				for i, paramName := range lambda.Params {
+				for i, paramName := range lambda.ParamNameList {
 					localFrame[paramName] = args[i]
 				}
 				// 3. push local frame to stack if not tail call
@@ -163,7 +163,7 @@ func (r *Runtime) Step(ctx context.Context, e expr.Expr) (Object, error) {
 				}()
 
 				// 4. exec function
-				v, err := r.Step(ctx, lambda.Impl)
+				v, err := r.Step(ctx, lambda.Implementation)
 				if err != nil {
 					return nil, err
 				}

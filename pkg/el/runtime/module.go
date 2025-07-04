@@ -55,25 +55,27 @@ var lambdaModule = Module{
 		if len(e.Args) < 1 {
 			return nil, fmt.Errorf("lambda requires at least 1 arguments")
 		}
-		v := Lambda{
-			Params:  nil,
-			Impl:    nil,
-			Closure: nil,
-		}
+		paramNameList := make([]Name, 0, len(e.Args)-1)
 		for i := 0; i < len(e.Args)-1; i++ {
 			lvalue, ok := e.Args[i].(expr.Name)
 			if !ok {
 				return nil, fmt.Errorf("lvalue must be a name")
 			}
 			name := Name(lvalue)
-			v.Params = append(v.Params, name)
+			paramNameList = append(paramNameList, name)
 		}
-		v.Impl = e.Args[len(e.Args)-1]
+		implementation := e.Args[len(e.Args)-1]
+
 		// capture only the top of FrameStack
 		head := r.Stack.Pop()
-		v.Closure = maps.Clone(head)
+		closure := maps.Clone(head)
 		r.Stack.Push(head)
-		return v, nil
+
+		return Lambda{
+			ParamNameList:  paramNameList,
+			Implementation: implementation,
+			Closure:        closure,
+		}, nil
 	},
 	Man: "module: (lambda x y (add x y) - declare a function",
 }
