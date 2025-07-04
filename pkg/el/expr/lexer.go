@@ -9,30 +9,34 @@ import (
 type Token = string
 
 func Tokenize(s string) []Token {
-	return tokenizeWithSplitCharacters(s, map[rune]struct{}{
-		'(': {},
-		')': {},
-		'*': {},
-	})
+	return tokenize(s, removeComments, splitString(map[string]struct{}{
+		"(": {},
+		")": {},
+		"*": {},
+	}))
 }
 
 func TokenizeWithInfixOperator(s string) []Token {
-	// transpile first
+	return tokenize(s, transpile, removeComments, splitString(map[string]struct{}{
+		"(": {},
+		")": {},
+		"*": {},
+		"[": {},
+		"]": {},
+	}))
+}
+
+type preprocessor func(string) string
+
+var transpile preprocessor = func(s string) string {
 	s = strings.ReplaceAll(s, "[[", " (list ")
 	s = strings.ReplaceAll(s, "]]", " ) ")
 	s = strings.ReplaceAll(s, "{", " (let ")
 	s = strings.ReplaceAll(s, "}", " ) ")
-
-	return tokenizeWithSplitCharacters(s, map[rune]struct{}{
-		'(': {},
-		')': {},
-		'*': {},
-		'[': {},
-		']': {},
-	})
+	return s
 }
 
-func removeComments(str string) string {
+var removeComments preprocessor = func(str string) string {
 	lines := strings.Split(str, "\n")
 	var newLines []string
 	for _, line := range lines {
@@ -41,8 +45,31 @@ func removeComments(str string) string {
 	return strings.Join(newLines, "\n")
 }
 
-func tokenizeWithSplitCharacters(str string, splitCharacters map[rune]struct{}) []Token {
-	str = removeComments(str)
+var splitString func(sepString map[string]struct{}) preprocessor = func(sepString map[string]struct{}) preprocessor {
+	return func(str string) string {
+		normalize := func(s string) string {
+			return strings.Join(strings.Fields(s), " ")
+		}
+		str = normalize(str)
+		for {
+			str1 := str
+			for s := range sepString {
+				str1 = strings.ReplaceAll(str1, s, " "+s+" ")
+			}
+			str1 = normalize(str1)
+			if str1 == str {
+				break
+			}
+			str = str1
+		}
+		return str
+	}
+}
+
+func tokenize(str string, pList ...preprocessor) []Token {
+	for _, p := range pList {
+		str = p(str)
+	}
 
 	const (
 		STATE_OUTSTRING = iota
@@ -64,11 +91,6 @@ func tokenizeWithSplitCharacters(str string, splitCharacters map[rune]struct{}) 
 		case STATE_OUTSTRING: // outside string
 			if unicode.IsSpace(ch) {
 				// flush buffer if seeing whitespace
-				flushBuffer()
-			} else if _, ok := splitCharacters[ch]; ok {
-				// split characters are tokenized immediately
-				flushBuffer()
-				buffer += string(ch)
 				flushBuffer()
 			} else if ch == '"' {
 				// enter string mode
