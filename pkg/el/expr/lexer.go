@@ -9,20 +9,20 @@ import (
 type Token = string
 
 func Tokenize(s string) []Token {
-	return tokenize(s, removeComments, splitString(map[string]struct{}{
-		"(": {},
-		")": {},
-		"*": {},
+	return tokenize(s, removeComments, splitString([]string{
+		"(",
+		")",
+		"*",
 	}))
 }
 
 func TokenizeWithInfixOperator(s string) []Token {
-	return tokenize(s, transpile, removeComments, splitString(map[string]struct{}{
-		"(": {},
-		")": {},
-		"*": {},
-		"[": {},
-		"]": {},
+	return tokenize(s, transpile, removeComments, splitString([]string{
+		"(",
+		")",
+		"*",
+		"[",
+		"]",
 	}))
 }
 
@@ -45,7 +45,7 @@ var removeComments preprocessor = func(str string) string {
 	return strings.Join(newLines, "\n")
 }
 
-var splitString = func(sepString map[string]struct{}) preprocessor {
+var splitString = func(sepString []string) preprocessor {
 	return func(str string) string {
 		normalize := func(s string) string {
 			return strings.Join(strings.Fields(s), " ")
@@ -53,7 +53,7 @@ var splitString = func(sepString map[string]struct{}) preprocessor {
 		str = normalize(str)
 		for {
 			str1 := str
-			for s := range sepString {
+			for _, s := range sepString {
 				str1 = strings.ReplaceAll(str1, s, " "+s+" ")
 			}
 			str1 = normalize(str1)
