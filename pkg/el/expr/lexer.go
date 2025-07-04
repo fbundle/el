@@ -17,23 +17,33 @@ func Tokenize(s string) []Token {
 }
 
 func TokenizeWithInfixOperator(s string) []Token {
-	return tokenize(s, transpile, removeComments, splitString([]string{
-		"(",
-		")",
-		"*",
-		"[",
-		"]",
-	}))
+	return tokenize(s,
+		removeComments,
+		mapping(map[string]string{
+			"[[": " (list ",
+			"]]": " ) ",
+			"{":  " (let ",
+			"}":  " ) ",
+		}),
+		splitString([]string{
+			"(",
+			")",
+			"*",
+			"[",
+			"]",
+		}),
+	)
 }
 
 type preprocessor func(string) string
 
-var transpile preprocessor = func(s string) string {
-	s = strings.ReplaceAll(s, "[[", " (list ")
-	s = strings.ReplaceAll(s, "]]", " ) ")
-	s = strings.ReplaceAll(s, "{", " (let ")
-	s = strings.ReplaceAll(s, "}", " ) ")
-	return s
+var mapping = func(stringMap map[string]string) preprocessor {
+	return func(str string) string {
+		for k, v := range stringMap {
+			str = strings.ReplaceAll(str, k, v)
+		}
+		return str
+	}
 }
 
 var removeComments preprocessor = func(str string) string {
