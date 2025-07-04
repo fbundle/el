@@ -45,7 +45,7 @@ var removeComments preprocessor = func(str string) string {
 	return strings.Join(newLines, "\n")
 }
 
-var splitString func(sepString map[string]struct{}) preprocessor = func(sepString map[string]struct{}) preprocessor {
+var splitString = func(sepString map[string]struct{}) preprocessor {
 	return func(str string) string {
 		normalize := func(s string) string {
 			return strings.Join(strings.Fields(s), " ")
