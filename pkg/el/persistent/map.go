@@ -1,7 +1,7 @@
 package persistent
 
 import (
-	"el/pkg/el/persistent/ordmap"
+	"el/pkg/el/persistent/internal/ordmap"
 	"golang.org/x/exp/constraints"
 )
 
