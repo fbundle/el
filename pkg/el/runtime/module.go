@@ -8,7 +8,7 @@ import (
 	"maps"
 )
 
-var InternalError = errors.New("internal")
+var InternalError = errors.New("ordmap")
 
 var letModule = Module{
 	Name: "let",
