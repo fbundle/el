@@ -91,19 +91,6 @@ func (r *Runtime) Step(ctx context.Context, e expr.Expr) (Object, error) {
 					bind parameters and previously captured variables in lambda
 		*/
 
-		// TODO - actually function call can be implmented as
-		/*
-			(let
-				f (lambda (add x y))
-				(let
-					x 1
-					y 2
-					f	// bind local variables x y and exec implementation of f
-
-				)
-			)
-		*/
-
 		switch e := e.(type) {
 		case expr.Name:
 			var v Object
