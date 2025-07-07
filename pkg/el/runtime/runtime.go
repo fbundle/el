@@ -91,7 +91,7 @@ func (r *Runtime) Step(ctx context.Context, e expr.Expr) (Object, error) {
 					bind parameters and previously captured variables in lambda
 		*/
 
-		// TODO - actually function call can be implmented as
+		// TODO - actually pure function call can be implemented as - but it does not support frame capture
 		/*
 			(let
 				f_impl (impl (add x y))
