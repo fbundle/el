@@ -94,7 +94,7 @@ func (r *Runtime) Step(ctx context.Context, e expr.Expr) (Object, error) {
 		// TODO - actually function call can be implmented as
 		/*
 			(let
-				f_impl (lambda_impl (add x y))
+				f_impl (impl (add x y))
 				(let
 					x 1
 					y 2
