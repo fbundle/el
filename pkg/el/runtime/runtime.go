@@ -9,16 +9,11 @@ import (
 	"time"
 )
 
-const (
-	MAX_STACK_DEPTH = 1000
-)
-
 var NameNotFoundError = func(name Name) error {
 	return fmt.Errorf("obj not found %s", name)
 }
 var InterruptError = errors.New("interrupt")
 var TimeoutError = errors.New("timeout")
-var StackOverflowError = errors.New("stackoverflow")
 
 type Runtime struct {
 	ParseLiteral func(lit string) (Object, error)
@@ -38,38 +33,15 @@ func (r *Runtime) searchOnStack(name Name) (out Object, err error) {
 	return out, err
 }
 
-type stepOptions struct {
-	tailCall bool
-}
-
-func getOptionsFromContext(ctx context.Context) (*stepOptions, bool) {
-	if o, ok := ctx.Value("step_options").(*stepOptions); ok {
-		return o, true
-	}
-	// default option
-	return &stepOptions{
-		tailCall: false,
-	}, false
-}
-
-func setOptionsToContext(ctx context.Context, o *stepOptions) context.Context {
-	return context.WithValue(ctx, "step_options", o)
-}
-
 // Step -
 func (r *Runtime) Step(ctx context.Context, e expr.Expr) (Object, error) {
 	if ctx.Err() != nil {
 		return nil, ctx.Err()
 	}
 
-	options, _ := getOptionsFromContext(ctx)
-
 	deadline, ok := ctx.Deadline()
 	if ok && time.Now().After(deadline) {
 		return nil, TimeoutError
-	}
-	if r.Stack.Depth() > MAX_STACK_DEPTH {
-		return nil, StackOverflowError
 	}
 	select {
 	case <-ctx.Done():
@@ -130,7 +102,7 @@ func (r *Runtime) Step(ctx context.Context, e expr.Expr) (Object, error) {
 			return o, nil
 		case Lambda:
 			// 1. evaluate arguments
-			args, err := r.stepManyWithTailCall(ctx, e.Args...) // TCO inside recursive function call
+			args, err := r.stepMany(ctx, e.Args...) // TCO inside recursive function call
 			if err != nil {
 				return nil, err
 			}
@@ -147,20 +119,8 @@ func (r *Runtime) Step(ctx context.Context, e expr.Expr) (Object, error) {
 				localFrame[paramName] = args[i]
 			}
 			// 3. push local frame to stack if not tail call
-			if options.tailCall {
-				for name, rvalue := range localFrame {
-					r.Stack.HeadSet(name, rvalue)
-				}
-			} else {
-				r.Stack.Push(localFrame)
-			}
-			defer func() {
-				// 5. pop Closure from FrameStack
-				if options.tailCall {
-				} else {
-					r.Stack.Pop()
-				}
-			}()
+			r.Stack.Push(localFrame)
+			defer r.Stack.Pop() // 5. pop local frame from frame stack
 
 			// 4. exec function
 			v, err := r.Step(ctx, lambda.Implementation)
@@ -176,26 +136,23 @@ func (r *Runtime) Step(ctx context.Context, e expr.Expr) (Object, error) {
 	}
 }
 
-func (r *Runtime) stepManyWithTailCall(ctx context.Context, eList ...expr.Expr) ([]Object, error) {
-	outputs := make([]Object, len(eList))
-	for i, e := range eList {
-		if i == len(eList)-1 {
-			ctx = setOptionsToContext(ctx, &stepOptions{
-				tailCall: true,
-			})
-		}
-		value, err := r.Step(ctx, e)
+func (r *Runtime) stepMany(ctx context.Context, es ...expr.Expr) ([]Object, error) {
+	var outputs []Object
+	for _, e := range es {
+		out, err := r.Step(ctx, e)
 		if err != nil {
 			return nil, err
 		}
-		outputs[i] = value
+		outputs = append(outputs, out)
 	}
 	return outputs, nil
 }
 
 func (r *Runtime) LoadModule(ms ...Module) *Runtime {
 	for _, m := range ms {
-		r.Stack.HeadSet(m.Name, m)
+		head := r.Stack.Pop()
+		head[m.Name] = m
+		r.Stack.Push(head)
 	}
 	return r
 }

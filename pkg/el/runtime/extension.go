@@ -8,7 +8,9 @@ import (
 )
 
 func (r *Runtime) LoadConstant(name Name, value Object) *Runtime {
-	r.Stack.HeadSet(name, value)
+	head := r.Stack.Pop()
+	head[name] = value
+	r.Stack.Push(head)
 	return r
 }
 
@@ -29,16 +31,11 @@ func makeModuleFromExtension(ext Extension) Module {
 	return Module{
 		Name: ext.Name,
 		Exec: func(ctx context.Context, r *Runtime, e expr.Lambda) (Object, error) {
-			var args []Object
-			for _, argExpr := range e.Args {
-				arg, err := r.Step(ctx, argExpr)
-				if err != nil {
-					return nil, err
-				}
-				args = append(args, arg)
+			args, err := r.stepMany(ctx, e.Args...)
+			if err != nil {
+				return nil, err
 			}
-
-			args, err := unwrapArgs(args)
+			args, err = unwrapArgs(args)
 			if err != nil {
 				return nil, err
 			}

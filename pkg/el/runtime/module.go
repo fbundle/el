@@ -33,7 +33,9 @@ var letModule = Module{
 			}
 			name := Name(lvalue)
 			// update stack
-			r.Stack.HeadSet(name, rvalue)
+			head := r.Stack.Pop()
+			head[name] = rvalue
+			r.Stack.Push(head)
 		}
 		value, err := r.Step(ctx, e.Args[len(e.Args)-1])
 		if err != nil {
@@ -64,8 +66,10 @@ var lambdaModule = Module{
 		}
 		implementation := e.Args[len(e.Args)-1]
 
-		// capture only the top of FrameStack
-		closure := maps.Clone(r.Stack.HeadGet())
+		// capture only the top of frame stack
+		head := r.Stack.Pop()
+		closure := maps.Clone(head)
+		r.Stack.Push(head)
 
 		return Lambda{
 			ParamNameList:  paramNameList,
