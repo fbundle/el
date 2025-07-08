@@ -112,7 +112,7 @@ func (r *Runtime) Step(ctx context.Context, e expr.Expr) (Object, error) {
 			return o, nil
 		case Lambda:
 			// 1. evaluate arguments
-			args, err := r.stepManyTCO(ctx, e.Args...)
+			args, err := r.stepManyTCO(ctx, e.Args...) // TCO for tail call recursion
 			if err != nil {
 				return nil, err
 			}
