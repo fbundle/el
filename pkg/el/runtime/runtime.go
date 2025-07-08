@@ -130,7 +130,7 @@ func (r *Runtime) Step(ctx context.Context, e expr.Expr) (Object, error) {
 			return o, nil
 		case Lambda:
 			// 1. evaluate arguments
-			args, err := r.stepManyWithTCO(ctx, e.Args...) // TCO inside recursive function call
+			args, err := r.stepManyWithTailCall(ctx, e.Args...) // TCO inside recursive function call
 			if err != nil {
 				return nil, err
 			}
@@ -176,19 +176,7 @@ func (r *Runtime) Step(ctx context.Context, e expr.Expr) (Object, error) {
 	}
 }
 
-func (r *Runtime) stepMany(ctx context.Context, eList ...expr.Expr) ([]Object, error) {
-	outputs := make([]Object, len(eList))
-	for i, e := range eList {
-		value, err := r.Step(ctx, e)
-		if err != nil {
-			return nil, err
-		}
-		outputs[i] = value
-	}
-	return outputs, nil
-}
-
-func (r *Runtime) stepManyWithTCO(ctx context.Context, eList ...expr.Expr) ([]Object, error) {
+func (r *Runtime) stepManyWithTailCall(ctx context.Context, eList ...expr.Expr) ([]Object, error) {
 	outputs := make([]Object, len(eList))
 	for i, e := range eList {
 		if i == len(eList)-1 {
