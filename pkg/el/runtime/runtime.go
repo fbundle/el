@@ -76,124 +76,123 @@ func (r *Runtime) Step(ctx context.Context, e expr.Expr) (Object, error) {
 	case <-ctx.Done():
 		return nil, InterruptError
 	default:
-		/*
-			the whole language is every simple
-				1. parse literal or search on stack
-				2. function application: push a new frame, exec the function, pop
-				3. builtin module
-					a. lambda: capture the current frame and save the implementation
-					b. let: push a new frame, exec the function, pop
-					c. match: eval and match
+	}
+	/*
+		the whole language is every simple
+			1. parse literal or search on stack
+			2. function application: push a new frame, exec the function, pop
+			3. builtin module
+				a. lambda: capture the current frame and save the implementation
+				b. let: push a new frame, exec the function, pop
+				c. match: eval and match
 
-			only let and function application push a new frame since
-				- let requires local scope to bind new variables
-				- function application requires local scope to
-					bind parameters and previously captured variables in lambda
-		*/
+		only let and function application push a new frame since
+			- let requires local scope to bind new variables
+			- function application requires local scope to
+				bind parameters and previously captured variables in lambda
+	*/
 
-		// TODO - actually function call can be implemented as - but it does not support frame capture
-		/*
-			(let
-				f_impl (impl (add x y))
-				(let
-					x 1
-					y 2
-					f_impl	// bind local variables x y and exec implementation of f
+	switch e := e.(type) {
+	case expr.Name:
+		var v Object
+		// load literal
+		v, err := r.ParseLiteral(string(e))
+		if err == nil {
+			return v, nil
+		}
+		// find in stack for variable
+		v, err = r.searchOnStack(Name(e))
+		if err != nil {
+			return nil, err
+		}
+		return v, nil
 
-				)
-			)
-		*/
-
-		switch e := e.(type) {
-		case expr.Name:
-			var v Object
-			// load literal
-			v, err := r.ParseLiteral(string(e))
-			if err == nil {
-				return v, nil
+	case expr.Lambda:
+		getLambda := func(cmd expr.Expr) (Object, error) {
+			switch cmd := e.Cmd.(type) {
+			case expr.Name:
+				return r.searchOnStack(Name(cmd))
+			case expr.Lambda:
+				return r.Step(ctx, cmd)
+			default:
+				return nil, fmt.Errorf("lambda: invalid command")
 			}
-			// find in stack for variable
-			v, err = r.searchOnStack(Name(e))
+		}
+		lambda, err := getLambda(e.Cmd)
+		if err != nil {
+			return nil, err
+		}
+		switch lambda := lambda.(type) {
+		case Module:
+			o, err := lambda.Exec(ctx, r, e)
+			if err != nil {
+				return nil, err
+			}
+			return o, nil
+		case Lambda:
+			// 1. evaluate arguments
+			args, err := r.stepManyWithTCO(ctx, e.Args...)
+			if err != nil {
+				return nil, err
+			}
+			args, err = unwrapArgs(args)
+			if err != nil {
+				return nil, err
+			}
+			if len(args) != len(lambda.ParamNameList) {
+				return nil, fmt.Errorf("lambda: expected %d arguments, got %d", len(lambda.ParamNameList), len(args))
+			}
+			// 2. make local frame from captured frame and arguments
+			localFrame := maps.Clone(lambda.Closure)
+			for i, paramName := range lambda.ParamNameList {
+				localFrame[paramName] = args[i]
+			}
+			// 3. push local frame to stack if not tail call
+			if options.tailCall {
+				head := r.Stack.Pop()
+				maps.Copy(head, localFrame)
+				r.Stack.Push(head)
+			} else {
+				r.Stack.Push(localFrame)
+			}
+			defer func() {
+				// 5. pop Closure from FrameStack
+				if options.tailCall {
+				} else {
+					r.Stack.Pop()
+				}
+			}()
+
+			// 4. exec function
+			v, err := r.Step(ctx, lambda.Implementation)
 			if err != nil {
 				return nil, err
 			}
 			return v, nil
-
-		case expr.Lambda:
-			getLambda := func(cmd expr.Expr) (Object, error) {
-				switch cmd := e.Cmd.(type) {
-				case expr.Name:
-					return r.searchOnStack(Name(cmd))
-				case expr.Lambda:
-					return r.Step(ctx, cmd)
-				default:
-					return nil, fmt.Errorf("lambda: invalid command")
-				}
-			}
-			lambda, err := getLambda(e.Cmd)
-			if err != nil {
-				return nil, err
-			}
-			switch lambda := lambda.(type) {
-			case Module:
-				o, err := lambda.Exec(ctx, r, e)
-				if err != nil {
-					return nil, err
-				}
-				return o, nil
-			case Lambda:
-				// 1. evaluate arguments
-				args, err := r.stepMany(ctx, e.Args...)
-				if err != nil {
-					return nil, err
-				}
-				args, err = unwrapArgs(args)
-				if err != nil {
-					return nil, err
-				}
-				if len(args) != len(lambda.ParamNameList) {
-					return nil, fmt.Errorf("lambda: expected %d arguments, got %d", len(lambda.ParamNameList), len(args))
-				}
-				// 2. make local frame from captured frame and arguments
-				localFrame := maps.Clone(lambda.Closure)
-				for i, paramName := range lambda.ParamNameList {
-					localFrame[paramName] = args[i]
-				}
-				// 3. push local frame to stack if not tail call
-				if options.tailCall {
-					head := r.Stack.Pop()
-					maps.Copy(head, localFrame)
-					r.Stack.Push(head)
-				} else {
-					r.Stack.Push(localFrame)
-				}
-				defer func() {
-					// 5. pop Closure from FrameStack
-					if options.tailCall {
-					} else {
-						r.Stack.Pop()
-					}
-				}()
-
-				// 4. exec function
-				v, err := r.Step(ctx, lambda.Implementation)
-				if err != nil {
-					return nil, err
-				}
-				return v, nil
-			default:
-				return nil, fmt.Errorf("expression cannot be executed: %s", e.String())
-			}
 		default:
-			return nil, fmt.Errorf("unknown expression type")
+			return nil, fmt.Errorf("expression cannot be executed: %s", e.String())
 		}
+	default:
+		return nil, fmt.Errorf("unknown expression type")
 	}
 }
 
 func (r *Runtime) stepMany(ctx context.Context, eList ...expr.Expr) ([]Object, error) {
 	outputs := make([]Object, len(eList))
 	for i, e := range eList {
-		if i == len(eList)-1 && TAIL_CALL_OPTIMIZATION {
+		value, err := r.Step(ctx, e)
+		if err != nil {
+			return nil, err
+		}
+		outputs[i] = value
+	}
+	return outputs, nil
+}
+
+func (r *Runtime) stepManyWithTCO(ctx context.Context, eList ...expr.Expr) ([]Object, error) {
+	outputs := make([]Object, len(eList))
+	for i, e := range eList {
+		if i == len(eList)-1 {
 			ctx = setOptionsToContext(ctx, &stepOptions{
 				tailCall: true,
 			})
