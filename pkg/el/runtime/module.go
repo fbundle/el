@@ -19,8 +19,11 @@ var letModule = Module{
 		if len(e.Args) < 1 {
 			return nil, fmt.Errorf("let requires at least 1 arguments")
 		}
-		r.Stack.Push(Frame{})
-		defer r.Stack.Pop()
+		if getTailCall(ctx) {
+		} else {
+			r.Stack.Push(Frame{})
+			defer r.Stack.Pop()
+		}
 
 		for i := 0; i < len(e.Args)-1; i += 2 {
 			lvalue, ok := e.Args[i].(expr.Name)

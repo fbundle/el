@@ -31,7 +31,7 @@ func makeModuleFromExtension(ext Extension) Module {
 	return Module{
 		Name: ext.Name,
 		Exec: func(ctx context.Context, r *Runtime, e expr.Lambda) (Object, error) {
-			args, err := r.stepMany(ctx, e.Args...)
+			args, err := r.stepManyTCO(ctx, e.Args...)
 			if err != nil {
 				return nil, err
 			}

@@ -9,11 +9,20 @@ import (
 	"time"
 )
 
+const (
+	MAX_STACK_DEPTH = 1000
+)
+
 var NameNotFoundError = func(name Name) error {
 	return fmt.Errorf("obj not found %s", name)
 }
-var InterruptError = errors.New("interrupt")
-var TimeoutError = errors.New("timeout")
+var InterruptError = func(err error) error {
+	return fmt.Errorf("interrupted: %s", err)
+}
+var TimeoutError = func(err error) error {
+	return fmt.Errorf("timeout: %s", err)
+}
+var StackOverflowError = errors.New("stack overflow")
 
 type Runtime struct {
 	ParseLiteral func(lit string) (Object, error)
@@ -35,18 +44,17 @@ func (r *Runtime) searchOnStack(name Name) (out Object, err error) {
 
 // Step -
 func (r *Runtime) Step(ctx context.Context, e expr.Expr) (Object, error) {
-	if ctx.Err() != nil {
-		return nil, ctx.Err()
-	}
-
 	deadline, ok := ctx.Deadline()
 	if ok && time.Now().After(deadline) {
-		return nil, TimeoutError
+		return nil, TimeoutError(ctx.Err())
 	}
 	select {
 	case <-ctx.Done():
-		return nil, InterruptError
+		return nil, InterruptError(ctx.Err())
 	default:
+	}
+	if r.Stack.Depth() > MAX_STACK_DEPTH {
+		return nil, StackOverflowError
 	}
 	/*
 		the whole language is every simple
@@ -61,6 +69,8 @@ func (r *Runtime) Step(ctx context.Context, e expr.Expr) (Object, error) {
 			- let requires local scope to bind new variables
 			- function application requires local scope to
 				bind parameters and previously captured variables in lambda
+
+		hence tailcall optimization will apply for lambda and let
 	*/
 
 	switch e := e.(type) {
@@ -102,7 +112,7 @@ func (r *Runtime) Step(ctx context.Context, e expr.Expr) (Object, error) {
 			return o, nil
 		case Lambda:
 			// 1. evaluate arguments
-			args, err := r.stepMany(ctx, e.Args...) // TCO inside recursive function call
+			args, err := r.stepManyTCO(ctx, e.Args...)
 			if err != nil {
 				return nil, err
 			}
@@ -118,9 +128,15 @@ func (r *Runtime) Step(ctx context.Context, e expr.Expr) (Object, error) {
 			for i, paramName := range lambda.ParamNameList {
 				localFrame[paramName] = args[i]
 			}
-			// 3. push local frame to stack if not tail call
-			r.Stack.Push(localFrame)
-			defer r.Stack.Pop() // 5. pop local frame from frame stack
+			// 3. push local frame to stack if not tailcall
+			if getTailCall(ctx) {
+				head := r.Stack.Pop()
+				maps.Copy(head, localFrame)
+				r.Stack.Push(head)
+			} else {
+				r.Stack.Push(localFrame)
+				defer r.Stack.Pop() // 5. pop local frame from frame stack
+			}
 
 			// 4. exec function
 			v, err := r.Step(ctx, lambda.Implementation)
@@ -147,7 +163,20 @@ func (r *Runtime) stepMany(ctx context.Context, es ...expr.Expr) ([]Object, erro
 	}
 	return outputs, nil
 }
-
+func (r *Runtime) stepManyTCO(ctx context.Context, es ...expr.Expr) ([]Object, error) {
+	var outputs []Object
+	for i, e := range es {
+		if i == len(es)-1 {
+			ctx = setTailCall(ctx)
+		}
+		out, err := r.Step(ctx, e)
+		if err != nil {
+			return nil, err
+		}
+		outputs = append(outputs, out)
+	}
+	return outputs, nil
+}
 func (r *Runtime) LoadModule(ms ...Module) *Runtime {
 	for _, m := range ms {
 		head := r.Stack.Pop()
