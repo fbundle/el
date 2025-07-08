@@ -7,6 +7,8 @@ type Frame = map[Name]Object
 
 // FrameStack - stack of frames
 type FrameStack interface {
+	HeadSet(Name, Object)
+	HeadGet() Frame
 	Push(Frame)
 	Pop() Frame
 	Depth() uint
@@ -23,6 +25,14 @@ func newFrameStack() FrameStack {
 
 type frameStack struct {
 	stack []Frame
+}
+
+func (s *frameStack) HeadGet() Frame {
+	return s.stack[len(s.stack)-1]
+}
+
+func (s *frameStack) HeadSet(name Name, value Object) {
+	s.stack[len(s.stack)-1][name] = value
 }
 
 func (s *frameStack) Push(frame Frame) {

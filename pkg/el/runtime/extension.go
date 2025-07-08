@@ -8,9 +8,7 @@ import (
 )
 
 func (r *Runtime) LoadConstant(name Name, value Object) *Runtime {
-	head := r.Stack.Pop()
-	head[name] = value
-	r.Stack.Push(head)
+	r.Stack.HeadSet(name, value)
 	return r
 }
 

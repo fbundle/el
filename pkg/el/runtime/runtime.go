@@ -148,9 +148,9 @@ func (r *Runtime) Step(ctx context.Context, e expr.Expr) (Object, error) {
 			}
 			// 3. push local frame to stack if not tail call
 			if options.tailCall {
-				head := r.Stack.Pop()
-				maps.Copy(head, localFrame)
-				r.Stack.Push(head)
+				for name, rvalue := range localFrame {
+					r.Stack.HeadSet(name, rvalue)
+				}
 			} else {
 				r.Stack.Push(localFrame)
 			}
@@ -194,11 +194,9 @@ func (r *Runtime) stepManyWithTailCall(ctx context.Context, eList ...expr.Expr) 
 }
 
 func (r *Runtime) LoadModule(ms ...Module) *Runtime {
-	head := r.Stack.Pop()
 	for _, m := range ms {
-		head[m.Name] = m
+		r.Stack.HeadSet(m.Name, m)
 	}
-	r.Stack.Push(head)
 	return r
 }
 
