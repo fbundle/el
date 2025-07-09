@@ -122,7 +122,7 @@ func testRuntime() {
 			while (lambda cond_func body_func state (
 				match (cond_func state)
 				false	state
-				_		(unit (while cond_func body_func (body_func state)))	# wrap while in a unit to force TCO
+				_		(unit (while cond_func body_func (body_func state)))	# wrap while in a unit to force TCO since arguments are executed with TCO
 					
 			))
 			
