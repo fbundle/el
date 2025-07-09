@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	MAX_STACK_DEPTH = 100
+	MAX_STACK_DEPTH = 1000
 )
 
 var NameNotFoundError = func(name Name) error {
@@ -112,7 +112,7 @@ func (r *Runtime) Step(ctx context.Context, e expr.Expr) (Object, error) {
 			return o, nil
 		case Lambda:
 			// 1. evaluate arguments
-			args, err := r.stepManyTCO(ctx, e.Args...) // TCO for tail call recursion
+			args, err := r.stepMany(ctx, e.Args...)
 			if err != nil {
 				return nil, err
 			}
@@ -129,14 +129,9 @@ func (r *Runtime) Step(ctx context.Context, e expr.Expr) (Object, error) {
 				localFrame[paramName] = args[i]
 			}
 			// 3. push local frame to stack if not tailcall
-			if getTailCall(ctx) {
-				head := r.Stack.Pop()
-				maps.Copy(head, localFrame)
-				r.Stack.Push(head)
-			} else {
-				r.Stack.Push(localFrame)
-				defer r.Stack.Pop() // 5. pop local frame from frame stack
-			}
+
+			r.Stack.Push(localFrame)
+			defer r.Stack.Pop() // 5. pop local frame from frame stack
 
 			// 4. exec function
 			v, err := r.Step(ctx, lambda.Implementation)
@@ -163,20 +158,7 @@ func (r *Runtime) stepMany(ctx context.Context, es ...expr.Expr) ([]Object, erro
 	}
 	return outputs, nil
 }
-func (r *Runtime) stepManyTCO(ctx context.Context, es ...expr.Expr) ([]Object, error) {
-	var outputs []Object
-	for i, e := range es {
-		if i == len(es)-1 {
-			ctx = setTailCall(ctx)
-		}
-		out, err := r.Step(ctx, e)
-		if err != nil {
-			return nil, err
-		}
-		outputs = append(outputs, out)
-	}
-	return outputs, nil
-}
+
 func (r *Runtime) LoadModule(ms ...Module) *Runtime {
 	for _, m := range ms {
 		head := r.Stack.Pop()
