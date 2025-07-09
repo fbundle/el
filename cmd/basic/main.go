@@ -119,13 +119,11 @@ func testRuntime() {
 			unit (lambda x x)											# unit is the identity function
 			get (lambda l i (unit * (slice l (range i (add i 1))))) 	# define get function from unit, slice, range
 
-			while (lambda state cond_func body_func (
+			while (lambda cond_func body_func state (
 				match (cond_func state)
 				false	state
-				_		(let
-					next_state (body_func state)
-					(while next_state cond_func body_func)				# it does not capture tail recursion here
-				)
+				_		(unit (while cond_func body_func (body_func state)))				# it does not capture tail recursion here	
+					
 			))
 			
 			# sum from 1 to 2000 										# sum, n = 0, 2000; while n > 0: sum = sum + n; n = n - 1
@@ -141,7 +139,7 @@ func testRuntime() {
 				new_state (list new_sum new_n)
 				new_state
 			))
-			final_state (while state cond_func body_func)
+			final_state (while  cond_func body_func state)
 			final_state
 		)
 	`)
