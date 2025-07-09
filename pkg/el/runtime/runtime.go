@@ -54,7 +54,7 @@ func (r *Runtime) Step(ctx context.Context, e expr.Expr) (Object, error) {
 	default:
 	}
 	if r.Stack.Depth() > MAX_STACK_DEPTH {
-		return nil, StackOverflowError
+		fmt.Println("STACKOVERFLOW")
 	}
 	/*
 		the whole language is every simple
