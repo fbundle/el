@@ -111,6 +111,39 @@ func testRuntime() {
 			== eq != ne <= le < lt > gt >= ge
 			[1 + 2 - 3 + -4]
 		}
+
+		# map filter reduce
+
+		# while loop
+		(let
+			unit (lambda x x)											# unit is the identity function
+			get (lambda l i (unit * (slice l (range i (add i 1))))) 	# define get function from unit, slice, range
+
+			while (lambda state cond_func body_func (
+				match (cond_func state)
+				false	state
+				_		(let
+					next_state (body_func state)
+					(while next_state cond_func body_func)
+				)
+			))
+			
+			# sum from 1 to 100 										# sum, n = 0, 100; while n > 0: sum = sum + n; n = n - 1
+			sum	0
+			n	100
+			state (list sum n)
+			cond_func (lambda state (gt (get state 1) 0)) 				# keep looping while n > 0
+			body_func (lambda state (let
+				sum	(get state 0)
+				n	(get state 1)
+				new_sum (add sum n)
+				new_n (sub n 1)
+				new_state (list new_sum new_n)
+				new_state
+			))
+			final_state (while state cond_func body_func)
+			final_state
+		)
 	`)
 
 	r := runtime.NewBasicRuntime()

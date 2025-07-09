@@ -14,7 +14,7 @@ const (
 )
 
 var NameNotFoundError = func(name Name) error {
-	return fmt.Errorf("obj not found %s", name)
+	return fmt.Errorf("object not found %s", name)
 }
 var InterruptError = func(err error) error {
 	return fmt.Errorf("interrupted: %s", err)
