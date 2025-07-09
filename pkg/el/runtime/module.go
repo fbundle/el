@@ -24,7 +24,6 @@ var letModule = Module{
 			r.Stack.Push(Frame{})
 			defer r.Stack.Pop()
 		}
-
 		for i := 0; i < len(e.Args)-1; i += 2 {
 			lvalue, ok := e.Args[i].(expr.Name)
 			if !ok {
