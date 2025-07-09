@@ -51,7 +51,7 @@ func testRuntime() {
 			(list length sublist second another)
 		)
 
-		# test tco
+		# does not have tco here 
 		(let
 			count (lambda n (match (le n 0)
 				true 0 								# if n <= 0 then 0
@@ -122,7 +122,7 @@ func testRuntime() {
 			while (lambda cond_func body_func state (
 				match (cond_func state)
 				false	state
-				_		(unit (while cond_func body_func (body_func state)))	# wrap while in a unit to force TCO since arguments are executed with TCO
+				_		(while cond_func body_func (body_func state))	# does not have TCO here 
 					
 			))
 			
