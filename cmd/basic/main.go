@@ -124,13 +124,13 @@ func testRuntime() {
 				false	state
 				_		(let
 					next_state (body_func state)
-					(while next_state cond_func body_func)
+					(while next_state cond_func body_func)				# it does not capture tail recursion here
 				)
 			))
 			
-			# sum from 1 to 100 										# sum, n = 0, 100; while n > 0: sum = sum + n; n = n - 1
+			# sum from 1 to 10000 										# sum, n = 0, 10000; while n > 0: sum = sum + n; n = n - 1
 			sum	0
-			n	100
+			n	10000
 			state (list sum n)
 			cond_func (lambda state (gt (get state 1) 0)) 				# keep looping while n > 0
 			body_func (lambda state (let
