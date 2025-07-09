@@ -57,7 +57,7 @@ func testRuntime() {
 				true 0 								# if n <= 0 then 0
 				false (add n (count (sub n 1)))		# else n + count(n-1)
 			))
-			count 2000
+			count 200
 		)
 
 		# test recursion
@@ -122,13 +122,13 @@ func testRuntime() {
 			while (lambda cond_func body_func state (
 				match (cond_func state)
 				false	state
-				_		(unit (while cond_func body_func (body_func state)))				# it does not capture tail recursion here	
+				_		(unit (while cond_func body_func (body_func state)))	# wrap while in a unit to force TCO
 					
 			))
 			
-			# sum from 1 to 2000 										# sum, n = 0, 2000; while n > 0: sum = sum + n; n = n - 1
+			# sum from 1 to 200 										# sum, n = 0, 200; while n > 0: sum = sum + n; n = n - 1
 			sum	0
-			n	2000
+			n	200
 			state (list sum n)
 			cond_func (lambda state (gt (get state 1) 0)) 				# keep looping while n > 0
 			body_func (lambda state (let

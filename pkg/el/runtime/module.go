@@ -92,7 +92,6 @@ var matchModule = Module{
 		if len(e.Args) < 2 {
 			return nil, fmt.Errorf("match requires at least 2 arguments")
 		}
-
 		cond, err := r.Step(ctx, e.Args[0])
 		if err != nil {
 			return nil, err

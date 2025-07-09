@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	MAX_STACK_DEPTH = 1000
+	MAX_STACK_DEPTH = 100
 )
 
 var NameNotFoundError = func(name Name) error {
