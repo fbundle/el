@@ -7,7 +7,7 @@ import (
 
 type Name string
 
-// Frame - a collection of bindings NameExpr -> Object
+// Frame - a collection of bindings Name -> Object
 type Frame = ordered_map.OrderedMap[Name, Object]
 
 type FrameStack = stack.Stack[Frame]
