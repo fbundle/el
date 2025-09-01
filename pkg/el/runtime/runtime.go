@@ -22,6 +22,7 @@ var TimeoutError = func(err error) error {
 	return fmt.Errorf("timeout: %s", err)
 }
 var StackOverflowError = errors.New("stack overflow")
+var LengthMismatchError = errors.New("length mismatch")
 
 type Runtime struct {
 	ParseLiteral func(lit string) (Object, error)
@@ -120,8 +121,10 @@ func (r *Runtime) Step(ctx context.Context, e expr.Expr) (Object, error) {
 			}
 			// 2. make local frame from captured frame and arguments
 			localFrame := lambda.Closure
-			for i, paramName := range lambda.ParamNameList {
-				localFrame = localFrame.Set(paramName, args[i])
+			for i := 0; i < len(lambda.ParamNameList); i++ {
+				paramName := lambda.ParamNameList[i]
+				arg := args[i]
+				localFrame = localFrame.Set(paramName, arg)
 			}
 			// 3. push local frame to stack if not tailcall
 
