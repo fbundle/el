@@ -28,17 +28,13 @@ type Runtime struct {
 	Stack        FrameStack
 }
 
-func (r *Runtime) searchOnStack(name Name) (out Object, err error) {
-	err = NameNotFoundError(name)
-	r.Stack.Iter(func(_ int, frame Frame) bool {
+func (r *Runtime) searchOnStack(name Name) (Object, error) {
+	for _, frame := range r.Stack.Iter {
 		if o, ok := frame.Get(name); ok {
-			out = o
-			err = nil
-			return false
+			return o, nil
 		}
-		return true
-	})
-	return out, err
+	}
+	return nil, NameNotFoundError(name)
 }
 
 // Step -
