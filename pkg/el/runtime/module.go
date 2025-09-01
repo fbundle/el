@@ -5,7 +5,6 @@ import (
 	"el/pkg/el/expr"
 	"errors"
 	"fmt"
-	"maps"
 )
 
 var InternalError = errors.New("ordmap")
@@ -20,8 +19,10 @@ var letModule = Module{
 			return nil, fmt.Errorf("let requires at least 1 arguments")
 		}
 
-		r.Stack.Push(Frame{})
-		defer r.Stack.Pop()
+		r.Stack = r.Stack.Push(Frame{})
+		defer func() {
+			r.Stack, _ = r.Stack.Pop()
+		}()
 		for i := 0; i < len(e.Args)-1; i += 2 {
 			lvalue, ok := e.Args[i].(expr.Name)
 			if !ok {
@@ -33,9 +34,9 @@ var letModule = Module{
 			}
 			name := Name(lvalue)
 			// update stack
-			head := r.Stack.Pop()
-			head[name] = rvalue
-			r.Stack.Push(head)
+			r.Stack = updateHead(r.Stack, func(frame Frame) Frame {
+				return frame.Set(name, rvalue)
+			})
 		}
 		value, err := r.Step(ctx, e.Args[len(e.Args)-1])
 		if err != nil {
@@ -67,9 +68,7 @@ var lambdaModule = Module{
 		implementation := e.Args[len(e.Args)-1]
 
 		// capture only the top of frame stack
-		head := r.Stack.Pop()
-		closure := maps.Clone(head)
-		r.Stack.Push(head)
+		closure := r.Stack.Peek()
 
 		return Lambda{
 			ParamNameList:  paramNameList,

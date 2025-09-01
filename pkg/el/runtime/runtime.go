@@ -5,7 +5,6 @@ import (
 	"el/pkg/el/expr"
 	"errors"
 	"fmt"
-	"maps"
 	"time"
 )
 
@@ -31,8 +30,8 @@ type Runtime struct {
 
 func (r *Runtime) searchOnStack(name Name) (out Object, err error) {
 	err = NameNotFoundError(name)
-	r.Stack.Iter(func(frame Frame) bool {
-		if o, ok := frame[name]; ok {
+	r.Stack.Iter(func(_ int, frame Frame) bool {
+		if o, ok := frame.Get(name); ok {
 			out = o
 			err = nil
 			return false
@@ -124,14 +123,16 @@ func (r *Runtime) Step(ctx context.Context, e expr.Expr) (Object, error) {
 				return nil, fmt.Errorf("lambda: expected %d arguments, got %d", len(lambda.ParamNameList), len(args))
 			}
 			// 2. make local frame from captured frame and arguments
-			localFrame := maps.Clone(lambda.Closure)
+			localFrame := lambda.Closure
 			for i, paramName := range lambda.ParamNameList {
-				localFrame[paramName] = args[i]
+				localFrame = localFrame.Set(paramName, args[i])
 			}
 			// 3. push local frame to stack if not tailcall
 
-			r.Stack.Push(localFrame)
-			defer r.Stack.Pop() // 5. pop local frame from frame stack
+			r.Stack = r.Stack.Push(localFrame)
+			defer func() { // 5. pop local frame from frame stack
+				r.Stack, _ = r.Stack.Pop()
+			}()
 
 			// 4. exec function
 			v, err := r.Step(ctx, lambda.Implementation)
@@ -161,9 +162,9 @@ func (r *Runtime) stepMany(ctx context.Context, es ...expr.Expr) ([]Object, erro
 
 func (r *Runtime) LoadModule(ms ...Module) *Runtime {
 	for _, m := range ms {
-		head := r.Stack.Pop()
-		head[m.Name] = m
-		r.Stack.Push(head)
+		r.Stack = updateHead(r.Stack, func(frame Frame) Frame {
+			return frame.Set(m.Name, m)
+		})
 	}
 	return r
 }

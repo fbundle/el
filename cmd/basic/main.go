@@ -145,6 +145,7 @@ func testRuntime() {
 	`)
 
 	r := runtime.NewBasicRuntime()
+
 	var e expr.Expr
 	var err error
 	ctx := context.Background()
@@ -153,11 +154,11 @@ func testRuntime() {
 		if err != nil {
 			panic(err)
 		}
+		fmt.Println("expr\t", e)
 		o, err := r.Step(ctx, e)
 		if err != nil {
 			panic(err)
 		}
-		fmt.Println("expr\t", e)
 		fmt.Println("output\t", o)
 		fmt.Println()
 	}
