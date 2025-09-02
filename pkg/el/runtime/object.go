@@ -10,7 +10,7 @@ import (
 // Object : union - TODO : introduce new data types
 type Object interface {
 	String() string
-	MustTypeObject() // for type-safety every Object must implement this
+	MustValue() // for type-safety every Object must implement this
 }
 
 type Int int
@@ -19,7 +19,7 @@ func (i Int) String() string {
 	return fmt.Sprintf("%d", i)
 }
 
-func (i Int) MustTypeObject() {}
+func (i Int) MustValue() {}
 
 var True = Int(1)
 var False = Int(0)
@@ -30,7 +30,7 @@ func (u Unwrap) String() string {
 	return "*"
 }
 
-func (u Unwrap) MustTypeObject() {}
+func (u Unwrap) MustValue() {}
 
 type Wildcard struct{}
 
@@ -38,7 +38,7 @@ func (w Wildcard) String() string {
 	return "_"
 }
 
-func (w Wildcard) MustTypeObject() {}
+func (w Wildcard) MustValue() {}
 
 type Lambda struct {
 	ParamNameList  []Name    `json:"paramnamelist,omitempty"`
@@ -56,7 +56,7 @@ func (l Lambda) String() string {
 	return s
 }
 
-func (l Lambda) MustTypeObject() {}
+func (l Lambda) MustValue() {}
 
 type Module struct {
 	Name Name `json:"name,omitempty"`
@@ -68,7 +68,7 @@ func (m Module) String() string {
 	return fmt.Sprintf("[%s]", m.Man)
 }
 
-func (m Module) MustTypeObject() {}
+func (m Module) MustValue() {}
 
 type List []Object
 
@@ -83,4 +83,4 @@ func (l List) String() string {
 
 }
 
-func (l List) MustTypeObject() {}
+func (l List) MustValue() {}

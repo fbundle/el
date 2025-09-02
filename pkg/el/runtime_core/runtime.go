@@ -31,11 +31,11 @@ var ErrorNotEnoughArguments = errors.New("not enough arguments")
 
 type Runtime struct {
 	MaxStackDepth   int
-	ParseLiteralOpt func(lit string) adt.Option[Object]
-	UnwrapArgsOpt   func(args []Object) adt.Option[[]Object]
+	ParseLiteralOpt func(lit string) adt.Option[Value]
+	UnwrapArgsOpt   func(args []Value) adt.Option[[]Value]
 }
 
-func (r Runtime) StepOpt(ctx context.Context, s Stack, e expr.Expr) adt.Option[Object] {
+func (r Runtime) StepOpt(ctx context.Context, s Stack, e expr.Expr) adt.Option[Value] {
 	deadline, ok := ctx.Deadline()
 	if ok && time.Now().After(deadline) {
 		return errorObject(ErrorTimeout(ctx.Err()))
@@ -67,7 +67,7 @@ func (r Runtime) StepOpt(ctx context.Context, s Stack, e expr.Expr) adt.Option[O
 	switch e := e.(type) {
 	case expr.Name:
 		// parse literal
-		var o Object
+		var o Value
 		if err := r.ParseLiteralOpt(string(e)).Unwrap(&o); err == nil {
 			return object(o)
 		}
@@ -77,12 +77,12 @@ func (r Runtime) StepOpt(ctx context.Context, s Stack, e expr.Expr) adt.Option[O
 		}
 		return errorObject(ErrorNameNotFound(Name(e)))
 	case expr.Lambda:
-		var cmd Object
+		var cmd Value
 		if err := r.StepOpt(ctx, s, e.Cmd).Unwrap(&cmd); err != nil {
 			return errorObject(err)
 		}
 		if cmd, ok := cmd.(Command); ok {
-			return cmd.Exec(r, ctx, s, e.Args)
+			return cmd.Apply(r, ctx, s, e.Args)
 		}
 		return errorObject(ErrorCannotExecuteExpression(e))
 	default:
@@ -90,10 +90,10 @@ func (r Runtime) StepOpt(ctx context.Context, s Stack, e expr.Expr) adt.Option[O
 	}
 }
 
-func object(o Object) adt.Option[Object] {
-	return adt.Some[Object](o)
+func object(o Value) adt.Option[Value] {
+	return adt.Some[Value](o)
 }
 
-func errorObject(err error) adt.Option[Object] {
-	return adt.Error[Object](err)
+func errorObject(err error) adt.Option[Value] {
+	return adt.Error[Value](err)
 }

@@ -8,8 +8,10 @@ import (
 	"github.com/fbundle/lab_public/lab/go_util/pkg/adt"
 )
 
-type Object = runtime_core.Object
+type Object = runtime_core.Value
 type Name = runtime_core.Name
+type Module = runtime_core.Module
+
 type Extension struct {
 	Name Name
 	Exec func(ctx context.Context, values ...Object) adt.Option[Object]
@@ -18,8 +20,8 @@ type Extension struct {
 
 func (ext Extension) Module() Module {
 	return Module{
-		man: ext.Man,
-		exec: func(r Runtime, ctx context.Context, s Stack, argList []expr.Expr) adt.Option[Object] {
+		Man: ext.Man,
+		Exec: func(r Runtime, ctx context.Context, s Stack, argList []expr.Expr) adt.Option[Object] {
 			args := make([]Object, len(argList))
 			for i, argExpr := range argList {
 				if err := r.StepOpt(ctx, s, argExpr).Unwrap(&args[i]); err != nil {

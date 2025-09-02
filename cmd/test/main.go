@@ -20,7 +20,7 @@ func testRuntime() {
 	r, s := runtime_ext.NewBasicRuntime()
 
 	var e expr.Expr
-	var o runtime_core.Object
+	var o runtime_core.Value
 	var err error
 	ctx := context.Background()
 	for len(tokens) > 0 {

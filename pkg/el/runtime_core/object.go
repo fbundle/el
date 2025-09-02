@@ -8,19 +8,19 @@ import (
 	"github.com/fbundle/lab_public/lab/go_util/pkg/adt"
 )
 
-type Object interface {
+type Value interface {
 	String() string
-	MustTypeObject()
+	MustValue()
 }
 
 type Command interface {
-	Object
-	Exec(r Runtime, ctx context.Context, s Stack, argList []expr.Expr) adt.Option[Object]
+	Value
+	Apply(r Runtime, ctx context.Context, s Stack, argList []expr.Expr) adt.Option[Value]
 }
 
 type Lambda struct {
 	Params  []Name    `json:"params,omitempty"`
-	Impl    expr.Expr `json:"impl,omitempty"`
+	Body    expr.Expr `json:"body,omitempty"`
 	Closure Frame     `json:"closure,omitempty"`
 }
 
@@ -29,20 +29,20 @@ func (l Lambda) String() string {
 	for _, param := range l.Params {
 		s += string(param) + " "
 	}
-	s += l.Impl.String()
+	s += l.Body.String()
 	s += ")"
 	return s
 }
 
-func (l Lambda) MustTypeObject() {}
+func (l Lambda) MustValue() {}
 
-func (l Lambda) Exec(r Runtime, ctx context.Context, s Stack, argList []expr.Expr) adt.Option[Object] {
+func (l Lambda) Apply(r Runtime, ctx context.Context, s Stack, argList []expr.Expr) adt.Option[Value] {
 	// 0. sanity check
 	if len(argList) < len(l.Params) {
 		errorObject(ErrorNotEnoughArguments)
 	}
 	// 1. evaluate arguments
-	args := make([]Object, len(argList))
+	args := make([]Value, len(argList))
 	for i, argExpr := range argList {
 		if err := r.StepOpt(ctx, s, argExpr).Unwrap(&args[i]); err != nil {
 			return errorObject(err)
@@ -59,9 +59,24 @@ func (l Lambda) Exec(r Runtime, ctx context.Context, s Stack, argList []expr.Exp
 	}
 	callStack := s.Push(local)
 	// 3. make call with new stack
-	var o Object
-	if err := r.StepOpt(ctx, callStack, l.Impl).Unwrap(&o); err != nil {
+	var o Value
+	if err := r.StepOpt(ctx, callStack, l.Body).Unwrap(&o); err != nil {
 		return errorObject(err)
 	}
 	return object(o)
+}
+
+type Module struct {
+	Name Name
+	Exec func(r Runtime, ctx context.Context, s Stack, args []expr.Expr) adt.Option[Value]
+	Man  string
+}
+
+func (m Module) String() string {
+	return fmt.Sprintf("[%s]", m.Man)
+}
+func (m Module) MustValue() {}
+
+func (m Module) Apply(r Runtime, ctx context.Context, s Stack, args []expr.Expr) adt.Option[Value] {
+	return m.Exec(r, ctx, s, args)
 }
