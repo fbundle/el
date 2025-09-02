@@ -19,9 +19,9 @@ var emptyStack = stack.Empty[Frame]()
 
 // PeekAndUpdate - update top of the stack
 func PeekAndUpdate(s Stack, f func(Frame) Frame) Stack {
-	s, h := s.Pop()
+	h := s.Peek()
 	h = f(h)
-	return s.Push(h)
+	return s.Pop().Push(h)
 }
 
 var InitStack Stack
