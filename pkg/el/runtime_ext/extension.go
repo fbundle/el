@@ -28,7 +28,7 @@ func (ext Extension) Module() Module {
 					return errorObject(err)
 				}
 			}
-			if err := r.UnwrapArgsOpt(args).Unwrap(&args); err != nil {
+			if err := r.PostProcessArgsOpt(args).Unwrap(&args); err != nil {
 				return errorObject(err)
 			}
 

@@ -17,7 +17,7 @@ func NewBasicRuntime() (Runtime, Stack) {
 				return parseLiteral(lit)
 			})()
 		},
-		UnwrapArgsOpt: func(args []runtime_core.Value) adt.Option[[]runtime_core.Value] {
+		PostProcessArgsOpt: func(args []runtime_core.Value) adt.Option[[]runtime_core.Value] {
 			return adt.Wrap(func() ([]Object, error) {
 				return unwrapArgs(args)
 			})()

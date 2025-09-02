@@ -48,7 +48,7 @@ func (l Lambda) Apply(r Runtime, ctx context.Context, s Stack, argList []expr.Ex
 			return errorValue(err)
 		}
 	}
-	if err := r.UnwrapArgsOpt(args).Unwrap(&args); err != nil {
+	if err := r.PostProcessArgsOpt(args).Unwrap(&args); err != nil {
 		return errorValue(err)
 	}
 	// 2. make call stack

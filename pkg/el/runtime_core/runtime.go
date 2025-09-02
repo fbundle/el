@@ -30,9 +30,9 @@ var ErrorCannotExecuteExpression = func(e expr.Expr) error {
 var ErrorNotEnoughArguments = errors.New("not enough arguments")
 
 type Runtime struct {
-	MaxStackDepth   int
-	ParseLiteralOpt func(lit string) adt.Option[Value]
-	UnwrapArgsOpt   func(args []Value) adt.Option[[]Value]
+	MaxStackDepth      int
+	ParseLiteralOpt    func(lit string) adt.Option[Value]
+	PostProcessArgsOpt func(args []Value) adt.Option[[]Value]
 }
 
 func (r Runtime) StepOpt(ctx context.Context, s Stack, e expr.Expr) adt.Option[Value] {
