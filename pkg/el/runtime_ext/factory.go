@@ -7,6 +7,7 @@ import (
 )
 
 type Runtime = runtime_core.Runtime
+type Stack = runtime_core.Stack
 
 var InitRuntime = Runtime{
 	MaxStackDepth: 1000,
@@ -20,4 +21,20 @@ var InitRuntime = Runtime{
 			return unwrapArgs(args)
 		})()
 	},
+}
+
+var InitStack Stack
+
+func init() {
+	InitStack = runtime_core.InitStack
+	InitStack = runtime_core.PeekAndUpdate(InitStack, func(frame runtime_core.Frame) runtime_core.Frame {
+		var m runtime_core.Module
+		m = runtime_core.MakeModuleFromExtension(listExtension)
+		frame = frame.Set(m.Name, m)
+		m = runtime_core.MakeModuleFromExtension(lenExtension)
+		frame = frame.Set(m.Name, m)
+		m = runtime_core.MakeModuleFromExtension(sliceExtension)
+		frame = frame.Set(m.Name, m)
+		return frame
+	})
 }
