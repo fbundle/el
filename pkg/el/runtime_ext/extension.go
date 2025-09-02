@@ -21,9 +21,9 @@ func (ext Extension) Module() Module {
 	return Module{
 		Name: ext.Name,
 		Man:  ext.Man,
-		Exec: func(r Runtime, ctx context.Context, s Stack, e expr.Lambda) adt.Option[Object] {
-			args := make([]Object, len(e.Args))
-			for i, argExpr := range e.Args {
+		Exec: func(r Runtime, ctx context.Context, s Stack, argList []expr.Expr) adt.Option[Object] {
+			args := make([]Object, len(argList))
+			for i, argExpr := range argList {
 				if err := r.StepOpt(ctx, s, argExpr).Unwrap(&args[i]); err != nil {
 					return errorObject(err)
 				}

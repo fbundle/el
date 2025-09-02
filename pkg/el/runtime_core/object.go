@@ -42,7 +42,7 @@ func (l Lambda) MustTypeObject() {}
 
 type Module struct {
 	Name Name `json:"name,omitempty"`
-	Exec func(r Runtime, ctx context.Context, s Stack, e expr.Lambda) adt.Option[Object]
+	Exec func(r Runtime, ctx context.Context, s Stack, args []expr.Expr) adt.Option[Object]
 	Man  string `json:"man,omitempty"`
 }
 

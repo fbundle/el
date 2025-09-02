@@ -83,7 +83,7 @@ func (r Runtime) StepOpt(ctx context.Context, s Stack, e expr.Expr) adt.Option[O
 		}
 		switch cmd := cmd.(type) {
 		case Module:
-			return cmd.Exec(r, ctx, s, e)
+			return cmd.Exec(r, ctx, s, e.Args)
 		case Lambda:
 			// 0. sanity check
 			if len(e.Args) < len(cmd.Params) {
