@@ -1,4 +1,4 @@
-package runtime
+package runtime_core
 
 import (
 	"context"
@@ -71,12 +71,12 @@ func StepOpt(ctx context.Context, s Stack, e expr.Expr) adt.Option[Object] {
 				return errorObject(err)
 			}
 			// 2. make call stack
-			local := emptyFrame
+			local := cmd.Closure
 			for i := 0; i < len(cmd.ParamNameList); i++ {
 				param, arg := cmd.ParamNameList[i], args[i]
 				local = local.Set(param, arg)
 			}
-			callStack := cmd.Closure.Push(local)
+			callStack := s.Push(local)
 			// 3. make call with new stack
 			var o Object
 			if err := StepOpt(ctx, callStack, cmd.Implementation).Unwrap(&o); err != nil {

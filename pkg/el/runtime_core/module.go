@@ -1,4 +1,4 @@
-package runtime
+package runtime_core
 
 import (
 	"context"
@@ -73,11 +73,12 @@ var lambdaModule = Module{
 			paramNameList = append(paramNameList, Name(lvalue))
 		}
 		implementation := e.Args[len(e.Args)-1]
+		closure := s.Peek() // capture only top of stack
 
 		return object(Lambda{
 			ParamNameList:  paramNameList,
 			Implementation: implementation,
-			Closure:        s,
+			Closure:        closure,
 		})
 	},
 	Man: "module: (lambda x y (add x y) - declare a function",

@@ -1,4 +1,4 @@
-package runtime
+package runtime_core
 
 import (
 	"context"
@@ -45,7 +45,7 @@ func (w Wildcard) MustTypeObject() {}
 type Lambda struct {
 	ParamNameList  []Name    `json:"paramnamelist,omitempty"`
 	Implementation expr.Expr `json:"implementation,omitempty"`
-	Closure        Stack     `json:"closure,omitempty"`
+	Closure        Frame     `json:"closure,omitempty"`
 }
 
 func (l Lambda) String() string {

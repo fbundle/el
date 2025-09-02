@@ -1,4 +1,4 @@
-package runtime
+package runtime_core
 
 import (
 	"el/pkg/el/expr"

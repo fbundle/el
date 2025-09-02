@@ -1,4 +1,4 @@
-package runtime
+package runtime_core
 
 import (
 	"github.com/fbundle/lab_public/lab/go_util/pkg/persistent/ordered_map"
