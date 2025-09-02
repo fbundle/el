@@ -18,7 +18,7 @@ var letModule = Module{
 			return errorObjectString("let requires odd number of arguments")
 		}
 
-		s = s.Push(runtime_core.EmptyFrame) // new empty frame
+		s = s.Push(runtime_core.Frame{}) // new empty frame
 		for i := 0; i < len(args)-1; i += 2 {
 			// for let, rexpr must be executed in sequence
 			lexpr, rexpr := args[i], args[i+1]

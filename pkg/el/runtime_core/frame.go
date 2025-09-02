@@ -13,10 +13,6 @@ type Frame = ordered_map.OrderedMap[Name, Object]
 // Stack - stack frame
 type Stack = stack.Stack[Frame]
 
-var EmptyFrame = ordered_map.EmptyOrderedMap[Name, Object]()
-
-var EmptyStack = stack.Empty[Frame]()
-
 // PeekAndUpdate - update top of the stack
 func PeekAndUpdate(s Stack, f func(Frame) Frame) Stack {
 	h := s.Peek()
