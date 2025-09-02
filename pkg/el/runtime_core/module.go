@@ -102,6 +102,7 @@ var matchModule = Module{
 				if _, ok := comp.(Wildcard); ok || comp == cond {
 					return i, nil
 				}
+				// TODO - drop Wildcard, the last arg will be wildcard
 			}
 			return 0, fmt.Errorf("no case matched: %s", e.String())
 		}()
