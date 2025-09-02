@@ -10,7 +10,6 @@ import (
 
 type Object = runtime_core.Object
 type Name = runtime_core.Name
-type Module = runtime_core.Module
 type Extension struct {
 	Name Name
 	Exec func(ctx context.Context, values ...Object) adt.Option[Object]
@@ -19,9 +18,8 @@ type Extension struct {
 
 func (ext Extension) Module() Module {
 	return Module{
-		Name: ext.Name,
-		Man:  ext.Man,
-		Exec: func(r Runtime, ctx context.Context, s Stack, argList []expr.Expr) adt.Option[Object] {
+		man: ext.Man,
+		exec: func(r Runtime, ctx context.Context, s Stack, argList []expr.Expr) adt.Option[Object] {
 			args := make([]Object, len(argList))
 			for i, argExpr := range argList {
 				if err := r.StepOpt(ctx, s, argExpr).Unwrap(&args[i]); err != nil {
@@ -39,6 +37,7 @@ func (ext Extension) Module() Module {
 
 var listExtension = Extension{
 	Name: "list",
+	Man:  "Module: (list 1 2 (lambda x (add x 1))) - make a list",
 	Exec: func(ctx context.Context, values ...Object) adt.Option[Object] {
 		l := List{}
 		for _, v := range values {
@@ -46,11 +45,11 @@ var listExtension = Extension{
 		}
 		return adt.Some[Object](l)
 	},
-	Man: "module: (list 1 2 (lambda x (add x 1))) - make a list",
 }
 
 var lenExtension = Extension{
 	Name: "len",
+	Man:  "Module: (len (list 1 2 3)) - get the length of a list",
 	Exec: func(ctx context.Context, values ...Object) adt.Option[Object] {
 		if len(values) != 1 {
 			return errorObjectString("len requires 1 argument")
@@ -61,11 +60,11 @@ var lenExtension = Extension{
 		}
 		return object(Int{l.Len()})
 	},
-	Man: "module: (len (list 1 2 3)) - get the length of a list",
 }
 
 var sliceExtension = Extension{
 	Name: "slice",
+	Man:  "Module: (get (list 1 2 3) (list 0 2)) - get the 0th and 2nd element of a list",
 	Exec: func(ctx context.Context, values ...Object) adt.Option[Object] {
 		if len(values) != 2 {
 			return errorObjectString("slice requires 2 arguments")
@@ -89,5 +88,4 @@ var sliceExtension = Extension{
 		}
 		return object(output)
 	},
-	Man: "module: (get (list 1 2 3) (list 0 2)) - get the 0th and 2nd element of a list",
 }

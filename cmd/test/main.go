@@ -17,8 +17,7 @@ func testRuntime() {
 		)
 	`)
 
-	r := runtime_ext.InitRuntime
-	s := runtime_ext.InitStack
+	r, s := runtime_ext.NewBasicRuntime()
 
 	var e expr.Expr
 	var o runtime_core.Object

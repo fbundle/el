@@ -56,9 +56,6 @@ func parseLiteral(lit string) (Object, error) {
 	if len(lit) == 0 {
 		return nil, ErrorEmptyLiteral
 	}
-	if lit == "_" {
-		return Wildcard{}, nil
-	}
 	if lit == "*" {
 		return Unwrap{}, nil
 	}

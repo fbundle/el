@@ -8,24 +8,14 @@ import (
 	"github.com/fbundle/lab_public/lab/go_util/pkg/adt"
 )
 
-// Object : union
 type Object interface {
 	String() string
 	MustTypeObject()
 }
 
-type Wildcard struct{}
-
-func (w Wildcard) String() string {
-	return "_"
-}
-
-func (w Wildcard) MustTypeObject() {}
-
 type Command interface {
-	String() string
-	MustTypeObject()
-	Apply(r Runtime, ctx context.Context, s Stack, args []expr.Expr) adt.Option[Object]
+	Object
+	Exec(r Runtime, ctx context.Context, s Stack, argList []expr.Expr) adt.Option[Object]
 }
 
 type Lambda struct {
@@ -45,7 +35,8 @@ func (l Lambda) String() string {
 }
 
 func (l Lambda) MustTypeObject() {}
-func (l Lambda) Apply(r Runtime, ctx context.Context, s Stack, argList []expr.Expr) adt.Option[Object] {
+
+func (l Lambda) Exec(r Runtime, ctx context.Context, s Stack, argList []expr.Expr) adt.Option[Object] {
 	// 0. sanity check
 	if len(argList) < len(l.Params) {
 		errorObject(ErrorNotEnoughArguments)
@@ -73,19 +64,4 @@ func (l Lambda) Apply(r Runtime, ctx context.Context, s Stack, argList []expr.Ex
 		return errorObject(err)
 	}
 	return object(o)
-}
-
-type Module struct {
-	Name Name `json:"name,omitempty"`
-	Exec func(r Runtime, ctx context.Context, s Stack, args []expr.Expr) adt.Option[Object]
-	Man  string `json:"man,omitempty"`
-}
-
-func (m Module) String() string {
-	return fmt.Sprintf("[%s]", m.Man)
-}
-
-func (m Module) MustTypeObject() {}
-func (m Module) Apply(r Runtime, ctx context.Context, s Stack, args []expr.Expr) adt.Option[Object] {
-	return m.Exec(r, ctx, s, args)
 }

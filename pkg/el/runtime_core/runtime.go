@@ -82,7 +82,7 @@ func (r Runtime) StepOpt(ctx context.Context, s Stack, e expr.Expr) adt.Option[O
 			return errorObject(err)
 		}
 		if cmd, ok := cmd.(Command); ok {
-			return cmd.Apply(r, ctx, s, e.Args)
+			return cmd.Exec(r, ctx, s, e.Args)
 		}
 		return errorObject(ErrorCannotExecuteExpression(e))
 	default:
@@ -96,8 +96,4 @@ func object(o Object) adt.Option[Object] {
 
 func errorObject(err error) adt.Option[Object] {
 	return adt.Error[Object](err)
-}
-
-func errorObjectString(msg string) adt.Option[Object] {
-	return errorObject(errors.New(msg))
 }

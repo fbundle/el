@@ -1,14 +1,30 @@
 package runtime_ext
 
 import (
+	"context"
+	"el/pkg/el/expr"
 	"el/pkg/el/runtime_core"
 	"fmt"
 	"strings"
 
+	"github.com/fbundle/lab_public/lab/go_util/pkg/adt"
 	"github.com/fbundle/lab_public/lab/go_util/pkg/persistent/seq"
 )
 
-type Wildcard = runtime_core.Wildcard
+type Module struct {
+	name runtime_core.Name
+	exec func(r runtime_core.Runtime, ctx context.Context, s runtime_core.Stack, args []expr.Expr) adt.Option[runtime_core.Object]
+	man  string
+}
+
+func (m Module) String() string {
+	return fmt.Sprintf("[%s]", m.man)
+}
+func (m Module) MustTypeObject() {}
+
+func (m Module) Exec(r runtime_core.Runtime, ctx context.Context, s runtime_core.Stack, args []expr.Expr) adt.Option[runtime_core.Object] {
+	return m.exec(r, ctx, s, args)
+}
 
 type Unwrap struct{}
 
