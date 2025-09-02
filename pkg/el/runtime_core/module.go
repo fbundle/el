@@ -67,7 +67,7 @@ var lambdaModule = Module{
 			paramList = append(paramList, Name(lvalue))
 		}
 		implementation := e.Args[len(e.Args)-1]
-		closure := s.Peek() // capture only top of stack
+		closure := s.Peek() // capture only top of stack // TODO - capture more but only necessary variables
 
 		return object(Lambda{
 			Params:  paramList,
