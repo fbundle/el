@@ -38,11 +38,11 @@ type Runtime struct {
 func (r Runtime) StepOpt(ctx context.Context, s Stack, e expr.Expr) adt.Option[Value] {
 	deadline, ok := ctx.Deadline()
 	if ok && time.Now().After(deadline) {
-		return errorObject(ErrorTimeout(ctx.Err()))
+		return errorValue(ErrorTimeout(ctx.Err()))
 	}
 	select {
 	case <-ctx.Done():
-		return errorObject(ErrorInterrupt(ctx.Err()))
+		return errorValue(ErrorInterrupt(ctx.Err()))
 	default:
 	}
 
@@ -62,38 +62,38 @@ func (r Runtime) StepOpt(ctx context.Context, s Stack, e expr.Expr) adt.Option[V
 	*/
 
 	if s.Depth() > r.MaxStackDepth {
-		return errorObject(ErrorStackOverflow)
+		return errorValue(ErrorStackOverflow)
 	}
 	switch e := e.(type) {
 	case expr.Name:
 		// parse literal
 		var o Value
 		if err := r.ParseLiteralOpt(string(e)).Unwrap(&o); err == nil {
-			return object(o)
+			return value(o)
 		}
 		// search name on stack
 		if o, ok := searchOnStack(s, Name(e)); ok {
-			return object(o)
+			return value(o)
 		}
-		return errorObject(ErrorNameNotFound(Name(e)))
+		return errorValue(ErrorNameNotFound(Name(e)))
 	case expr.Lambda:
 		var cmd Value
 		if err := r.StepOpt(ctx, s, e.Cmd).Unwrap(&cmd); err != nil {
-			return errorObject(err)
+			return errorValue(err)
 		}
 		if cmd, ok := cmd.(Command); ok {
 			return cmd.Apply(r, ctx, s, e.Args)
 		}
-		return errorObject(ErrorCannotExecuteExpression(e))
+		return errorValue(ErrorCannotExecuteExpression(e))
 	default:
-		return errorObject(ErrorUnknownExpression(e))
+		return errorValue(ErrorUnknownExpression(e))
 	}
 }
 
-func object(o Value) adt.Option[Value] {
+func value(o Value) adt.Option[Value] {
 	return adt.Some[Value](o)
 }
 
-func errorObject(err error) adt.Option[Value] {
+func errorValue(err error) adt.Option[Value] {
 	return adt.Error[Value](err)
 }

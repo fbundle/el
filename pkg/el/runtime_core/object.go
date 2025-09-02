@@ -39,17 +39,17 @@ func (l Lambda) MustValue() {}
 func (l Lambda) Apply(r Runtime, ctx context.Context, s Stack, argList []expr.Expr) adt.Option[Value] {
 	// 0. sanity check
 	if len(argList) < len(l.Params) {
-		errorObject(ErrorNotEnoughArguments)
+		errorValue(ErrorNotEnoughArguments)
 	}
 	// 1. evaluate arguments
 	args := make([]Value, len(argList))
 	for i, argExpr := range argList {
 		if err := r.StepOpt(ctx, s, argExpr).Unwrap(&args[i]); err != nil {
-			return errorObject(err)
+			return errorValue(err)
 		}
 	}
 	if err := r.UnwrapArgsOpt(args).Unwrap(&args); err != nil {
-		return errorObject(err)
+		return errorValue(err)
 	}
 	// 2. make call stack
 	local := l.Closure
@@ -61,9 +61,9 @@ func (l Lambda) Apply(r Runtime, ctx context.Context, s Stack, argList []expr.Ex
 	// 3. make call with new stack
 	var o Value
 	if err := r.StepOpt(ctx, callStack, l.Body).Unwrap(&o); err != nil {
-		return errorObject(err)
+		return errorValue(err)
 	}
-	return object(o)
+	return value(o)
 }
 
 type Module struct {
