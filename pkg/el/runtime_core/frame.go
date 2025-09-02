@@ -17,7 +17,8 @@ var emptyFrame = ordered_map.EmptyOrderedMap[Name, Object]()
 
 var emptyStack = stack.Empty[Frame]()
 
-func updateHead(s Stack, f func(Frame) Frame) Stack {
+// PeekAndUpdate - update top of the stack
+func PeekAndUpdate(s Stack, f func(Frame) Frame) Stack {
 	s, h := s.Pop()
 	h = f(h)
 	return s.Push(h)

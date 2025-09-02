@@ -1,6 +1,11 @@
 package runtime_core
 
-func NewRuntime() Stack {
+func New() Stack {
 	stack := emptyStack.Push(emptyFrame)
-	return LoadModule(stack, letModule, lambdaModule, matchModule)
+	return PeekAndUpdate(stack, func(f Frame) Frame {
+		for _, m := range []Module{letModule, lambdaModule, matchModule} {
+			f = f.Set(m.Name, m)
+		}
+		return f
+	})
 }

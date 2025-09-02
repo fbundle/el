@@ -8,15 +8,6 @@ import (
 	"github.com/fbundle/lab_public/lab/go_util/pkg/adt"
 )
 
-func LoadModule(s Stack, ms ...Module) Stack {
-	return updateHead(s, func(f Frame) Frame {
-		for _, m := range ms {
-			f = f.Set(m.Name, m)
-		}
-		return f
-	})
-}
-
 var letModule = Module{
 	Name: "let",
 	Exec: func(ctx context.Context, s Stack, e expr.Lambda) adt.Option[Object] {
@@ -45,7 +36,7 @@ var letModule = Module{
 			}
 
 			// update stack
-			s = updateHead(s, func(f Frame) Frame {
+			s = PeekAndUpdate(s, func(f Frame) Frame {
 				return f.Set(Name(lvalue), rvalue)
 			})
 		}
