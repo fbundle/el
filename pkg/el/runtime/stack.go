@@ -13,7 +13,7 @@ type Frame = ordered_map.OrderedMap[Name, Object]
 type FrameStack = stack.Stack[Frame]
 
 func newFrameStack() FrameStack {
-	return stack.Empty[Frame]().Push(Frame{})
+	return stack.Empty[Frame]().Push(ordered_map.EmptyOrderedMap[Name, Object]())
 }
 
 func updateHead(s FrameStack, f func(Frame) Frame) FrameStack {

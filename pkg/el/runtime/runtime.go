@@ -86,17 +86,7 @@ func (r *Runtime) Step(ctx context.Context, e expr.Expr) (Object, error) {
 		return v, nil
 
 	case expr.Lambda:
-		getLambda := func(cmd expr.Expr) (Object, error) {
-			switch cmd := e.Cmd.(type) {
-			case expr.Name:
-				return r.searchOnStack(Name(cmd))
-			case expr.Lambda:
-				return r.Step(ctx, cmd)
-			default:
-				return nil, fmt.Errorf("lambda: invalid command")
-			}
-		}
-		lambda, err := getLambda(e.Cmd)
+		lambda, err := r.Step(ctx, e.Cmd)
 		if err != nil {
 			return nil, err
 		}
