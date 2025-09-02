@@ -8,7 +8,7 @@ import (
 	"github.com/fbundle/lab_public/lab/go_util/pkg/adt"
 )
 
-// Object : union - TODO : introduce new data types
+// Object : union
 type Object interface {
 	String() string
 	MustTypeObject() // for type-safety every Object must implement this
@@ -23,17 +23,17 @@ func (w Wildcard) String() string {
 func (w Wildcard) MustTypeObject() {}
 
 type Lambda struct {
-	ParamNameList  []Name    `json:"paramnamelist,omitempty"`
-	Implementation expr.Expr `json:"implementation,omitempty"`
-	Closure        Frame     `json:"closure,omitempty"`
+	Params  []Name    `json:"params,omitempty"`
+	Impl    expr.Expr `json:"impl,omitempty"`
+	Closure Frame     `json:"closure,omitempty"`
 }
 
 func (l Lambda) String() string {
 	s := fmt.Sprintf("(<closure_%p>; lambda ", l.Closure)
-	for _, param := range l.ParamNameList {
+	for _, param := range l.Params {
 		s += string(param) + " "
 	}
-	s += l.Implementation.String()
+	s += l.Impl.String()
 	s += ")"
 	return s
 }

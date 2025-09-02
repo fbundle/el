@@ -47,8 +47,7 @@ func (r Runtime) StepOpt(ctx context.Context, s Stack, e expr.Expr) adt.Option[O
 	case expr.Name:
 		// parse literal
 		var o Object
-		err := r.ParseLiteralOpt(string(e)).Unwrap(&o)
-		if err == nil {
+		if err := r.ParseLiteralOpt(string(e)).Unwrap(&o); err == nil {
 			return object(o)
 		}
 		// search name on stack
@@ -66,7 +65,7 @@ func (r Runtime) StepOpt(ctx context.Context, s Stack, e expr.Expr) adt.Option[O
 			return cmd.Exec(r, ctx, s, e)
 		case Lambda:
 			// 0. sanity check
-			if len(e.Args) < len(cmd.ParamNameList) {
+			if len(e.Args) < len(cmd.Params) {
 				errorObject(ErrorNotEnoughArguments)
 			}
 			// 1. evaluate arguments
@@ -81,14 +80,14 @@ func (r Runtime) StepOpt(ctx context.Context, s Stack, e expr.Expr) adt.Option[O
 			}
 			// 2. make call stack
 			local := cmd.Closure
-			for i := 0; i < len(cmd.ParamNameList); i++ {
-				param, arg := cmd.ParamNameList[i], args[i]
+			for i := 0; i < len(cmd.Params); i++ {
+				param, arg := cmd.Params[i], args[i]
 				local = local.Set(param, arg)
 			}
 			callStack := s.Push(local)
 			// 3. make call with new stack
 			var o Object
-			if err := r.StepOpt(ctx, callStack, cmd.Implementation).Unwrap(&o); err != nil {
+			if err := r.StepOpt(ctx, callStack, cmd.Impl).Unwrap(&o); err != nil {
 				return errorObject(err)
 			}
 			return object(o)

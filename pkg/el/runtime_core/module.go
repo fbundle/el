@@ -55,21 +55,21 @@ var lambdaModule = Module{
 		if len(e.Args) < 1 {
 			return errorObjectString("lambda requires at least 1 arguments")
 		}
-		paramNameList := make([]Name, 0, len(e.Args)-1)
+		paramList := make([]Name, 0, len(e.Args)-1)
 		for i := 0; i < len(e.Args)-1; i++ {
 			lvalue, ok := e.Args[i].(expr.Name)
 			if !ok {
 				return errorObjectString("lvalue must be a name")
 			}
-			paramNameList = append(paramNameList, Name(lvalue))
+			paramList = append(paramList, Name(lvalue))
 		}
 		implementation := e.Args[len(e.Args)-1]
 		closure := s.Peek() // capture only top of stack
 
 		return object(Lambda{
-			ParamNameList:  paramNameList,
-			Implementation: implementation,
-			Closure:        closure,
+			Params:  paramList,
+			Impl:    implementation,
+			Closure: closure,
 		})
 	},
 	Man: "module: (lambda x y (add x y) - declare a function",
