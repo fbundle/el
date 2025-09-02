@@ -11,11 +11,11 @@ import (
 func StepOpt(ctx context.Context, s Stack, e expr.Expr) adt.Option[Object] {
 	deadline, ok := ctx.Deadline()
 	if ok && time.Now().After(deadline) {
-		return errorObject(TimeoutError(ctx.Err()))
+		return errorObject(ErrorTimeout(ctx.Err()))
 	}
 	select {
 	case <-ctx.Done():
-		return errorObject(InterruptError(ctx.Err()))
+		return errorObject(ErrorInterrupt(ctx.Err()))
 	default:
 	}
 
@@ -35,7 +35,7 @@ func StepOpt(ctx context.Context, s Stack, e expr.Expr) adt.Option[Object] {
 	*/
 
 	if s.Depth() > MAX_STACK_DEPTH {
-		return errorObject(StackOverflowError)
+		return errorObject(ErrorStackOverflow)
 	}
 	switch e := e.(type) {
 	case expr.Name:
@@ -60,7 +60,7 @@ func StepOpt(ctx context.Context, s Stack, e expr.Expr) adt.Option[Object] {
 		case Lambda:
 			// 0. sanity check
 			if len(e.Args) < len(cmd.ParamNameList) {
-				errorObject(NotEnoughArguments)
+				errorObject(ErrorNotEnoughArguments)
 			}
 			// 1. evaluate arguments
 			var args []Object
@@ -84,11 +84,11 @@ func StepOpt(ctx context.Context, s Stack, e expr.Expr) adt.Option[Object] {
 			}
 			return object(o)
 		default:
-			return errorObject(CannotExecuteExpression(e))
+			return errorObject(ErrorCannotExecuteExpression(e))
 		}
 
 	default:
-		return errorObject(UnknownExpression(e))
+		return errorObject(ErrorUnknownExpression(e))
 	}
 }
 

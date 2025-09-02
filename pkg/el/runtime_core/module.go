@@ -12,7 +12,7 @@ var letModule = Module{
 	Name: "let",
 	Exec: func(ctx context.Context, s Stack, e expr.Lambda) adt.Option[Object] {
 		if e.Cmd.(expr.Name) != "let" {
-			return errorObject(InternalError)
+			return errorObject(ErrorInternal)
 		}
 		if len(e.Args) < 1 {
 			return errorObjectString("let requires at least 1 arguments")
@@ -50,7 +50,7 @@ var lambdaModule = Module{
 	Name: "lambda",
 	Exec: func(ctx context.Context, s Stack, e expr.Lambda) adt.Option[Object] {
 		if e.Cmd.(expr.Name) != "lambda" {
-			return errorObject(InternalError)
+			return errorObject(ErrorInternal)
 		}
 		if len(e.Args) < 1 {
 			return errorObjectString("lambda requires at least 1 arguments")
@@ -79,7 +79,7 @@ var matchModule = Module{
 	Name: "match",
 	Exec: func(ctx context.Context, s Stack, e expr.Lambda) adt.Option[Object] {
 		if e.Cmd.(expr.Name) != "match" {
-			return errorObject(InternalError)
+			return errorObject(ErrorInternal)
 		}
 		if len(e.Args) < 3 {
 			return errorObjectString("match requires at least 3 arguments")

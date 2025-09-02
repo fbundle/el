@@ -14,25 +14,25 @@ const (
 	MAX_STACK_DEPTH = 1000
 )
 
-var NameNotFoundError = func(name Name) error {
+var ErrorNameNotFound = func(name Name) error {
 	return fmt.Errorf("object not found %s", name)
 }
-var InterruptError = func(err error) error {
+var ErrorInterrupt = func(err error) error {
 	return fmt.Errorf("interrupted: %s", err)
 }
-var TimeoutError = func(err error) error {
+var ErrorTimeout = func(err error) error {
 	return fmt.Errorf("timeout: %s", err)
 }
-var StackOverflowError = errors.New("stack overflow")
-var EmptyLiteralError = errors.New("empty literal")
-var UnknownExpression = func(e expr.Expr) error {
+var ErrorStackOverflow = errors.New("stack overflow")
+var ErrorEmptyLiteral = errors.New("empty literal")
+var ErrorUnknownExpression = func(e expr.Expr) error {
 	return fmt.Errorf("unknown expression type %s", e.String())
 }
-var CannotExecuteExpression = func(e expr.Expr) error {
+var ErrorCannotExecuteExpression = func(e expr.Expr) error {
 	return fmt.Errorf("expression cannot be executed: %s", e.String())
 }
-var NotEnoughArguments = errors.New("not enough arguments")
-var InternalError = errors.New("internal")
+var ErrorNotEnoughArguments = errors.New("not enough arguments")
+var ErrorInternal = errors.New("internal")
 
 func unwrapArgsOpt(args []Object) adt.Option[[]Object] {
 	return adt.Wrap(func() ([]Object, error) {
@@ -84,7 +84,7 @@ func unwrapArgs(args []Object) ([]Object, error) {
 
 func parseLiteral(lit string) (Object, error) {
 	if len(lit) == 0 {
-		return nil, EmptyLiteralError
+		return nil, ErrorEmptyLiteral
 	}
 	if lit == "_" {
 		return Wildcard{}, nil
