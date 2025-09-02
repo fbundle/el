@@ -81,45 +81,15 @@ func (r Runtime) StepOpt(ctx context.Context, s Stack, e expr.Expr) adt.Option[O
 		if err := r.StepOpt(ctx, s, e.Cmd).Unwrap(&cmd); err != nil {
 			return errorObject(err)
 		}
-		switch cmd := cmd.(type) {
-		case Module:
-			return cmd.Exec(r, ctx, s, e.Args)
-		case Lambda:
-			// 0. sanity check
-			if len(e.Args) < len(cmd.Params) {
-				errorObject(ErrorNotEnoughArguments)
-			}
-			// 1. evaluate arguments
-			args := make([]Object, len(e.Args))
-			for i, argExpr := range e.Args {
-				if err := r.StepOpt(ctx, s, argExpr).Unwrap(&args[i]); err != nil {
-					return errorObject(err)
-				}
-			}
-			if err := r.UnwrapArgsOpt(args).Unwrap(&args); err != nil {
-				return errorObject(err)
-			}
-			// 2. make call stack
-			local := cmd.Closure
-			for i := 0; i < len(cmd.Params); i++ {
-				param, arg := cmd.Params[i], args[i]
-				local = local.Set(param, arg)
-			}
-			callStack := s.Push(local)
-			// 3. make call with new stack
-			var o Object
-			if err := r.StepOpt(ctx, callStack, cmd.Impl).Unwrap(&o); err != nil {
-				return errorObject(err)
-			}
-			return object(o)
-		default:
-			return errorObject(ErrorCannotExecuteExpression(e))
+		if cmd, ok := cmd.(Command); ok {
+			return cmd.Apply(r, ctx, s, e.Args)
 		}
-
+		return errorObject(ErrorCannotExecuteExpression(e))
 	default:
 		return errorObject(ErrorUnknownExpression(e))
 	}
 }
+
 func object(o Object) adt.Option[Object] {
 	return adt.Some[Object](o)
 }
