@@ -3,7 +3,8 @@ package main
 import (
 	"context"
 	"el/pkg/el/expr"
-	"el/pkg/el/runtime"
+	"el/pkg/el/runtime_core"
+	"el/pkg/el/runtime_ext"
 	"fmt"
 )
 
@@ -16,9 +17,11 @@ func testRuntime() {
 		)
 	`)
 
-	r := runtime.NewBasicRuntime()
+	r := runtime_ext.InitRuntime
+	s := runtime_ext.InitStack
 
 	var e expr.Expr
+	var o runtime_core.Object
 	var err error
 	ctx := context.Background()
 	for len(tokens) > 0 {
@@ -27,8 +30,7 @@ func testRuntime() {
 			panic(err)
 		}
 		fmt.Println("expr\t", e)
-		o, err := r.Step(ctx, e)
-		if err != nil {
+		if err := r.StepOpt(ctx, s, e).Unwrap(&o); err != nil {
 			panic(err)
 		}
 		fmt.Println("output\t", o)

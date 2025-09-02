@@ -6,7 +6,6 @@ import (
 	"strconv"
 
 	"github.com/fbundle/lab_public/lab/go_util/pkg/adt"
-	"github.com/fbundle/lab_public/lab/go_util/pkg/persistent/seq"
 )
 
 func unwrapArgs(args []Object) ([]Object, error) {
@@ -22,8 +21,7 @@ func unwrapArgs(args []Object) ([]Object, error) {
 				}
 				switch next := args[1].(type) {
 				case List:
-					lst := seq.Seq[Object](next)
-					unwrappedArgs = append(unwrappedArgs, lst.Repr()...)
+					unwrappedArgs = append(unwrappedArgs, next.Repr()...)
 					args = args[2:]
 					unwrapped = true
 				case Unwrap: // nested unwrap
@@ -69,14 +67,14 @@ func parseLiteral(lit string) (Object, error) {
 		if err := json.Unmarshal([]byte(lit), &str); err != nil {
 			return nil, err
 		}
-		strList := seq.Seq[Object]{}
+		strList := List{}
 		for _, ch := range []rune(str) {
-			strList = strList.Ins(strList.Len(), Int(ch))
+			strList = List{strList.Ins(strList.Len(), Int{int(ch)})}
 		}
-		return List(strList), nil
+		return strList, nil
 	}
 	i, err := strconv.Atoi(lit)
-	return Int(i), err
+	return Int{i}, err
 }
 func object(o Object) adt.Option[Object] {
 	return adt.Some[Object](o)
