@@ -12,7 +12,7 @@ import (
 type Runtime = runtime_core.Runtime
 
 var InitRuntime = Runtime{
-	MAX_STACK_DEPTH: 1000,
+	MaxStackDepth:   1000,
 	ParseLiteralOpt: parseLiteralOpt,
 	UnwrapArgsOpt:   unwrapArgsOpt,
 }

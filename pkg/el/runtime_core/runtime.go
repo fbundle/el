@@ -9,7 +9,7 @@ import (
 )
 
 type Runtime struct {
-	MAX_STACK_DEPTH int
+	MaxStackDepth   int
 	ParseLiteralOpt func(lit string) adt.Option[Object]
 	UnwrapArgsOpt   func(args []Object) adt.Option[[]Object]
 }
@@ -40,7 +40,7 @@ func (r Runtime) StepOpt(ctx context.Context, s Stack, e expr.Expr) adt.Option[O
 				bind parameters and previously captured variables in lambda
 	*/
 
-	if s.Depth() > r.MAX_STACK_DEPTH {
+	if s.Depth() > r.MaxStackDepth {
 		return errorObject(ErrorStackOverflow)
 	}
 	switch e := e.(type) {
