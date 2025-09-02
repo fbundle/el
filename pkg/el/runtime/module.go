@@ -21,7 +21,7 @@ var letModule = Module{
 
 		r.Stack = r.Stack.Push(Frame{})
 		defer func() {
-			r.Stack, _ = r.Stack.Pop()
+			r.Stack = r.Stack.Pop()
 		}()
 		for i := 0; i < len(e.Args)-1; i += 2 {
 			lvalue, ok := e.Args[i].(expr.Name)

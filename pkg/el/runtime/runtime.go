@@ -120,9 +120,9 @@ func (r *Runtime) Step(ctx context.Context, e expr.Expr) (Object, error) {
 			// 3. push local frame to stack if not tailcall
 
 			r.Stack = r.Stack.Push(localFrame)
-			defer func() { // 5. pop local frame from frame stack
-				r.Stack, _ = r.Stack.Pop()
-			}()
+			defer func() {
+				r.Stack = r.Stack.Pop()
+			}() // 5. pop local frame from frame stack
 
 			// 4. exec function
 			v, err := r.Step(ctx, lambda.Implementation)

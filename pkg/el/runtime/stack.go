@@ -17,7 +17,7 @@ func newFrameStack() FrameStack {
 }
 
 func updateHead(s FrameStack, f func(Frame) Frame) FrameStack {
-	s, h := s.Pop()
+	h := s.Peek()
 	h = f(h)
-	return s.Push(h)
+	return s.Pop().Push(h)
 }
