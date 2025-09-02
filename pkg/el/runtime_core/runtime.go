@@ -63,9 +63,11 @@ func StepOpt(ctx context.Context, s Stack, e expr.Expr) adt.Option[Object] {
 				errorObject(ErrorNotEnoughArguments)
 			}
 			// 1. evaluate arguments
-			var args []Object
-			if err := stepManyOpt(ctx, s, e.Args...).Unwrap(&args); err != nil {
-				return errorObject(err)
+			args := make([]Object, len(e.Args))
+			for i, argExpr := range e.Args {
+				if err := StepOpt(ctx, s, argExpr).Unwrap(&args[i]); err != nil {
+					return errorObject(err)
+				}
 			}
 			if err := unwrapArgsOpt(args).Unwrap(&args); err != nil {
 				return errorObject(err)
@@ -90,14 +92,4 @@ func StepOpt(ctx context.Context, s Stack, e expr.Expr) adt.Option[Object] {
 	default:
 		return errorObject(ErrorUnknownExpression(e))
 	}
-}
-
-func stepManyOpt(ctx context.Context, s Stack, exprList ...expr.Expr) adt.Option[[]Object] {
-	var outputs = make([]Object, len(exprList))
-	for i, e := range exprList {
-		if err := StepOpt(ctx, s, e).Unwrap(&outputs[i]); err != nil {
-			return adt.Error[[]Object](err)
-		}
-	}
-	return adt.Some(outputs)
 }
