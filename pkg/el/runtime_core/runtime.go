@@ -45,16 +45,17 @@ func (r Runtime) StepOpt(ctx context.Context, s Stack, e expr.Expr) adt.Option[O
 	}
 	switch e := e.(type) {
 	case expr.Name:
+		// parse literal
+		var o Object
+		err := r.ParseLiteralOpt(string(e)).Unwrap(&o)
+		if err == nil {
+			return object(o)
+		}
 		// search name on stack
 		if o, ok := searchOnStack(s, Name(e)); ok {
 			return object(o)
 		}
-		// parse literal
-		var o Object
-		if err := r.ParseLiteralOpt(string(e)).Unwrap(&o); err != nil {
-			return errorObject(err)
-		}
-		return object(o)
+		return errorObject(ErrorNameNotFound(Name(e)))
 	case expr.Lambda:
 		var cmd Object
 		if err := r.StepOpt(ctx, s, e.Cmd).Unwrap(&cmd); err != nil {
