@@ -28,13 +28,10 @@ var InitStack Stack
 func init() {
 	InitStack = runtime_core.InitStack
 	InitStack = runtime_core.PeekAndUpdate(InitStack, func(frame runtime_core.Frame) runtime_core.Frame {
-		var m runtime_core.Module
-		m = runtime_core.MakeModuleFromExtension(listExtension)
-		frame = frame.Set(m.Name, m)
-		m = runtime_core.MakeModuleFromExtension(lenExtension)
-		frame = frame.Set(m.Name, m)
-		m = runtime_core.MakeModuleFromExtension(sliceExtension)
-		frame = frame.Set(m.Name, m)
+		for _, ext := range []Extension{listExtension, lenExtension, sliceExtension} {
+			m := ext.Module()
+			frame = frame.Set(m.Name, m)
+		}
 		return frame
 	})
 }
