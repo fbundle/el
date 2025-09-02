@@ -3,8 +3,10 @@ package runtime
 import (
 	"context"
 	"el/pkg/el/expr"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"strconv"
 	"time"
 )
 
@@ -25,8 +27,7 @@ var StackOverflowError = errors.New("stack overflow")
 var LengthMismatchError = errors.New("length mismatch")
 
 type Runtime struct {
-	ParseLiteral func(lit string) (Object, error)
-	Stack        FrameStack
+	Stack FrameStack
 }
 
 func (r *Runtime) searchOnStack(name Name) (Object, error) {
@@ -73,7 +74,7 @@ func (r *Runtime) Step(ctx context.Context, e expr.Expr) (Object, error) {
 	case expr.Name:
 		var v Object
 		// load literal
-		v, err := r.ParseLiteral(string(e))
+		v, err := parseLiteral(string(e))
 		if err == nil {
 			return v, nil
 		}
@@ -208,4 +209,29 @@ func unwrapArgs(args []Object) ([]Object, error) {
 			return args, nil
 		}
 	}
+}
+
+func parseLiteral(lit string) (Object, error) {
+	if len(lit) == 0 {
+		return nil, errors.New("empty literal")
+	}
+	if lit == "_" {
+		return Wildcard{}, nil
+	}
+	if lit == "*" {
+		return Unwrap{}, nil
+	}
+	if lit[0] == '"' && lit[len(lit)-1] == '"' {
+		str := ""
+		if err := json.Unmarshal([]byte(lit), &str); err != nil {
+			return nil, err
+		}
+		strList := List{}
+		for _, ch := range []rune(str) {
+			strList = append(strList, Int(ch))
+		}
+		return strList, nil
+	}
+	i, err := strconv.Atoi(lit)
+	return Int(i), err
 }
