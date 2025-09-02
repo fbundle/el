@@ -18,23 +18,23 @@ func (u Unwrap) String() string {
 
 func (u Unwrap) MustTypeObject() {}
 
-type Int int
+type Int struct {
+	int
+}
 
 func (i Int) String() string {
-	return fmt.Sprintf("%d", i)
+	return fmt.Sprintf("%d", i.int)
 }
 
 func (i Int) MustTypeObject() {}
 
-var True = Int(1)
-var False = Int(0)
-
-type List seq.Seq[Object]
+type List struct {
+	seq.Seq[Object]
+}
 
 func (l List) String() string {
-	lst := (seq.Seq[Object])(l)
-	ls := make([]string, 0, lst.Len())
-	for _, o := range lst.Iter {
+	ls := make([]string, 0, l.Len())
+	for _, o := range l.Iter {
 		ls = append(ls, o.String())
 	}
 	s := strings.Join(ls, ",")

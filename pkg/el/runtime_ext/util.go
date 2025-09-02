@@ -5,6 +5,7 @@ import (
 	"errors"
 	"strconv"
 
+	"github.com/fbundle/lab_public/lab/go_util/pkg/adt"
 	"github.com/fbundle/lab_public/lab/go_util/pkg/persistent/seq"
 )
 
@@ -76,4 +77,15 @@ func parseLiteral(lit string) (Object, error) {
 	}
 	i, err := strconv.Atoi(lit)
 	return Int(i), err
+}
+func object(o Object) adt.Option[Object] {
+	return adt.Some[Object](o)
+}
+
+func errorObject(err error) adt.Option[Object] {
+	return adt.Error[Object](err)
+}
+
+func errorObjectString(msg string) adt.Option[Object] {
+	return errorObject(errors.New(msg))
 }

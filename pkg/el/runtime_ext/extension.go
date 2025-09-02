@@ -15,9 +15,52 @@ var listExtension = Extension{
 	Exec: func(ctx context.Context, values ...Object) adt.Option[Object] {
 		l := List{}
 		for _, v := range values {
-			l = append(l, v)
+			l = List{l.Ins(l.Len(), v)}
 		}
 		return adt.Some[Object](l)
 	},
 	Man: "module: (list 1 2 (lambda x (add x 1))) - make a list",
+}
+
+var lenExtension = Extension{
+	Name: "len",
+	Exec: func(ctx context.Context, values ...Object) adt.Option[Object] {
+		if len(values) != 1 {
+			return errorObjectString("len requires 1 argument")
+		}
+		l, ok := values[0].(List)
+		if !ok {
+			return errorObjectString("len argument must be a list")
+		}
+		return object(Int{l.Len()})
+	},
+	Man: "module: (len (list 1 2 3)) - get the length of a list",
+}
+
+var sliceExtension = Extension{
+	Name: "slice",
+	Exec: func(ctx context.Context, values ...Object) adt.Option[Object] {
+		if len(values) != 2 {
+			return errorObjectString("slice requires 2 arguments")
+		}
+		l, ok := values[0].(List)
+		if !ok {
+			return errorObjectString("slice first argument not a list")
+		}
+		i, ok := values[1].(List)
+		if !ok {
+			return errorObjectString("slice first argument not a list")
+		}
+		output := List{}
+		for _, index := range i.Iter {
+			if index, ok := index.(Int); ok {
+				v := l.Get(index.int)
+				output = List{output.Ins(output.Len(), v)}
+			} else {
+				return errorObjectString("slice index must be an integer")
+			}
+		}
+		return object(output)
+	},
+	Man: "module: (get (list 1 2 3) (list 0 2)) - get the 0th and 2nd element of a list",
 }
