@@ -10,7 +10,7 @@ import (
 
 var letModule = Module{
 	Name: "let",
-	Exec: func(ctx context.Context, s Stack, e expr.Lambda) adt.Option[Object] {
+	Exec: func(r Runtime, ctx context.Context, s Stack, e expr.Lambda) adt.Option[Object] {
 		if e.Cmd.(expr.Name) != "let" {
 			return errorObject(ErrorInternal)
 		}
@@ -31,7 +31,7 @@ var letModule = Module{
 			}
 
 			var rvalue Object
-			if err := StepOpt(ctx, s, rexpr).Unwrap(&rvalue); err != nil {
+			if err := r.StepOpt(ctx, s, rexpr).Unwrap(&rvalue); err != nil {
 				return errorObject(err)
 			}
 
@@ -41,14 +41,14 @@ var letModule = Module{
 			})
 		}
 
-		return StepOpt(ctx, s, e.Args[len(e.Args)-1])
+		return r.StepOpt(ctx, s, e.Args[len(e.Args)-1])
 	},
 	Man: "module: (let x 3) - assign value 3 to local variable x",
 }
 
 var lambdaModule = Module{
 	Name: "lambda",
-	Exec: func(ctx context.Context, s Stack, e expr.Lambda) adt.Option[Object] {
+	Exec: func(r Runtime, ctx context.Context, s Stack, e expr.Lambda) adt.Option[Object] {
 		if e.Cmd.(expr.Name) != "lambda" {
 			return errorObject(ErrorInternal)
 		}
@@ -77,7 +77,7 @@ var lambdaModule = Module{
 
 var matchModule = Module{
 	Name: "match",
-	Exec: func(ctx context.Context, s Stack, e expr.Lambda) adt.Option[Object] {
+	Exec: func(r Runtime, ctx context.Context, s Stack, e expr.Lambda) adt.Option[Object] {
 		if e.Cmd.(expr.Name) != "match" {
 			return errorObject(ErrorInternal)
 		}
@@ -85,7 +85,7 @@ var matchModule = Module{
 			return errorObjectString("match requires at least 3 arguments")
 		}
 		var cond Object
-		if err := StepOpt(ctx, s, e.Args[0]).Unwrap(&cond); err != nil {
+		if err := r.StepOpt(ctx, s, e.Args[0]).Unwrap(&cond); err != nil {
 			return errorObject(err)
 		}
 
@@ -93,7 +93,7 @@ var matchModule = Module{
 			for i := 1; i < len(e.Args); i += 2 {
 				compExpr := e.Args[i]
 				var comp Object
-				if err := StepOpt(ctx, s, compExpr).Unwrap(&comp); err != nil {
+				if err := r.StepOpt(ctx, s, compExpr).Unwrap(&comp); err != nil {
 					return 0, err
 				}
 				if _, ok := comp.(Wildcard); ok || comp == cond {
@@ -105,7 +105,7 @@ var matchModule = Module{
 		if err != nil {
 			return errorObject(err)
 		}
-		return StepOpt(ctx, s, e.Args[i+1])
+		return r.StepOpt(ctx, s, e.Args[i+1])
 	},
 	Man: "module: (match x 1 2 4 5) - match, if x=1 then return 3, if x=4 the return 5",
 }

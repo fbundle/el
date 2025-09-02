@@ -23,3 +23,15 @@ func PeekAndUpdate(s Stack, f func(Frame) Frame) Stack {
 	h = f(h)
 	return s.Push(h)
 }
+
+var InitStack Stack
+
+func init() {
+	InitStack = emptyStack.Push(emptyFrame)
+	InitStack = PeekAndUpdate(InitStack, func(f Frame) Frame {
+		for _, m := range []Module{letModule, lambdaModule, matchModule} {
+			f = f.Set(m.Name, m)
+		}
+		return f
+	})
+}

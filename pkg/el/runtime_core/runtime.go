@@ -8,7 +8,13 @@ import (
 	"github.com/fbundle/lab_public/lab/go_util/pkg/adt"
 )
 
-func StepOpt(ctx context.Context, s Stack, e expr.Expr) adt.Option[Object] {
+type Runtime struct {
+	MAX_STACK_DEPTH int
+	ParseLiteralOpt func(lit string) adt.Option[Object]
+	UnwrapArgsOpt   func(args []Object) adt.Option[[]Object]
+}
+
+func (r Runtime) StepOpt(ctx context.Context, s Stack, e expr.Expr) adt.Option[Object] {
 	deadline, ok := ctx.Deadline()
 	if ok && time.Now().After(deadline) {
 		return errorObject(ErrorTimeout(ctx.Err()))
@@ -34,7 +40,7 @@ func StepOpt(ctx context.Context, s Stack, e expr.Expr) adt.Option[Object] {
 				bind parameters and previously captured variables in lambda
 	*/
 
-	if s.Depth() > MAX_STACK_DEPTH {
+	if s.Depth() > r.MAX_STACK_DEPTH {
 		return errorObject(ErrorStackOverflow)
 	}
 	switch e := e.(type) {
@@ -44,19 +50,19 @@ func StepOpt(ctx context.Context, s Stack, e expr.Expr) adt.Option[Object] {
 			return object(o)
 		}
 		// parse literal
-		o, err := parseLiteral(string(e))
-		if err != nil {
+		var o Object
+		if err := r.ParseLiteralOpt(string(e)).Unwrap(&o); err != nil {
 			return errorObject(err)
 		}
 		return object(o)
 	case expr.Lambda:
 		var cmd Object
-		if err := StepOpt(ctx, s, e.Cmd).Unwrap(&cmd); err != nil {
+		if err := r.StepOpt(ctx, s, e.Cmd).Unwrap(&cmd); err != nil {
 			return errorObject(err)
 		}
 		switch cmd := cmd.(type) {
 		case Module:
-			return cmd.Exec(ctx, s, e)
+			return cmd.Exec(r, ctx, s, e)
 		case Lambda:
 			// 0. sanity check
 			if len(e.Args) < len(cmd.ParamNameList) {
@@ -65,11 +71,11 @@ func StepOpt(ctx context.Context, s Stack, e expr.Expr) adt.Option[Object] {
 			// 1. evaluate arguments
 			args := make([]Object, len(e.Args))
 			for i, argExpr := range e.Args {
-				if err := StepOpt(ctx, s, argExpr).Unwrap(&args[i]); err != nil {
+				if err := r.StepOpt(ctx, s, argExpr).Unwrap(&args[i]); err != nil {
 					return errorObject(err)
 				}
 			}
-			if err := unwrapArgsOpt(args).Unwrap(&args); err != nil {
+			if err := r.UnwrapArgsOpt(args).Unwrap(&args); err != nil {
 				return errorObject(err)
 			}
 			// 2. make call stack
@@ -81,7 +87,7 @@ func StepOpt(ctx context.Context, s Stack, e expr.Expr) adt.Option[Object] {
 			callStack := s.Push(local)
 			// 3. make call with new stack
 			var o Object
-			if err := StepOpt(ctx, callStack, cmd.Implementation).Unwrap(&o); err != nil {
+			if err := r.StepOpt(ctx, callStack, cmd.Implementation).Unwrap(&o); err != nil {
 				return errorObject(err)
 			}
 			return object(o)
