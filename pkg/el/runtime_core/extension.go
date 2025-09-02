@@ -24,6 +24,10 @@ func MakeModuleFromExtension(ext Extension) Module {
 					return errorObject(err)
 				}
 			}
+			if err := r.UnwrapArgsOpt(args).Unwrap(&args); err != nil {
+				return errorObject(err)
+			}
+
 			return ext.Exec(ctx, args...)
 		},
 	}
