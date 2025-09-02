@@ -35,3 +35,12 @@ func init() {
 		return f
 	})
 }
+
+func searchOnStack(s Stack, name Name) (Object, bool) {
+	for _, frame := range s.Iter {
+		if o, ok := frame.Get(name); ok {
+			return o, true
+		}
+	}
+	return nil, false
+}

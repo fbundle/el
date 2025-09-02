@@ -3,10 +3,13 @@ package runtime_core
 import (
 	"context"
 	"el/pkg/el/expr"
+	"errors"
 	"fmt"
 
 	"github.com/fbundle/lab_public/lab/go_util/pkg/adt"
 )
+
+var ErrorInternal = errors.New("internal")
 
 var letModule = Module{
 	Name: "let",
