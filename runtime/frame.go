@@ -8,8 +8,8 @@ import (
 
 type Name string
 
-// Frame - a collection of bindings Name -> Value
-type Frame = ordered_map.OrderedMap[Name, Value]
+// Frame - a collection of bindings Name -> Object
+type Frame = ordered_map.OrderedMap[Name, Object]
 
 // Stack - stack frame
 type Stack = stack.Stack[Frame]
@@ -33,11 +33,11 @@ func collapseStack(s Stack) Frame {
 	return head
 }
 
-func searchOnStack(s Stack, name Name) adt.Option[Value] {
+func findStack(s Stack, name Name) adt.Option[Object] {
 	for _, frame := range s.Iter {
 		if o, ok := frame.Get(name); ok {
-			return adt.Some[Value](o)
+			return adt.Some[Object](o)
 		}
 	}
-	return adt.None[Value]()
+	return adt.None[Object]()
 }

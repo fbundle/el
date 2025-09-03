@@ -9,23 +9,23 @@ import (
 )
 
 // helpers
-func value(o Value) adt.Result[Value] {
-	return adt.Ok[Value](o)
+func value(o Object) adt.Result[Object] {
+	return adt.Ok[Object](o)
 }
 
-func errValue(err error) adt.Result[Value] {
-	return adt.Err[Value](err)
+func errValue(err error) adt.Result[Object] {
+	return adt.Err[Object](err)
 }
 
-func errValueString(msg string) adt.Result[Value] {
+func errValueString(msg string) adt.Result[Object] {
 	return errValue(errors.New(msg))
 }
 
-func unwrapArgs(args []Value) ([]Value, error) {
-	var unwrapArgsLoop func(args []Value) ([]Value, bool, error)
-	unwrapArgsLoop = func(args []Value) ([]Value, bool, error) {
+func unwrapArgs(args []Object) ([]Object, error) {
+	var unwrapArgsLoop func(args []Object) ([]Object, bool, error)
+	unwrapArgsLoop = func(args []Object) ([]Object, bool, error) {
 		unwrapped := false
-		unwrappedArgs := make([]Value, 0, len(args))
+		unwrappedArgs := make([]Object, 0, len(args))
 		for len(args) > 0 {
 			head := args[0]
 			if _, ok := head.(Unwrap); ok {
@@ -65,7 +65,7 @@ func unwrapArgs(args []Value) ([]Value, error) {
 
 var ErrorEmptyLiteral = errors.New("empty literal")
 
-func parseLiteral(lit string) (Value, error) {
+func parseLiteral(lit string) (Object, error) {
 	if len(lit) == 0 {
 		return nil, ErrorEmptyLiteral
 	}

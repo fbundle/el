@@ -16,7 +16,7 @@ type Extension = runtime2.Extension
 func makeArithExtension(name string, f func(...Int) (Int, error)) Extension {
 	return Extension{
 		Name: Name(name),
-		Exec: func(ctx context.Context, values ...Value) adt.Result[Value] {
+		Exec: func(ctx context.Context, values ...Object) adt.Result[Object] {
 			vs := make([]Int, len(values))
 			for i, val := range values {
 				if ok := adt.Cast[Int](val).Unwrap(&vs[i]); !ok {

@@ -190,7 +190,7 @@ func testRuntime() {
 	r, s := runtime_ext.NewBasicRuntime()
 
 	var e ast.Node
-	var o runtime.Value
+	var o runtime.Object
 	var err error
 	ctx := context.Background()
 	for len(tokens) > 0 {

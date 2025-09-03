@@ -12,22 +12,22 @@ type Stack = runtime2.Stack
 func NewBasicRuntime() (Runtime, Stack) {
 	r := Runtime{
 		MaxStackDepth: 1000,
-		ParseLiteral: func(lit string) adt.Result[Value] {
+		ParseLiteral: func(lit string) adt.Result[Object] {
 			val, err := parseLiteral(lit)
-			return adt.Result[Value]{
+			return adt.Result[Object]{
 				Val: val,
 				Err: err,
 			}
 		},
-		UnwrapArgs: func(argsOpt adt.Result[[]Value]) adt.Result[[]Value] {
-			var args []Value
+		UnwrapArgs: func(argsOpt adt.Result[[]Object]) adt.Result[[]Object] {
+			var args []Object
 			if err := argsOpt.Unwrap(&args); err != nil {
-				return adt.Result[[]Value]{
+				return adt.Result[[]Object]{
 					Err: err,
 				}
 			}
 			unwrappedArgs, err := unwrapArgs(args)
-			return adt.Result[[]Value]{
+			return adt.Result[[]Object]{
 				Val: unwrappedArgs,
 				Err: err,
 			}
@@ -46,7 +46,7 @@ type stackHelper struct {
 	stack Stack
 }
 
-func (sh stackHelper) Load(name Name, value Value) stackHelper {
+func (sh stackHelper) Load(name Name, value Object) stackHelper {
 	stack := runtime2.UpdateHead(sh.stack, func(frame runtime2.Frame) runtime2.Frame {
 		return frame.Set(name, value)
 	})

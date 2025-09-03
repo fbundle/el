@@ -9,7 +9,7 @@ import (
 var listExtension = Extension{
 	Name: "list",
 	Man:  "module: (list 1 2 (lambda x (add x 1))) - make a list",
-	Exec: func(ctx context.Context, values ...Value) adt.Result[Value] {
+	Exec: func(ctx context.Context, values ...Object) adt.Result[Object] {
 		l := List{}
 		for _, v := range values {
 			l = List{l.Ins(l.Len(), v)}
@@ -21,7 +21,7 @@ var listExtension = Extension{
 var lenExtension = Extension{
 	Name: "len",
 	Man:  "module: (len (list 1 2 3)) - get the length of a list",
-	Exec: func(ctx context.Context, values ...Value) adt.Result[Value] {
+	Exec: func(ctx context.Context, values ...Object) adt.Result[Object] {
 		if len(values) != 1 {
 			return errValueString("len requires 1 argument")
 		}
@@ -36,7 +36,7 @@ var lenExtension = Extension{
 var sliceExtension = Extension{
 	Name: "slice",
 	Man:  "module: (get (list 1 2 3) (list 0 2)) - get the 0th and 2nd element of a list",
-	Exec: func(ctx context.Context, values ...Value) adt.Result[Value] {
+	Exec: func(ctx context.Context, values ...Object) adt.Result[Object] {
 		if len(values) != 2 {
 			return errValueString("slice requires 2 arguments")
 		}
@@ -63,7 +63,7 @@ var sliceExtension = Extension{
 
 var rangeExtension = Extension{
 	Name: "range",
-	Exec: func(ctx context.Context, values ...Value) adt.Result[Value] {
+	Exec: func(ctx context.Context, values ...Object) adt.Result[Object] {
 		if len(values) != 2 {
 			return errValueString("range requires 2 arguments")
 		}

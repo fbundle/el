@@ -9,7 +9,7 @@ import (
 )
 
 type Type = runtime.Type
-type Value = runtime.Value
+type Object = runtime.Object
 
 type Unwrap struct{}
 
@@ -17,7 +17,7 @@ func (u Unwrap) String() string {
 	return "*"
 }
 
-func (u Unwrap) Type() Type {
+func (u Unwrap) Type() Object {
 	return runtime.DataType("unwrap")
 }
 
@@ -29,12 +29,12 @@ func (i Int) String() string {
 	return fmt.Sprintf("%d", i.int)
 }
 
-func (i Int) Type() Type {
+func (i Int) Type() Object {
 	return runtime.DataType("int")
 }
 
 type List struct {
-	seq.Seq[Value]
+	seq.Seq[Object]
 }
 
 func (l List) String() string {
@@ -47,7 +47,7 @@ func (l List) String() string {
 	return s
 }
 
-func (l List) Type() Type {
+func (l List) Type() Object {
 	return runtime.DataType("list")
 }
 
@@ -59,6 +59,6 @@ func (s String) String() string {
 	return fmt.Sprintf("\"%s\"", s.string)
 }
 
-func (s String) Type() Type {
+func (s String) Type() Object {
 	return runtime.DataType("string")
 }

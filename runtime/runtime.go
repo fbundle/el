@@ -27,11 +27,11 @@ var ErrorNotEnoughArguments = errors.New("not enough arguments")
 
 type Runtime struct {
 	MaxStackDepth int
-	ParseLiteral  func(lit string) adt.Result[Value]
-	UnwrapArgs    func(argsOpt adt.Result[[]Value]) adt.Result[[]Value]
+	ParseLiteral  func(lit string) adt.Result[Object]
+	UnwrapArgs    func(argsOpt adt.Result[[]Object]) adt.Result[[]Object]
 }
 
-func (r Runtime) Step(ctx context.Context, s Stack, e ast.Node) adt.Result[Value] {
+func (r Runtime) Step(ctx context.Context, s Stack, e ast.Node) adt.Result[Object] {
 	deadline, ok := ctx.Deadline()
 	if ok && time.Now().After(deadline) {
 		return errValue(ErrorTimeout)
@@ -63,22 +63,22 @@ func (r Runtime) Step(ctx context.Context, s Stack, e ast.Node) adt.Result[Value
 	switch e := e.(type) {
 	case ast.Name:
 		// parse literal
-		var o Value
+		var o Object
 		if err := r.ParseLiteral(string(e)).Unwrap(&o); err == nil {
 			return value(o)
 		}
 		// search name on the stack
-		if ok := searchOnStack(s, Name(e)).Unwrap(&o); ok {
+		if ok := findStack(s, Name(e)).Unwrap(&o); ok {
 			return value(o)
 		}
 		return errValue(ErrorNameNotFound(Name(e)))
 	case ast.Function:
-		var cmd Value
+		var cmd Object
 		if err := r.Step(ctx, s, e.Cmd).Unwrap(&cmd); err != nil {
 			return errValue(err)
 		}
-		var mod Module
-		if ok := adt.Cast[Module](cmd).Unwrap(&mod); ok {
+		var mod Function
+		if ok := adt.Cast[Function](cmd).Unwrap(&mod); ok {
 			return mod.exec(r, ctx, s, e.Args)
 		}
 		return errValue(ErrorCannotExecuteExpression(e))
@@ -88,11 +88,11 @@ func (r Runtime) Step(ctx context.Context, s Stack, e ast.Node) adt.Result[Value
 }
 
 // stepAndUnwrapArgs executes the argument expressions in parallel and unwraps the results
-func (r Runtime) stepAndUnwrapArgs(ctx context.Context, s Stack, argList []ast.Node) adt.Result[[]Value] {
-	args := make([]Value, len(argList))
+func (r Runtime) stepAndUnwrapArgs(ctx context.Context, s Stack, argList []ast.Node) adt.Result[[]Object] {
+	args := make([]Object, len(argList))
 	for i, e := range argList {
 		if err := r.Step(ctx, s, e).Unwrap(&args[i]); err != nil {
-			return adt.Err[[]Value](err)
+			return adt.Err[[]Object](err)
 		}
 	}
 	return r.UnwrapArgs(adt.Ok(args))

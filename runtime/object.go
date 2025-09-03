@@ -8,10 +8,10 @@ import (
 	"github.com/fbundle/lab_public/lab/go_util/pkg/adt"
 )
 
-type Exec = func(r Runtime, ctx context.Context, s Stack, argList []ast.Node) adt.Result[Value]
+type Exec = func(r Runtime, ctx context.Context, s Stack, argList []ast.Node) adt.Result[Object]
 
-type Value interface {
-	Type() Type
+type Object interface {
+	Type() Object
 	String() string
 }
 
@@ -34,20 +34,20 @@ func (t Type) String() string {
 	return fmt.Sprintf("type_%d", t.level)
 }
 
-func (t Type) Type() Type {
+func (t Type) Type() Object {
 	return Type{
 		level: t.level + 1,
 	}
 }
 
-type Module struct {
-	repr string
+type Function struct {
 	exec Exec
+	repr string
 }
 
-func (m Module) Type() Type {
-	return DataType("module")
+func (f Function) Type() Object {
+	return DataType("function")
 }
-func (m Module) String() string {
-	return m.repr
+func (f Function) String() string {
+	return f.repr
 }

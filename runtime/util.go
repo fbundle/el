@@ -7,13 +7,13 @@ import (
 )
 
 // helpers
-func value(o Value) adt.Result[Value] {
-	return adt.Ok[Value](o)
+func value(o Object) adt.Result[Object] {
+	return adt.Ok[Object](o)
 }
 
-func errValue(err error) adt.Result[Value] {
-	return adt.Err[Value](err)
+func errValue(err error) adt.Result[Object] {
+	return adt.Err[Object](err)
 }
-func errValueString(msg string) adt.Result[Value] {
+func errValueString(msg string) adt.Result[Object] {
 	return errValue(errors.New(msg))
 }

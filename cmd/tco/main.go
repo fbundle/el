@@ -36,7 +36,7 @@ func testSimpleTCO(n int) {
 	start := time.Now()
 
 	var e ast.Node
-	var o runtime.Value
+	var o runtime.Object
 	var err error
 
 	for len(tokens) > 0 {
