@@ -14,7 +14,7 @@ type Value interface {
 }
 type Function interface {
 	Value
-	Apply(r Runtime, ctx context.Context, s Stack, argList []ast.Expr) adt.Result[Value]
+	apply(r Runtime, ctx context.Context, s Stack, argList []ast.Expr) adt.Result[Value]
 }
 
 func DataType(name string) Type {
@@ -63,7 +63,7 @@ func (l Lambda) String() string {
 	return s
 }
 
-func (l Lambda) Apply(r Runtime, ctx context.Context, s Stack, argList []ast.Expr) adt.Result[Value] {
+func (l Lambda) apply(r Runtime, ctx context.Context, s Stack, argList []ast.Expr) adt.Result[Value] {
 	// 0. sanity check
 	if len(argList) < len(l.ParamList) {
 		errValue(ErrorNotEnoughArguments)
@@ -105,6 +105,6 @@ func (m Module) String() string {
 	return fmt.Sprintf("[%s]", m.Man)
 }
 
-func (m Module) Apply(r Runtime, ctx context.Context, s Stack, args []ast.Expr) adt.Result[Value] {
+func (m Module) apply(r Runtime, ctx context.Context, s Stack, args []ast.Expr) adt.Result[Value] {
 	return m.Exec(r, ctx, s, args)
 }
