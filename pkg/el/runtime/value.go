@@ -2,7 +2,7 @@ package runtime
 
 import (
 	"context"
-	"el/pkg/el/expr"
+	"el/pkg/el/ast"
 	"fmt"
 
 	"github.com/fbundle/lab_public/lab/go_util/pkg/adt"
@@ -14,7 +14,7 @@ type Value interface {
 }
 type Function interface {
 	Value
-	Apply(r Runtime, ctx context.Context, s Stack, argList []expr.Expr) adt.Result[Value]
+	Apply(r Runtime, ctx context.Context, s Stack, argList []ast.Expr) adt.Result[Value]
 }
 
 func DataType(name string) Type {
@@ -44,9 +44,9 @@ func (t Type) Type() Type {
 
 // Lambda - a function written in S-expression
 type Lambda struct {
-	ParamList []Name    `json:"param_list,omitempty"`
-	Body      expr.Expr `json:"body,omitempty"`
-	Closure   Frame     `json:"closure,omitempty"`
+	ParamList []Name   `json:"param_list,omitempty"`
+	Body      ast.Expr `json:"body,omitempty"`
+	Closure   Frame    `json:"closure,omitempty"`
 }
 
 func (l Lambda) Type() Type {
@@ -63,7 +63,7 @@ func (l Lambda) String() string {
 	return s
 }
 
-func (l Lambda) Apply(r Runtime, ctx context.Context, s Stack, argList []expr.Expr) adt.Result[Value] {
+func (l Lambda) Apply(r Runtime, ctx context.Context, s Stack, argList []ast.Expr) adt.Result[Value] {
 	// 0. sanity check
 	if len(argList) < len(l.ParamList) {
 		errValue(ErrorNotEnoughArguments)
@@ -88,7 +88,7 @@ func (l Lambda) Apply(r Runtime, ctx context.Context, s Stack, argList []expr.Ex
 	return value(o)
 }
 
-type Exec = func(r Runtime, ctx context.Context, s Stack, args []expr.Expr) adt.Result[Value]
+type Exec = func(r Runtime, ctx context.Context, s Stack, args []ast.Expr) adt.Result[Value]
 
 // Module - a function built-in to the language
 type Module struct {
@@ -105,6 +105,6 @@ func (m Module) String() string {
 	return fmt.Sprintf("[%s]", m.Man)
 }
 
-func (m Module) Apply(r Runtime, ctx context.Context, s Stack, args []expr.Expr) adt.Result[Value] {
+func (m Module) Apply(r Runtime, ctx context.Context, s Stack, args []ast.Expr) adt.Result[Value] {
 	return m.Exec(r, ctx, s, args)
 }

@@ -2,7 +2,7 @@ package runtime
 
 import (
 	"context"
-	"el/pkg/el/expr"
+	"el/pkg/el/ast"
 	"errors"
 	"fmt"
 	"sync"
@@ -23,10 +23,10 @@ var ErrorTimeout = func(err error) error {
 }
 var ErrorStackOverflow = errors.New("stack overflow")
 
-var ErrorUnknownExpression = func(e expr.Expr) error {
+var ErrorUnknownExpression = func(e ast.Expr) error {
 	return fmt.Errorf("unknown expression type %s", e.String())
 }
-var ErrorCannotExecuteExpression = func(e expr.Expr) error {
+var ErrorCannotExecuteExpression = func(e ast.Expr) error {
 	return fmt.Errorf("expression cannot be executed: %s", e.String())
 }
 var ErrorNotEnoughArguments = errors.New("not enough arguments")
@@ -37,7 +37,7 @@ type Runtime struct {
 	UnwrapArgs    func(argsOpt adt.Result[[]Value]) adt.Result[[]Value]
 }
 
-func (r Runtime) Step(ctx context.Context, s Stack, e expr.Expr) adt.Result[Value] {
+func (r Runtime) Step(ctx context.Context, s Stack, e ast.Expr) adt.Result[Value] {
 	deadline, ok := ctx.Deadline()
 	if ok && time.Now().After(deadline) {
 		return errValue(ErrorTimeout(ctx.Err()))
@@ -67,7 +67,7 @@ func (r Runtime) Step(ctx context.Context, s Stack, e expr.Expr) adt.Result[Valu
 		return errValue(ErrorStackOverflow)
 	}
 	switch e := e.(type) {
-	case expr.Name:
+	case ast.Atom:
 		// parse literal
 		var o Value
 		if err := r.ParseLiteral(string(e)).Unwrap(&o); err == nil {
@@ -78,7 +78,7 @@ func (r Runtime) Step(ctx context.Context, s Stack, e expr.Expr) adt.Result[Valu
 			return value(o)
 		}
 		return errValue(ErrorNameNotFound(Name(e)))
-	case expr.Lambda:
+	case ast.SExpr:
 		var cmd Value
 		if err := r.Step(ctx, s, e.Cmd).Unwrap(&cmd); err != nil {
 			return errValue(err)
@@ -94,7 +94,7 @@ func (r Runtime) Step(ctx context.Context, s Stack, e expr.Expr) adt.Result[Valu
 }
 
 // StepAndUnwrapArgs executes the argument expressions in parallel and unwraps the results
-func (r Runtime) StepAndUnwrapArgs(ctx context.Context, s Stack, argList []expr.Expr) adt.Result[[]Value] {
+func (r Runtime) StepAndUnwrapArgs(ctx context.Context, s Stack, argList []ast.Expr) adt.Result[[]Value] {
 	args := make([]Value, len(argList))
 	errHolder := &atomic.Value{}
 	subCtx, cancel := context.WithCancel(ctx)

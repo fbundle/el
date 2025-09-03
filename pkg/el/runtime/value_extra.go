@@ -2,7 +2,7 @@ package runtime
 
 import (
 	"context"
-	"el/pkg/el/expr"
+	"el/pkg/el/ast"
 
 	"github.com/fbundle/lab_public/lab/go_util/pkg/adt"
 )
@@ -23,7 +23,7 @@ func init() {
 var typeModule = Module{
 	Name: "type",
 	Man:  "module: (type (list 1 2 3)) - get the type of an arbitrary object",
-	Exec: func(r Runtime, ctx context.Context, s Stack, argList []expr.Expr) adt.Result[Value] {
+	Exec: func(r Runtime, ctx context.Context, s Stack, argList []ast.Expr) adt.Result[Value] {
 		if len(argList) != 1 {
 			return errValueString("type requires 1 argument")
 		}
@@ -38,19 +38,19 @@ var typeModule = Module{
 var letModule = Module{
 	Name: "let",
 	Man:  "module: (let x 3) - assign value 3 to local variable x",
-	Exec: func(r Runtime, ctx context.Context, s Stack, argList []expr.Expr) adt.Result[Value] {
+	Exec: func(r Runtime, ctx context.Context, s Stack, argList []ast.Expr) adt.Result[Value] {
 		if len(argList) < 1 || len(argList)%2 != 1 {
 			return errValueString("let requires at least 1 arguments and odd number of arguments")
 		}
 
 		s = s.Push(Frame{}) // push a new empty frame
 
-		var lvalue expr.Name
+		var lvalue ast.Atom
 		var rvalue Value
 		for i := 0; i < len(argList)-1; i += 2 {
 			lexpr, rexpr := argList[i], argList[i+1]
-			if ok := adt.Cast[expr.Name](lexpr).Unwrap(&lvalue); !ok {
-				return errValueString("lvalue must be a Name")
+			if ok := adt.Cast[ast.Atom](lexpr).Unwrap(&lvalue); !ok {
+				return errValueString("lvalue must be a Atom")
 			}
 			if err := r.Step(ctx, s, rexpr).Unwrap(&rvalue); err != nil {
 				return errValue(err)
@@ -68,17 +68,17 @@ var letModule = Module{
 var lambdaModule = Module{
 	Name: "lambda",
 	Man:  "module: (lambda x y (add x y) - declare a function",
-	Exec: func(r Runtime, ctx context.Context, s Stack, argList []expr.Expr) adt.Result[Value] {
+	Exec: func(r Runtime, ctx context.Context, s Stack, argList []ast.Expr) adt.Result[Value] {
 		if len(argList) < 1 {
 			return errValueString("lambda requires at least 1 arguments")
 		}
 
 		paramList := make([]Name, 0, len(argList)-1)
-		var lvalue expr.Name
+		var lvalue ast.Atom
 		for i := 0; i < len(argList)-1; i++ {
 			lexpr := argList[i]
-			if ok := adt.Cast[expr.Name](lexpr).Unwrap(&lvalue); !ok {
-				return errValueString("lvalue must be a Name")
+			if ok := adt.Cast[ast.Atom](lexpr).Unwrap(&lvalue); !ok {
+				return errValueString("lvalue must be a Atom")
 			}
 			paramList = append(paramList, Name(lvalue))
 		}
@@ -99,7 +99,7 @@ var lambdaModule = Module{
 var matchModule = Module{
 	Name: "match",
 	Man:  "module: (match x 1 2 4 5 6) - match, if x=1 then return 3, if x=4 the return 5, otherwise return 6",
-	Exec: func(r Runtime, ctx context.Context, s Stack, argList []expr.Expr) adt.Result[Value] {
+	Exec: func(r Runtime, ctx context.Context, s Stack, argList []ast.Expr) adt.Result[Value] {
 		if len(argList) < 2 || len(argList)%2 != 0 {
 			return errValueString("match requires at least 2 arguments and even number of arguments")
 		}
@@ -132,7 +132,7 @@ func (ext Extension) Module() Module {
 	return Module{
 		Name: ext.Name,
 		Man:  ext.Man,
-		Exec: func(r Runtime, ctx context.Context, s Stack, argList []expr.Expr) adt.Result[Value] {
+		Exec: func(r Runtime, ctx context.Context, s Stack, argList []ast.Expr) adt.Result[Value] {
 			var args []Value
 			if err := r.StepAndUnwrapArgs(ctx, s, argList).Unwrap(&args); err != nil {
 				return errValue(err)

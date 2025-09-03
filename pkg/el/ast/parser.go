@@ -1,4 +1,4 @@
-package expr
+package ast
 
 import (
 	"errors"
@@ -22,8 +22,8 @@ func parseUntilClose(tokenList []Token, close Token, parseOnce Parser) ([]Expr, 
 		if err != nil {
 			return nil, tokenList, err
 		}
-		// detect end of Lambda
-		if nameExpr, ok := arg.(Name); ok && string(nameExpr) == close {
+		// detect end of SExpr
+		if nameExpr, ok := arg.(Atom); ok && string(nameExpr) == close {
 			break
 		}
 		argList = append(argList, arg)
@@ -45,17 +45,17 @@ func Parse(tokenList []Token) (Expr, []Token, error) {
 		}
 		switch len(argList) {
 		case 0:
-			return nil, tokenList, errors.New("empty Lambda")
+			return nil, tokenList, errors.New("empty SExpr")
 		case 1:
 			return argList[0], tokenList, nil
 		default:
-			return Lambda{
+			return SExpr{
 				Cmd:  argList[0],
 				Args: argList[1:],
 			}, tokenList, nil
 		}
 	} else {
-		return Name(head), tokenList, nil
+		return Atom(head), tokenList, nil
 	}
 }
 
@@ -72,9 +72,9 @@ func ParseWithInfixOperator(tokenList []Token) (Expr, []Token, error) {
 			return nil, tokenList, err
 		}
 		if len(argList) == 0 {
-			return nil, tokenList, errors.New("empty Lambda")
+			return nil, tokenList, errors.New("empty SExpr")
 		}
-		return Lambda{
+		return SExpr{
 			Cmd:  argList[0],
 			Args: argList[1:],
 		}, tokenList, nil
@@ -97,7 +97,7 @@ func ParseWithInfixOperator(tokenList []Token) (Expr, []Token, error) {
 			if err != nil {
 				return nil, err
 			}
-			return Lambda{
+			return SExpr{
 				Cmd:  cmdExpr,
 				Args: []Expr{left, right},
 			}, nil
@@ -110,6 +110,6 @@ func ParseWithInfixOperator(tokenList []Token) (Expr, []Token, error) {
 		}
 		return expr, tokenList, nil
 	} else {
-		return Name(head), tokenList, nil
+		return Atom(head), tokenList, nil
 	}
 }
