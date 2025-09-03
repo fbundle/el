@@ -2,6 +2,7 @@ package runtime_ext
 
 import "fmt"
 
+// WithTemplate - add some common template to the code
 func WithTemplate(s string) string {
 	return fmt.Sprintf(`
 (let

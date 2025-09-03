@@ -12,7 +12,7 @@ import (
 var program = `
 (let
     _ (print "hello world")
-	_ (print [])
+	_ (print [1 2 3 (list 4 5 6) (lambda x {x + 3})])
 	_ (print (map (list 1 2 3) (lambda x {x + 2})))
 	nil
 )`

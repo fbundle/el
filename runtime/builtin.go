@@ -115,15 +115,11 @@ var lambdaFunc = Function{
 }
 
 func makeLambdaRepr(paramList []Name, body ast.Expr, closure Frame) string {
-	closureNameList := make([]string, 0, closure.Len())
-	for name, _ := range closure.Iter {
-		closureNameList = append(closureNameList, string(name))
-	}
 	paramNameList := make([]string, 0, len(paramList))
 	for _, name := range paramList {
 		paramNameList = append(paramNameList, string(name))
 	}
-	return fmt.Sprintf("(closure{%s}; %s -> %s)", strings.Join(closureNameList, " "), strings.Join(paramNameList, " "), body.String())
+	return fmt.Sprintf("(closure{...}; %s -> %s)", strings.Join(paramNameList, " "), body.String())
 }
 
 func makeLambdaExec(paramList []Name, body ast.Expr, closure Frame) Exec {
