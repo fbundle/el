@@ -73,7 +73,7 @@ func tokenize(str string, splitToken map[Token]struct{}, pList ...preprocessor) 
 			} else if unicode.IsSpace(ch) {
 				// flush buffer if seeing whitespace
 				flushBuffer()
-			} else if ch == '"' {
+			} else if string(ch) == ast.TokenStringBeg {
 				// enter string mode
 				flushBuffer()
 				buffer += string(ch)
@@ -85,7 +85,7 @@ func tokenize(str string, splitToken map[Token]struct{}, pList ...preprocessor) 
 			if ch == '\\' {
 				buffer += string(ch)
 				state = STATE_INSTRING_ESCAPE
-			} else if ch == '"' {
+			} else if string(ch) == ast.TokenStringEnd {
 				// exit string mode
 				buffer += string(ch)
 				flushBuffer()
