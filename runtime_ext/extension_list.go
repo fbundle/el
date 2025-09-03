@@ -54,7 +54,7 @@ var sliceExtension = Extension{
 			if ok := adt.Cast[Int](o).Unwrap(&index); !ok {
 				return errValueString("slice second argument must be a list of integers")
 			}
-			v := l.Get(index.int)
+			v := l.Get(index.Val)
 			output = List{output.Ins(output.Len(), v)}
 		}
 		return value(output)
@@ -76,7 +76,7 @@ var rangeExtension = Extension{
 			return errValueString("range end must be an integer")
 		}
 		output := List{}
-		for k := i.int; k < j.int; k++ {
+		for k := i.Val; k < j.Val; k++ {
 			output = List{output.Ins(output.Len(), Int{k})}
 		}
 		return value(output)

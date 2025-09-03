@@ -1,7 +1,7 @@
 package runtime_ext
 
 import (
-	runtime "el/runtime"
+	"el/runtime"
 
 	"github.com/fbundle/lab_public/lab/go_util/pkg/adt"
 )

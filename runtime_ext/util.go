@@ -77,9 +77,9 @@ func parseLiteral(lit string) (Object, error) {
 		if err := json.Unmarshal([]byte(lit), &str); err != nil {
 			return nil, err
 		}
-		return String{str}, nil
+		return String{Val: str}, nil
 
 	}
 	i, err := strconv.Atoi(lit)
-	return Int{i}, err
+	return Int{Val: i}, err
 }

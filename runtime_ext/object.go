@@ -22,11 +22,11 @@ func (u Unwrap) Type() Object {
 }
 
 type Int struct {
-	int
+	Val int
 }
 
 func (i Int) String() string {
-	return fmt.Sprintf("%d", i.int)
+	return fmt.Sprintf("%d", i.Val)
 }
 
 func (i Int) Type() Object {
@@ -52,11 +52,11 @@ func (l List) Type() Object {
 }
 
 type String struct {
-	string
+	Val string
 }
 
 func (s String) String() string {
-	return s.string
+	return s.Val
 }
 
 func (s String) Type() Object {

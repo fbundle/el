@@ -40,16 +40,16 @@ func Parse(tokenList []Token) (ast.Expr, []Token, error) {
 	}
 
 	switch head {
-	case TokenBlockBegin:
+	case ast.TokenBlockBegin:
 		// parse until seeing `)`
-		argList, tokenList, err := parseUntil(Parse, matchName(ast.Name(TokenBlockEnd)), tokenList)
+		argList, tokenList, err := parseUntil(Parse, matchName(ast.Name(ast.TokenBlockEnd)), tokenList)
 		if err != nil {
 			return nil, tokenList, err
 		}
 		return ast.Lambda(argList), tokenList, nil
-	case TokenSugarBegin:
+	case ast.TokenSugarBegin:
 		// parse until seeing `}`
-		argList, tokenList, err := parseUntil(Parse, matchName(ast.Name(TokenSugarEnd)), tokenList)
+		argList, tokenList, err := parseUntil(Parse, matchName(ast.Name(ast.TokenSugarEnd)), tokenList)
 		if err != nil {
 			return nil, tokenList, err
 		}

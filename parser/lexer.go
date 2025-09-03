@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"el/ast"
 	"fmt"
 	"strings"
 	"unicode"
@@ -10,7 +11,7 @@ type Token = string
 
 func Tokenize(s string) []Token {
 	return tokenize(s,
-		specialTokens,
+		ast.SpecialTokens,
 		removeComment("#"),
 		mapping(map[string]string{
 			"[": " (list ",
