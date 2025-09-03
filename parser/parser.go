@@ -16,13 +16,7 @@ func pop(tokenList []Token) ([]Token, Token, error) {
 
 type Parser = func(tokenList []Token) (ast.Expr, []Token, error)
 
-func parseArgList(parser Parser, stopExpr ast.Name, tokenList []Token) ([]ast.Expr, []Token, error) {
-	isStopExpr := func(arg ast.Expr) bool {
-		if name, ok := arg.(ast.Name); ok {
-			return string(name) == string(stopExpr)
-		}
-		return false
-	}
+func parseUntil(parser Parser, stopCond func(ast.Expr) bool, tokenList []Token) ([]ast.Expr, []Token, error) {
 	var arg ast.Expr
 	var err error
 	var argList []ast.Expr
@@ -31,7 +25,7 @@ func parseArgList(parser Parser, stopExpr ast.Name, tokenList []Token) ([]ast.Ex
 		if err != nil {
 			return nil, tokenList, err
 		}
-		if isStopExpr(arg) {
+		if stopCond(arg) {
 			break
 		}
 		argList = append(argList, arg)
@@ -45,40 +39,22 @@ func Parse(tokenList []Token) (ast.Expr, []Token, error) {
 		return nil, tokenList, err
 	}
 
-	if head != "(" {
-		return ast.Name(head), tokenList, nil
-	}
-	// parse until seeing `)`
-	argList, tokenList, err := parseArgList(Parse, ")", tokenList)
-	if err != nil {
-		return nil, tokenList, err
-	}
-	return ast.Lambda(argList), tokenList, nil
-}
-
-func ParseWithInfix(tokenList []Token) (ast.Expr, []Token, error) {
-	tokenList, head, err := pop(tokenList)
-	if err != nil {
-		return nil, tokenList, err
-	}
-
 	switch head {
-	case "(":
+	case TokenBlockBegin:
 		// parse until seeing `)`
-		argList, tokenList, err := parseArgList(ParseWithInfix, ")", tokenList)
+		argList, tokenList, err := parseUntil(Parse, matchName(ast.Name(TokenBlockEnd)), tokenList)
 		if err != nil {
 			return nil, tokenList, err
 		}
 		return ast.Lambda(argList), tokenList, nil
-	case "{":
+	case TokenSugarBegin:
 		// parse until seeing `}`
-		argList, tokenList, err := parseArgList(ParseWithInfix, "}", tokenList)
+		argList, tokenList, err := parseUntil(Parse, matchName(ast.Name(TokenSugarEnd)), tokenList)
 		if err != nil {
 			return nil, tokenList, err
 		}
 		expr, err := processSugar(argList)
 		return expr, tokenList, err
-
 	default:
 		return ast.Name(head), tokenList, nil
 	}

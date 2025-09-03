@@ -10,30 +10,7 @@ type Token = string
 
 func Tokenize(s string) []Token {
 	return tokenize(s,
-		map[rune]struct{}{
-			'(': {},
-			')': {},
-			'*': {},
-			'[': {},
-			']': {},
-			'{': {},
-			'}': {},
-		},
-		removeComment("#"),
-	)
-}
-
-func TokenizeWithListAndInfix(s string) []Token {
-	return tokenize(s,
-		map[rune]struct{}{
-			'(': {},
-			')': {},
-			'*': {},
-			'[': {},
-			']': {},
-			'{': {},
-			'}': {},
-		},
+		specialTokens,
 		removeComment("#"),
 		mapping(map[string]string{
 			"[": " (list ",
@@ -64,7 +41,7 @@ var removeComment = func(sep string) preprocessor {
 	}
 }
 
-func tokenize(str string, splitString map[rune]struct{}, pList ...preprocessor) []Token {
+func tokenize(str string, splitToken map[Token]struct{}, pList ...preprocessor) []Token {
 	for _, p := range pList {
 		str = p(str)
 	}
@@ -87,7 +64,7 @@ func tokenize(str string, splitString map[rune]struct{}, pList ...preprocessor) 
 	for _, ch := range str {
 		switch state {
 		case STATE_OUTSTRING: // outside string
-			if _, ok := splitString[ch]; ok {
+			if _, ok := splitToken[Token(ch)]; ok {
 				// split special characters like ( ) [ ] into tokens
 				flushBuffer()
 				tokens = append(tokens, string(ch))

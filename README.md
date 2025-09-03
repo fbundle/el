@@ -1,14 +1,45 @@
-## el
+# EL Programming Language
 
 `el` is a tiny, Lisp-like language implemented in Go with a minimal AST, a simple lexer/parser, and a small but expressive runtime. It supports first-class functions, lexical closures, list operations, lightweight matching, infix sugar, argument unwrapping, and an extension mechanism for builtins.
 
-### Quick start
+## Quick Start
 
+### Run the Basic Example
 ```bash
-go run ./cmd/test
+go run ./cmd/basic
 ```
 
-The sample program in `cmd/test/main.go` exercises functions, lists, infix, matching, unwrapping, and types.
+### Run All Demos
+```bash
+# Run individual demos
+go run ./cmd/demo/01_basic_syntax.go
+go run ./cmd/demo/02_arithmetic.go
+go run ./cmd/demo/03_lists.go
+# ... see cmd/demo/README.md for complete list
+
+# Or run all demos at once
+for demo in cmd/demo/*.go; do
+  echo "Running $demo"
+  go run "$demo"
+  echo "---"
+done
+```
+
+### Explore the Demos
+The `cmd/demo/` directory contains 11 comprehensive demonstration files covering all language features:
+- **01_basic_syntax.go** - Fundamental language constructs
+- **02_arithmetic.go** - Mathematical operations and functions  
+- **03_lists.go** - List manipulation and operations
+- **04_functions.go** - Function definition and closures
+- **05_recursion.go** - Recursion and mutual recursion
+- **06_matching.go** - Pattern matching capabilities
+- **07_unwrapping.go** - Argument unwrapping features
+- **08_types.go** - Type system and introspection
+- **09_advanced.go** - Advanced features and complex examples
+- **10_performance.go** - Performance testing and benchmarking
+- **11_error_handling.go** - Error handling and edge cases
+
+See `cmd/demo/README.md` for detailed descriptions of each demo.
 
 ## Language overview
 
@@ -168,8 +199,19 @@ Unwrapping only works in call argument positions. Nested `*` is supported; unwra
 
 ## Examples
 
-### Fibonacci
+### Basic Syntax
+```lisp
+(let
+  x 42
+  y "hello world"
+  z [1 2 3]
+  (print "x =" x)
+  (print "y =" y)
+  (print "z =" z)
+  nil)
+```
 
+### Fibonacci
 ```lisp
 (let
   fib (lambda n (match {n <= 1}
@@ -179,8 +221,7 @@ Unwrapping only works in call argument positions. Nested `*` is supported; unwra
   nil)
 ```
 
-### Mutual recursion
-
+### Mutual Recursion
 ```lisp
 (let
   even (lambda n (match {n <= 0} true true (odd {n - 1})))
@@ -189,14 +230,56 @@ Unwrapping only works in call argument positions. Nested `*` is supported; unwra
   nil)
 ```
 
-### Types
+### List Operations
+```lisp
+(let
+  numbers [1 2 3 4 5]
+  doubled (map numbers (lambda x {x * 2}))
+  sum (reduce numbers + 0)
+  (print "numbers:" numbers)
+  (print "doubled:" doubled)
+  (print "sum:" sum)
+  nil)
+```
 
+### Type Introspection
 ```lisp
 (let
   x 1
   y (list 1 2 3)
   z (lambda x {x + 1})
   (print (list (type x) (type y) (type z))))
+```
+
+### Argument Unwrapping
+```lisp
+(let
+  numbers [1 2 3 4 5]
+  (print "sum of numbers:" (add *numbers))
+  (print "product of numbers:" (mul *numbers))
+  nil)
+```
+
+### Advanced Features
+```lisp
+(let
+  # Object-oriented programming simulation
+  make_point (lambda x y (let
+    get_x (lambda () x)
+    get_y (lambda () y)
+    move (lambda dx dy (make_point {x + dx} {y + dy}))
+    (lambda method (match method
+      "get_x" (get_x)
+      "get_y" (get_y)
+      "move" move
+      "Error: unknown method"
+    ))
+  ))
+  
+  point (make_point 3 4)
+  (print "Point x:" (point "get_x"))
+  (print "Point y:" (point "get_y"))
+  nil)
 ```
 
 ## Equality notes
@@ -211,10 +294,70 @@ Unwrapping only works in call argument positions. Nested `*` is supported; unwra
 - Frames: persistent ordered maps; lists: persistent sequences.
 - Tail calls are not optimized; consider `MaxStackDepth` if you need recursion limits.
 
-## Developing
+## Project Structure
 
-- Packages: `ast`, `parser`, `runtime`, `runtime_ext`.
-- Run the sample: `go run ./cmd/test`.
+```
+el/
+├── ast/           # Abstract Syntax Tree definitions
+├── parser/        # Lexer and parser implementation
+├── runtime/       # Core runtime and evaluation engine
+├── runtime_ext/   # Built-in extensions and standard library
+├── cmd/
+│   ├── basic/     # Basic example program
+│   └── demo/      # Comprehensive demonstration programs
+├── vendor/        # External dependencies
+├── go.mod         # Go module definition
+└── README.md      # This file
+```
+
+## Development
+
+### Packages
+- **`ast`**: Abstract Syntax Tree definitions (`Name`, `Lambda`)
+- **`parser`**: Lexer and parser with support for infix expressions and list literals
+- **`runtime`**: Core evaluation engine with frame-based execution
+- **`runtime_ext`**: Built-in extensions (arithmetic, lists, I/O) and template system
+
+### Running Examples
+```bash
+# Basic example
+go run ./cmd/basic
+
+# Individual demos
+go run ./cmd/demo/01_basic_syntax.go
+
+# All demos
+for demo in cmd/demo/*.go; do go run "$demo"; done
+```
+
+### Building
+```bash
+# Build the project
+go build ./...
+
+# Run tests (if any)
+go test ./...
+```
+
+## Language Design Philosophy
+
+EL is designed as a minimal but expressive Lisp-like language with the following principles:
+
+1. **Simplicity**: Minimal syntax with maximum expressiveness
+2. **Functional**: First-class functions, closures, and functional programming patterns
+3. **Extensible**: Built-in extension mechanism for adding new functionality
+4. **Practical**: Includes practical features like infix syntax and argument unwrapping
+5. **Educational**: Clear implementation that demonstrates language design concepts
+
+## Contributing
+
+The language is designed to be educational and extensible. Key areas for contribution:
+
+- Additional built-in functions and extensions
+- Performance optimizations
+- More comprehensive error handling
+- Additional demo programs
+- Documentation improvements
 
 ## License
 

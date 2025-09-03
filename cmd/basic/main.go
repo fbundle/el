@@ -85,7 +85,7 @@ var program = `
 )`
 
 func testRuntime() {
-	tokens := parser.TokenizeWithListAndInfix(runtime_ext.WithTemplate(program))
+	tokens := parser.Tokenize(runtime_ext.WithTemplate(program))
 
 	r, s := runtime_ext.NewBasicRuntime()
 
@@ -94,7 +94,7 @@ func testRuntime() {
 	var err error
 	ctx := context.Background()
 	for len(tokens) > 0 {
-		e, tokens, err = parser.ParseWithInfix(tokens)
+		e, tokens, err = parser.Parse(tokens)
 		if err != nil {
 			panic(err)
 		}
