@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-func testSimpleTCO() {
+func testSimpleTCO(n int) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -17,7 +17,7 @@ func testSimpleTCO() {
 	fmt.Println("===============")
 
 	// Simple tail recursive function
-	tokens := ast.TokenizeWithInfixOperator(`
+	tokens := ast.TokenizeWithInfixOperator(fmt.Sprintf(`
 		(let
 			# Simple tail recursive counter
 			count (lambda n acc (
@@ -25,10 +25,10 @@ func testSimpleTCO() {
 				true acc
 				(count (sub n 1) (add acc 1))  # ← This should be a tail call
 			))
-			result (count 1000 0)
+			result (count %d 0)
 			result
 		)
-	`)
+	`, n))
 
 	r, s := runtime_ext.NewBasicRuntime()
 
@@ -50,9 +50,9 @@ func testSimpleTCO() {
 	}
 
 	duration := time.Since(start)
-	fmt.Printf("Counted to 1000: %s (took %v)\n", o.String(), duration)
+	fmt.Printf("Counted to %d: %s (took %v)\n", n, o.String(), duration)
 }
 
 func main() {
-	testSimpleTCO()
+	testSimpleTCO(2000)
 }

@@ -27,8 +27,9 @@ var typeModule = Module{
 		if len(argList) != 1 {
 			return errValueString("type requires 1 argument")
 		}
+		childCtx := withTailCall(ctx)
 		var v Value
-		if err := r.Step(ctx, s, argList[0]).Unwrap(&v); err != nil {
+		if err := r.Step(childCtx, s, argList[0]).Unwrap(&v); err != nil {
 			return errValue(err)
 		}
 		return value(v.Type())
@@ -60,8 +61,8 @@ var letModule = Module{
 				return f.Set(Name(lvalue), rvalue)
 			})
 		}
-
-		return r.Step(ctx, s, argList[len(argList)-1])
+		childCtx := withTailCall(ctx)
+		return r.Step(childCtx, s, argList[len(argList)-1])
 	},
 }
 
@@ -108,6 +109,7 @@ var matchModule = Module{
 			return errValue(err)
 		}
 
+		var finalRexpr ast.Expr = argList[len(argList)-1]
 		var comp Value
 		for i := 1; i < len(argList)-1; i += 2 {
 			lexpr, rexpr := argList[i], argList[i+1]
@@ -115,10 +117,12 @@ var matchModule = Module{
 				return errValue(err)
 			}
 			if comp == cond {
-				return r.Step(ctx, s, rexpr)
+				finalRexpr = rexpr
+				break
 			}
 		}
-		return r.Step(ctx, s, argList[len(argList)-1])
+		childCtx := withTailCall(ctx)
+		return r.Step(childCtx, s, finalRexpr)
 	},
 }
 
