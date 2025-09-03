@@ -25,9 +25,8 @@ var ErrorCannotExecuteExpression = func(e ast.Expr) error {
 var ErrorNotEnoughArguments = errors.New("not enough arguments")
 
 type Runtime struct {
-	MaxStackDepth int // TODO - delete
-	ParseLiteral  func(lit string) adt.Result[Object]
-	UnwrapArgs    func(argsOpt adt.Result[[]Object]) adt.Result[[]Object]
+	ParseLiteral func(lit string) adt.Result[Object]
+	UnwrapArgs   func(argsOpt adt.Result[[]Object]) adt.Result[[]Object]
 }
 
 func (r Runtime) Step(ctx context.Context, frame Frame, e ast.Expr) adt.Result[Object] {

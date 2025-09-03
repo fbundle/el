@@ -11,7 +11,6 @@ type Frame = runtime.Frame
 
 func NewBasicRuntime() (Runtime, Frame) {
 	r := Runtime{
-		MaxStackDepth: 1000,
 		ParseLiteral: func(lit string) adt.Result[Object] {
 			val, err := parseLiteral(lit)
 			return adt.Result[Object]{
