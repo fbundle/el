@@ -7,7 +7,7 @@ import (
 	"unicode"
 )
 
-type Token = string
+type Token = ast.Token
 
 func Tokenize(s string) []Token {
 	return tokenize(s,

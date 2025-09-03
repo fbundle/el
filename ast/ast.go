@@ -7,6 +7,7 @@ import "strings"
 // Expr - union of Name, Lambda
 type Expr interface {
 	String() string
+	// TODO - Line() int - for error reporting
 }
 
 // Name - a name, a number, a string, etc.

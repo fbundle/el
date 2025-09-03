@@ -1,6 +1,6 @@
 package ast
 
-type Token = string
+type Token = string // TODO - type Token struct {Value string; Line int}
 
 const (
 	TokenBlockBegin Token = "("
