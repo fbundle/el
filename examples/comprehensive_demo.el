@@ -6,7 +6,6 @@
     _ (print "\n1. Basic Operations:")
     _ (print "Arithmetic: 2 + 3 * 4 =" {2 + 3 * 4})
     _ (print "Comparison: 5 > 3 =" {5 > 3})
-    _ (print "Boolean: true and false =" (and true false))
 
     # 2. Variables and Let Bindings
     _ (print "\n2. Variables and Let Bindings:")
@@ -18,49 +17,50 @@
     )
 
     # 3. Lists and List Operations
-    (print "\n3. Lists and Operations:")
+    _ (print "\n3. Lists and Operations:")
     numbers [1 2 3 4 5 6 7 8 9 10]
-    (print "Original:" numbers)
-    (print "Head:" (head numbers))
-    (print "Tail:" (rest numbers))
-    (print "Last:" (last numbers))
-    (print "Length:" (len numbers))
-    (print "Sum:" (sum numbers))
-    (print "Product:" (product numbers))
-    (print "Maximum:" (max_list numbers))
-    (print "Minimum:" (min_list numbers))
+    _ (print "Original:" numbers)
+    _ (print "Head:" (head numbers))
+    _ (print "Tail:" (rest numbers))
+    _ (print "Last:" (last numbers))
+    _ (print "Length:" (len numbers))
+    _ (print "Sum:" (sum numbers))
+    _ (print "Product:" (product numbers))
+    _ (print "Maximum:" (max_list numbers))
+    _ (print "Minimum:" (min_list numbers))
 
     # 4. List Processing
-    (print "\n4. List Processing:")
-    (print "Squares:" (map numbers (lambda x {x * x})))
-    (print "Evens:" (filter numbers (lambda x {x % 2 == 0})))
-    (print "Odds:" (filter numbers (lambda x {x % 2 == 1})))
-    (print "Take 5:" (take 5 numbers))
-    (print "Drop 3:" (drop 3 numbers))
-    (print "Reverse:" (reverse numbers))
+    _ (print "\n4. List Processing:")
+    _ (print "Squares:" (map numbers (lambda x {x * x})))
+    _ (print "Evens:" (filter numbers (lambda x {x % 2 == 0})))
+    _ (print "Odds:" (filter numbers (lambda x {x % 2 == 1})))
+    _ (print "Take 5:" (take 5 numbers))
+    _ (print "Drop 3:" (drop 3 numbers))
+    _ (print "Reverse:" (reverse numbers))
 
     # 5. Functions and Lambdas
-    (print "\n5. Functions and Lambdas:")
+    _ (print "\n5. Functions and Lambdas:")
     square (lambda x {x * x})
     cube {x => {x * x * x}}
-    (print "Square of 5:" (square 5))
-    (print "Cube of 3:" (cube 3))
+    _ (print "Square of 5:" (square 5))
+    _ (print "Cube of 3:" (cube 3))
 
     # Higher-order functions
     apply_twice (lambda f x (f (f x)))
-    (print "Apply square twice to 2:" (apply_twice square 2))
+    _ (print "Apply square twice to 2:" (apply_twice square 2))
 
     # Function composition
+    compose {f g => {x => (f (g x))}}
     compose_square_cube (compose square cube)
-    (print "Compose square and cube of 2:" (compose_square_cube 2))
+    _ (print "Compose square and cube of 2:" (compose_square_cube 2))
 
     # 6. Recursive Functions
-    (print "\n6. Recursive Functions:")
+    _ (print "\n6. Recursive Functions:")
     factorial (lambda n (match {n <= 1}
         true 1
         {n * (factorial {n - 1})}
     ))
-    (print "Factorial of 5:" (factorial 5))
+    _ (print "Factorial of 5:" (factorial 5))
 
     fibonacci (lambda n (match {n <= 1}
         true n
@@ -70,10 +70,10 @@
             {p + q}
         )
     ))
-    (print "Fibonacci of 10:" (fibonacci 10))
+    _ (print "Fibonacci of 10:" (fibonacci 10))
 
     # 7. Pattern Matching
-    (print "\n7. Pattern Matching:")
+    _ (print "\n7. Pattern Matching:")
     grade (lambda score (match score
         100 "Perfect!"
         90 "Excellent"
@@ -82,24 +82,27 @@
         60 "Below Average"
         "Fail"
     ))
-    (print "Grade for 95:" (grade 95))
-    (print "Grade for 75:" (grade 75))
+    _ (print "Grade for 95:" (grade 95))
+    _ (print "Grade for 75:" (grade 75))
 
     # 8. Type System
-    (print "\n8. Type System:")
-    (print "Type of 42:" (type 42))
-    (print "Type of 'hello':" (type "hello"))
-    (print "Type of [1 2 3]:" (type [1 2 3]))
-    (print "Type of true:" (type true))
-    (print "Type of lambda:" (type (lambda x x)))
+    _ (print "\n8. Type System:")
+    _ (print "Type of nil:" (type nil))
+    _ (print "Type of 42:" (type 42))
+    _ (print "Type of 'hello':" (type "hello"))
+    _ (print "Type of [1 2 3]:" (type [1 2 3]))
+    _ (print "Type of true:" (type true))
+    _ (print "Type of lambda:" (type (lambda x x)))
+    _ (print "Type of type:" (type (type nil)))
+    _ (print "Type of type of type:" (type (type (type nil))))
 
     # 9. Advanced List Operations
-    (print "\n9. Advanced List Operations:")
+    _ (print "\n9. Advanced List Operations:")
     # Zip two lists
     list1 [1 2 3 4]
     list2 ["a" "b" "c" "d"]
-    zipped (zip list1 list2)
-    (print "Zip [1 2 3 4] and ['a' 'b' 'c' 'd']:" zipped)
+    # zipped (zip list1 list2)
+    # _ (print "Zip [1 2 3 4] and ['a' 'b' 'c' 'd']:" zipped)
 
     # Range generation
     (print "Range 1 to 10:" (range 1 11))

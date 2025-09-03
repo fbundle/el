@@ -49,7 +49,7 @@ var letFunc = Function{
 		for i := 0; i < len(argList)-1; i += 2 {
 			lexpr, rexpr := argList[i], argList[i+1]
 			if ok := adt.Cast[ast.Name](lexpr).Unwrap(&lvalue); !ok {
-				return errValueString("lvalue must be a Name")
+				return errValueString(fmt.Sprintf("lvalue must be a Name: %s", lexpr.String()))
 			}
 			if err := r.Step(ctx, frame, rexpr).Unwrap(&rvalue); err != nil {
 				return errValue(err)
@@ -103,7 +103,7 @@ var lambdaFunc = Function{
 		for i := 0; i < len(argList)-1; i++ {
 			lexpr := argList[i]
 			if ok := adt.Cast[ast.Name](lexpr).Unwrap(&lvalue); !ok {
-				return errValueString("lvalue must be a Name")
+				return errValueString(fmt.Sprintf("lvalue must be a Name: %s", lexpr.String()))
 			}
 			paramList = append(paramList, Name(lvalue))
 		}
