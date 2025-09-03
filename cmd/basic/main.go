@@ -2,7 +2,8 @@ package main
 
 import (
 	"context"
-	ast2 "el/ast"
+	"el/ast"
+	ast2 "el/parser"
 	"el/runtime"
 	"el/runtime_ext"
 	"fmt"
@@ -188,7 +189,7 @@ func testRuntime() {
 
 	r, s := runtime_ext.NewBasicRuntime()
 
-	var e ast2.Expr
+	var e ast.Node
 	var o runtime.Value
 	var err error
 	ctx := context.Background()

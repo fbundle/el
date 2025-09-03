@@ -8,7 +8,7 @@ import (
 	"github.com/fbundle/lab_public/lab/go_util/pkg/adt"
 )
 
-type Exec = func(r Runtime, ctx context.Context, s Stack, argList []ast.Expr) adt.Result[Value]
+type Exec = func(r Runtime, ctx context.Context, s Stack, argList []ast.Node) adt.Result[Value]
 
 type Value interface {
 	Type() Type

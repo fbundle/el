@@ -17,10 +17,10 @@ var ErrorInterrupt = errors.New("interrupted")
 var ErrorTimeout = errors.New("timeout")
 var ErrorStackOverflow = errors.New("stack overflow")
 
-var ErrorUnknownExpression = func(e ast.Expr) error {
+var ErrorUnknownExpression = func(e ast.Node) error {
 	return fmt.Errorf("unknown expression type %s", e.String())
 }
-var ErrorCannotExecuteExpression = func(e ast.Expr) error {
+var ErrorCannotExecuteExpression = func(e ast.Node) error {
 	return fmt.Errorf("expression cannot be executed: %s", e.String())
 }
 var ErrorNotEnoughArguments = errors.New("not enough arguments")
@@ -31,7 +31,7 @@ type Runtime struct {
 	UnwrapArgs    func(argsOpt adt.Result[[]Value]) adt.Result[[]Value]
 }
 
-func (r Runtime) Step(ctx context.Context, s Stack, e ast.Expr) adt.Result[Value] {
+func (r Runtime) Step(ctx context.Context, s Stack, e ast.Node) adt.Result[Value] {
 	deadline, ok := ctx.Deadline()
 	if ok && time.Now().After(deadline) {
 		return errValue(ErrorTimeout)
@@ -61,7 +61,7 @@ func (r Runtime) Step(ctx context.Context, s Stack, e ast.Expr) adt.Result[Value
 		return errValue(ErrorStackOverflow)
 	}
 	switch e := e.(type) {
-	case ast.Leaf:
+	case ast.Name:
 		// parse literal
 		var o Value
 		if err := r.ParseLiteral(string(e)).Unwrap(&o); err == nil {
@@ -72,7 +72,7 @@ func (r Runtime) Step(ctx context.Context, s Stack, e ast.Expr) adt.Result[Value
 			return value(o)
 		}
 		return errValue(ErrorNameNotFound(Name(e)))
-	case ast.Node:
+	case ast.Function:
 		var cmd Value
 		if err := r.Step(ctx, s, e.Cmd).Unwrap(&cmd); err != nil {
 			return errValue(err)
@@ -88,7 +88,7 @@ func (r Runtime) Step(ctx context.Context, s Stack, e ast.Expr) adt.Result[Value
 }
 
 // stepAndUnwrapArgs executes the argument expressions in parallel and unwraps the results
-func (r Runtime) stepAndUnwrapArgs(ctx context.Context, s Stack, argList []ast.Expr) adt.Result[[]Value] {
+func (r Runtime) stepAndUnwrapArgs(ctx context.Context, s Stack, argList []ast.Node) adt.Result[[]Value] {
 	args := make([]Value, len(argList))
 	for i, e := range argList {
 		if err := r.Step(ctx, s, e).Unwrap(&args[i]); err != nil {

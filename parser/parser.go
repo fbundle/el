@@ -1,6 +1,7 @@
-package ast
+package parser
 
 import (
+	"el/ast"
 	"errors"
 )
 
@@ -11,19 +12,19 @@ func pop(tokenList []Token) ([]Token, Token, error) {
 	return tokenList[1:], tokenList[0], nil
 }
 
-type Parser = func(tokenList []Token) (Expr, []Token, error)
+type Parser = func(tokenList []Token) (ast.Node, []Token, error)
 
-func parseUntilClose(tokenList []Token, close Token, parseOnce Parser) ([]Expr, []Token, error) {
-	var arg Expr
+func parseUntilClose(tokenList []Token, close Token, parseOnce Parser) ([]ast.Node, []Token, error) {
+	var arg ast.Node
 	var err error
-	var argList []Expr
+	var argList []ast.Node
 	for {
 		arg, tokenList, err = parseOnce(tokenList)
 		if err != nil {
 			return nil, tokenList, err
 		}
-		// detect end of Node
-		if nameExpr, ok := arg.(Leaf); ok && string(nameExpr) == close {
+		// detect end of Function
+		if nameExpr, ok := arg.(ast.Name); ok && string(nameExpr) == close {
 			break
 		}
 		argList = append(argList, arg)
@@ -31,7 +32,7 @@ func parseUntilClose(tokenList []Token, close Token, parseOnce Parser) ([]Expr, 
 	return argList, tokenList, nil
 }
 
-func Parse(tokenList []Token) (Expr, []Token, error) {
+func Parse(tokenList []Token) (ast.Node, []Token, error) {
 	tokenList, head, err := pop(tokenList)
 	if err != nil {
 		return nil, tokenList, err
@@ -45,21 +46,21 @@ func Parse(tokenList []Token) (Expr, []Token, error) {
 		}
 		switch len(argList) {
 		case 0:
-			return nil, tokenList, errors.New("empty Node")
+			return nil, tokenList, errors.New("empty Function")
 		case 1:
 			return argList[0], tokenList, nil
 		default:
-			return Node{
+			return ast.Function{
 				Cmd:  argList[0],
 				Args: argList[1:],
 			}, tokenList, nil
 		}
 	} else {
-		return Leaf(head), tokenList, nil
+		return ast.Name(head), tokenList, nil
 	}
 }
 
-func ParseWithInfixOperator(tokenList []Token) (Expr, []Token, error) {
+func ParseWithInfixOperator(tokenList []Token) (ast.Node, []Token, error) {
 	tokenList, head, err := pop(tokenList)
 	if err != nil {
 		return nil, tokenList, err
@@ -72,9 +73,9 @@ func ParseWithInfixOperator(tokenList []Token) (Expr, []Token, error) {
 			return nil, tokenList, err
 		}
 		if len(argList) == 0 {
-			return nil, tokenList, errors.New("empty Node")
+			return nil, tokenList, errors.New("empty Function")
 		}
-		return Node{
+		return ast.Function{
 			Cmd:  argList[0],
 			Args: argList[1:],
 		}, tokenList, nil
@@ -86,8 +87,8 @@ func ParseWithInfixOperator(tokenList []Token) (Expr, []Token, error) {
 		if len(argList)%2 == 0 {
 			return nil, tokenList, errors.New("InfixOperator must have an odd number of arguments")
 		}
-		var parseInfixOperator func(argList []Expr) (Expr, error)
-		parseInfixOperator = func(argList []Expr) (Expr, error) {
+		var parseInfixOperator func(argList []ast.Node) (ast.Node, error)
+		parseInfixOperator = func(argList []ast.Node) (ast.Node, error) {
 			// len argList is either 1 3 5 ...
 			if len(argList) == 1 {
 				return argList[0], nil
@@ -97,9 +98,9 @@ func ParseWithInfixOperator(tokenList []Token) (Expr, []Token, error) {
 			if err != nil {
 				return nil, err
 			}
-			return Node{
+			return ast.Function{
 				Cmd:  cmdExpr,
-				Args: []Expr{left, right},
+				Args: []ast.Node{left, right},
 			}, nil
 
 		}
@@ -110,6 +111,6 @@ func ParseWithInfixOperator(tokenList []Token) (Expr, []Token, error) {
 		}
 		return expr, tokenList, nil
 	} else {
-		return Leaf(head), tokenList, nil
+		return ast.Name(head), tokenList, nil
 	}
 }

@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"el/ast"
+	"el/parser"
 	"el/runtime"
 	"el/runtime_ext"
 	"fmt"
@@ -17,7 +18,7 @@ func testSimpleTCO(n int) {
 	fmt.Println("===============")
 
 	// Simple tail recursive function
-	tokens := ast.TokenizeWithInfixOperator(fmt.Sprintf(`
+	tokens := parser.TokenizeWithInfixOperator(fmt.Sprintf(`
 		(let
 			# Simple tail recursive counter
 			count (lambda n acc (
@@ -34,12 +35,12 @@ func testSimpleTCO(n int) {
 
 	start := time.Now()
 
-	var e ast.Expr
+	var e ast.Node
 	var o runtime.Value
 	var err error
 
 	for len(tokens) > 0 {
-		e, tokens, err = ast.ParseWithInfixOperator(tokens)
+		e, tokens, err = parser.ParseWithInfixOperator(tokens)
 		if err != nil {
 			panic(err)
 		}
