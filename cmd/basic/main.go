@@ -90,7 +90,7 @@ func testRuntime() {
 		)
 
 		# syntactic sugar for list
-		[ 1 2 3 4 5 ]
+		[1 2 3 4 5]
 
 		# rewrite fib
 		(let											# { is the same as (let, } is the same as )
@@ -187,7 +187,9 @@ func testRuntime() {
 
 		# empty expression -> nil
 		(list () nil)
-		
+	
+		# 
+		list
 	`)
 
 	r, s := runtime_ext.NewBasicRuntime()

@@ -15,7 +15,6 @@ var ErrorNameNotFound = func(name Name) error {
 }
 var ErrorInterrupt = errors.New("interrupted")
 var ErrorTimeout = errors.New("timeout")
-var ErrorStackOverflow = errors.New("stack overflow")
 
 var ErrorUnknownExpression = func(e ast.Expr) error {
 	return fmt.Errorf("unknown expression type %s", e.String())
