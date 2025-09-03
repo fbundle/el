@@ -19,11 +19,17 @@ func errValueString(msg string) adt.Result[Object] {
 	return errValue(errors.New(msg))
 }
 
-func getCmd(e ast.Lambda) adt.Option2[ast.Expr, []ast.Expr] {
+type cmd struct {
+	cmdExpr ast.Expr
+	argList []ast.Expr
+}
+
+func getCmd(e ast.Lambda) adt.Option[cmd] {
 	if len(e) == 0 {
-		return adt.None2[ast.Expr, []ast.Expr]()
+		return adt.None[cmd]()
 	}
-	cmd := e[0]
-	args := e[1:]
-	return adt.Some2[ast.Expr, []ast.Expr](cmd, args)
+	return adt.Some(cmd{
+		cmdExpr: e[0],
+		argList: e[1:],
+	})
 }

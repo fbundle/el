@@ -73,18 +73,18 @@ func (r Runtime) Step(ctx context.Context, s Stack, e ast.Expr) adt.Result[Objec
 		}
 		return errValue(ErrorNameNotFound(Name(e)))
 	case ast.Lambda:
-		var cmdExpr ast.Expr
-		var argList []ast.Expr
-		if ok := getCmd(e).Unwrap(&cmdExpr, &argList); !ok {
+		var cmd cmd
+		if ok := getCmd(e).Unwrap(&cmd); !ok {
 			return errValue(nil) // empty expression
 		}
-		var cmd Object
-		if err := r.Step(ctx, s, cmdExpr).Unwrap(&cmd); err != nil {
+
+		var cmdObject Object
+		if err := r.Step(ctx, s, cmd.cmdExpr).Unwrap(&cmdObject); err != nil {
 			return errValue(err)
 		}
 		var mod Function
-		if ok := adt.Cast[Function](cmd).Unwrap(&mod); ok {
-			return mod.exec(r, ctx, s, argList)
+		if ok := adt.Cast[Function](cmdObject).Unwrap(&mod); ok {
+			return mod.exec(r, ctx, s, cmd.argList)
 		}
 		return errValue(ErrorCannotExecuteExpression(e))
 	default:
