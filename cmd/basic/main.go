@@ -181,7 +181,7 @@ func testRuntime() {
 		(let
 			f (lambda x (add x y))
 			y 2
-			(f 3)
+			(f 3)		# this works since function call uses the current stack
 		)
 	`)
 
