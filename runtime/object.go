@@ -55,7 +55,7 @@ func (f Function) String() string {
 type Nil struct{}
 
 func (Nil) Type() Object {
-	return DataType("nil")
+	return DataType("nil_type")
 }
 func (Nil) String() string {
 	return "nil"
