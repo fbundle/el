@@ -144,6 +144,27 @@ func testRuntime() {
 			final_state (while  cond_func body_func state)
 			final_state
 		)
+
+		# if else
+		(let
+			if (lambda cond_func true_func false_func state (
+				match (cond_func state)
+				true	(true_func state)
+						(false_func state)
+			))
+
+			+ add - sub x mul / div % mod			# short hand for common operator
+			== eq != ne <= le < lt > gt >= ge
+
+			cond_func (lambda state [state > 3])
+			true_func (lambda state true)
+			false_func (lambda state false)
+
+			state1 2
+			state2 4
+
+			[[ (if cond_func true_func false_func state1) (if cond_func true_func false_func state2) ]]
+		)
 	`)
 
 	r, s := runtime_ext.NewBasicRuntime()
