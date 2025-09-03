@@ -2,26 +2,26 @@ package ast
 
 // A very simple AST, each node is either an Expr or a list of Expr
 
-// Expr - union of Atom, SExpr
+// Expr - union of Leaf, Node
 type Expr interface {
 	String() string
 }
 
-// Atom - a name, a number, a string, etc.
-type Atom string
+// Leaf - a name, a number, a string, etc.
+type Leaf string
 
-func (e Atom) String() string {
+func (e Leaf) String() string {
 	return string(e)
 }
 
-// SExpr - S-expression - every enclosed by a pair of parentheses
+// Node - S-expression - every enclosed by a pair of parentheses
 // e.g. (cmd ...)
-type SExpr struct {
+type Node struct {
 	Cmd  Expr
 	Args []Expr
 }
 
-func (e SExpr) String() string {
+func (e Node) String() string {
 	s := ""
 	s += "("
 	s += e.Cmd.String()

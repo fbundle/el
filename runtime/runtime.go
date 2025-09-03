@@ -67,7 +67,7 @@ func (r Runtime) Step(ctx context.Context, s Stack, e ast.Expr) adt.Result[Value
 		return errValue(ErrorStackOverflow)
 	}
 	switch e := e.(type) {
-	case ast.Atom:
+	case ast.Leaf:
 		// parse literal
 		var o Value
 		if err := r.ParseLiteral(string(e)).Unwrap(&o); err == nil {
@@ -78,7 +78,7 @@ func (r Runtime) Step(ctx context.Context, s Stack, e ast.Expr) adt.Result[Value
 			return value(o)
 		}
 		return errValue(ErrorNameNotFound(Name(e)))
-	case ast.SExpr:
+	case ast.Node:
 		var cmd Value
 		if err := r.Step(ctx, s, e.Cmd).Unwrap(&cmd); err != nil {
 			return errValue(err)

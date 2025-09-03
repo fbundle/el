@@ -22,8 +22,8 @@ func parseUntilClose(tokenList []Token, close Token, parseOnce Parser) ([]Expr, 
 		if err != nil {
 			return nil, tokenList, err
 		}
-		// detect end of SExpr
-		if nameExpr, ok := arg.(Atom); ok && string(nameExpr) == close {
+		// detect end of Node
+		if nameExpr, ok := arg.(Leaf); ok && string(nameExpr) == close {
 			break
 		}
 		argList = append(argList, arg)
@@ -45,17 +45,17 @@ func Parse(tokenList []Token) (Expr, []Token, error) {
 		}
 		switch len(argList) {
 		case 0:
-			return nil, tokenList, errors.New("empty SExpr")
+			return nil, tokenList, errors.New("empty Node")
 		case 1:
 			return argList[0], tokenList, nil
 		default:
-			return SExpr{
+			return Node{
 				Cmd:  argList[0],
 				Args: argList[1:],
 			}, tokenList, nil
 		}
 	} else {
-		return Atom(head), tokenList, nil
+		return Leaf(head), tokenList, nil
 	}
 }
 
@@ -72,9 +72,9 @@ func ParseWithInfixOperator(tokenList []Token) (Expr, []Token, error) {
 			return nil, tokenList, err
 		}
 		if len(argList) == 0 {
-			return nil, tokenList, errors.New("empty SExpr")
+			return nil, tokenList, errors.New("empty Node")
 		}
-		return SExpr{
+		return Node{
 			Cmd:  argList[0],
 			Args: argList[1:],
 		}, tokenList, nil
@@ -97,7 +97,7 @@ func ParseWithInfixOperator(tokenList []Token) (Expr, []Token, error) {
 			if err != nil {
 				return nil, err
 			}
-			return SExpr{
+			return Node{
 				Cmd:  cmdExpr,
 				Args: []Expr{left, right},
 			}, nil
@@ -110,6 +110,6 @@ func ParseWithInfixOperator(tokenList []Token) (Expr, []Token, error) {
 		}
 		return expr, tokenList, nil
 	} else {
-		return Atom(head), tokenList, nil
+		return Leaf(head), tokenList, nil
 	}
 }

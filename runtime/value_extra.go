@@ -45,12 +45,12 @@ var letModule = Module{
 
 		s = s.Push(Frame{}) // push a new empty frame
 
-		var lvalue ast.Atom
+		var lvalue ast.Leaf
 		var rvalue Value
 		for i := 0; i < len(argList)-1; i += 2 {
 			lexpr, rexpr := argList[i], argList[i+1]
-			if ok := adt.Cast[ast.Atom](lexpr).Unwrap(&lvalue); !ok {
-				return errValueString("lvalue must be a Atom")
+			if ok := adt.Cast[ast.Leaf](lexpr).Unwrap(&lvalue); !ok {
+				return errValueString("lvalue must be a Leaf")
 			}
 			if err := r.Step(ctx, s, rexpr).Unwrap(&rvalue); err != nil {
 				return errValue(err)
@@ -74,11 +74,11 @@ var lambdaModule = Module{
 		}
 
 		paramList := make([]Name, 0, len(argList)-1)
-		var lvalue ast.Atom
+		var lvalue ast.Leaf
 		for i := 0; i < len(argList)-1; i++ {
 			lexpr := argList[i]
-			if ok := adt.Cast[ast.Atom](lexpr).Unwrap(&lvalue); !ok {
-				return errValueString("lvalue must be a Atom")
+			if ok := adt.Cast[ast.Leaf](lexpr).Unwrap(&lvalue); !ok {
+				return errValueString("lvalue must be a Leaf")
 			}
 			paramList = append(paramList, Name(lvalue))
 		}
