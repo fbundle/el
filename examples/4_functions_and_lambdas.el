@@ -4,14 +4,14 @@
 
     # Simple lambda functions
     _ (let
-        square (lambda n {n x n})
+        square (lambda n {n * n})
         _ (print "Square of 5:" (square 5))
         nil
     )
 
     # Arrow function syntax
     _ (let
-        cube {n => {n x n x n}}
+        cube {n => {n * n * n}}
         _ (print "Cube of 3:" (cube 3))
         nil
     )
@@ -25,7 +25,7 @@
 
     # Higher-order functions
     _ (let
-        square (lambda a {a x a})
+        square (lambda a {a * a})
         apply_twice (lambda f a (f (f a)))
         _ (print "Apply square twice to 2:" (apply_twice square 2))
         nil
@@ -33,8 +33,8 @@
 
     # Function composition
     _ (let
-        square (lambda a {a x a})
-        cube {a => {a x a x a}}
+        square (lambda a {a * a})
+        cube {a => {a * a * a}}
         compose {f g => {x => (f (g x))}}
         compose_square_cube (compose square cube)
         _ (print "Compose square and cube of 2:" (compose_square_cube 2))
@@ -45,7 +45,7 @@
     _ (let
         factorial (lambda n (match {n <= 1}
             true 1
-            {n x (factorial {n - 1})}
+            {n * (factorial {n - 1})}
         ))
         _ (print "Factorial of 5:" (factorial 5))
         nil
@@ -89,7 +89,7 @@
 
     # Function that returns functions
     _ (let
-        make_multiplier (lambda factor (lambda a {a x factor}))
+        make_multiplier (lambda factor (lambda a {a * factor}))
         double (make_multiplier 2)
         triple (make_multiplier 3)
         _ (print "Double 7:" (double 7))
