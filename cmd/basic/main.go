@@ -161,6 +161,19 @@ func testRuntime() {
 
 			[[ (if [x < 3] "x less than 3" "x bigger than 3") (if [y < 3] "y less than 3" "y bigger than 3") ]]
 		)
+
+		# type system
+		(let
+			x 1
+			y (list 1 2 3)
+			z (lambda x [x+y])
+			x1 (type x)
+			y1 (type y)
+			z1 (type z)
+			x2 (type x1)
+
+			[[x y z x1 y1 z1 x2]]
+		)
 	`)
 
 	r, s := runtime_ext.NewBasicRuntime()

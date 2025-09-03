@@ -55,7 +55,7 @@ func (l Lambda) Type() Type {
 }
 
 func (l Lambda) String() string {
-	s := fmt.Sprintf("(<closure_%p>; lambda ", l.Closure)
+	s := fmt.Sprintf("(<closure_%s>; lambda ", l.Closure.Repr())
 	for _, param := range l.ParamList {
 		s += string(param) + " "
 	}
