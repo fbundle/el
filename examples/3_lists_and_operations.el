@@ -26,7 +26,7 @@
     # List processing
     _ (let
         numbers [1 2 3 4 5]
-        _ (print "Map (double each):" (map numbers (lambda n {n x 2})))
+        _ (print "Map (double each):" (map numbers (lambda n {n * 2})))
         _ (print "Filter (even numbers):" (filter numbers (lambda n {n % 2 == 0})))
         _ (print "Sum:" (sum numbers))
         _ (print "Product:" (product numbers))

@@ -7,7 +7,7 @@ const (
 	TokenBlockEnd   Token = ")"
 	TokenSugarBegin Token = "{"
 	TokenSugarEnd   Token = "}"
-	TokenUnwrap     Token = "*"
+	TokenUnwrap     Token = "$"
 	TokenStringBeg  Token = "\""
 	TokenStringEnd  Token = "\""
 )

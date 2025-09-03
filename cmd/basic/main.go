@@ -16,7 +16,7 @@ var program = `
 	_ (print list)
 	_ (print [1 2 3 (list 4 5 6) (lambda x {x + 3})])
 	_ (print (map (list 1 2 3) (lambda x {x + 2})))
-	_ (print [1 2 3] *[1 2 3])				# unwrap arguments
+	_ (print [1 2 3] $[1 2 3])				# unwrap arguments
 	_ (print {1 + 2 - 3 + 4})
 
 	# fibonacci
@@ -119,7 +119,7 @@ func withTemplate(s string) string {
 unit (lambda x x) 
 
 # get - get element from list
-get (lambda l i (unit * (slice l (range i (add i 1)))))			# get l[i]
+get (lambda l i (unit $(slice l (range i (add i 1)))))			# get l[i]
 head (lambda l (get l 0))							# get l[0]
 rest (lambda l (slice l (range 1 (len l))))			# get l[1:]
 
@@ -135,7 +135,7 @@ map (lambda l f (match (len l)
 		first_elem2 (f first_elem)
 		rest_elems (rest l)
 		rest_elems2 (map rest_elems f)	# recursive call
-		(list first_elem2 *rest_elems2)
+		(list first_elem2 $rest_elems2)
 	)
 ))
 
