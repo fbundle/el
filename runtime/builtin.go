@@ -30,7 +30,7 @@ var builtinObject = map[Name]Object{
 }
 
 var typeFunc = Function{
-	repr: "[module: (type (list 1 2 3)) - get the type of an arbitrary object]",
+	repr: "{builtin: (type (list 1 2 3)) - get the type of an arbitrary object}",
 	exec: func(r Runtime, ctx context.Context, frame Frame, argList []ast.Expr) adt.Result[Object] {
 		if len(argList) != 1 {
 			return errValueString("type requires 1 argument")
@@ -44,7 +44,7 @@ var typeFunc = Function{
 }
 
 var letFunc = Function{
-	repr: "[module: (let x 3) - assign value 3 to local variable x]",
+	repr: "{builtin: (let x 3) - assign value 3 to local variable x}",
 	exec: func(r Runtime, ctx context.Context, frame Frame, argList []ast.Expr) adt.Result[Object] {
 		if len(argList) < 1 || len(argList)%2 != 1 {
 			return errValueString("let requires at least 1 arguments and odd number of arguments")
@@ -67,7 +67,7 @@ var letFunc = Function{
 }
 
 var matchFunc = Function{
-	repr: "[module: (match x 1 2 4 5 6) - match, if x=1 then return 3, if x=4 the return 5, otherwise return 6]",
+	repr: "{builtin: (match x 1 2 3 4 5) - match, if x=1 then return 2, if x=3 the return 4, otherwise return 5",
 	exec: func(r Runtime, ctx context.Context, frame Frame, argList []ast.Expr) adt.Result[Object] {
 		if len(argList) < 2 || len(argList)%2 != 0 {
 			return errValueString("match requires at least 2 arguments and even number of arguments")
@@ -98,7 +98,7 @@ var matchFunc = Function{
 }
 
 var lambdaFunc = Function{
-	repr: "[module: (lambda x y (add x y) - declare a function]",
+	repr: "{builtin: (lambda x y (add x y) - declare a function}",
 	exec: func(r Runtime, ctx context.Context, frame Frame, argList []ast.Expr) adt.Result[Object] {
 		if len(argList) < 1 {
 			return errValueString("lambda requires at least 1 arguments")
