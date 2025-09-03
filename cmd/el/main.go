@@ -282,7 +282,7 @@ last (lambda l (get l (sub (len l) 1)))				# get last element
 init (lambda l (slice l (range 0 (sub (len l) 1))))	# get all but last
 
 # operator aliases
-+ add - sub x mul * mul / div %% mod
++ add - sub * mul / div %% mod
 == eq != ne <= le < lt > gt >= ge
 
 # conditional
