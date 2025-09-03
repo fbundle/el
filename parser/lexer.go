@@ -10,30 +10,34 @@ type Token = string
 
 func Tokenize(s string) []Token {
 	return tokenize(s,
+		map[rune]struct{}{
+			'(': {},
+			')': {},
+			'*': {},
+			'[': {},
+			']': {},
+			'{': {},
+			'}': {},
+		},
 		removeComment("#"),
-		splitString([]string{
-			"(",
-			")",
-			"*",
-		}),
 	)
 }
 
 func TokenizeWithListAndInfix(s string) []Token {
 	return tokenize(s,
+		map[rune]struct{}{
+			'(': {},
+			')': {},
+			'*': {},
+			'[': {},
+			']': {},
+			'{': {},
+			'}': {},
+		},
 		removeComment("#"),
 		mapping(map[string]string{
 			"[": " (list ",
 			"]": " ) ",
-		}),
-		splitString([]string{
-			"(",
-			")",
-			"*",
-			"[",
-			"]",
-			"{",
-			"}",
 		}),
 	)
 }
@@ -60,28 +64,7 @@ var removeComment = func(sep string) preprocessor {
 	}
 }
 
-var splitString = func(sepString []string) preprocessor {
-	return func(str string) string {
-		normalize := func(s string) string {
-			return strings.Join(strings.Fields(s), " ")
-		}
-		str = normalize(str)
-		for {
-			str1 := str
-			for _, s := range sepString {
-				str1 = strings.ReplaceAll(str1, s, " "+s+" ")
-			}
-			str1 = normalize(str1)
-			if str1 == str {
-				break
-			}
-			str = str1
-		}
-		return str
-	}
-}
-
-func tokenize(str string, pList ...preprocessor) []Token {
+func tokenize(str string, splitString map[rune]struct{}, pList ...preprocessor) []Token {
 	for _, p := range pList {
 		str = p(str)
 	}
@@ -104,7 +87,12 @@ func tokenize(str string, pList ...preprocessor) []Token {
 	for _, ch := range str {
 		switch state {
 		case STATE_OUTSTRING: // outside string
-			if unicode.IsSpace(ch) {
+			if _, ok := splitString[ch]; ok {
+				// split special characters like ( ) [ ] into tokens
+				flushBuffer()
+				tokens = append(tokens, string(ch))
+				flushBuffer()
+			} else if unicode.IsSpace(ch) {
 				// flush buffer if seeing whitespace
 				flushBuffer()
 			} else if ch == '"' {
