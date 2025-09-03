@@ -18,7 +18,7 @@ func testSimpleTCO(n int) {
 	fmt.Println("===============")
 
 	// Simple tail recursive function
-	tokens := parser.TokenizeWithInfixOperator(fmt.Sprintf(`
+	tokens := parser.TokenizeWithListAndInfix(fmt.Sprintf(`
 		(let
 			# Simple tail recursive counter
 			count (lambda n acc (
@@ -40,7 +40,7 @@ func testSimpleTCO(n int) {
 	var err error
 
 	for len(tokens) > 0 {
-		e, tokens, err = parser.ParseWithInfixOperator(tokens)
+		e, tokens, err = parser.ParseWithInfix(tokens)
 		if err != nil {
 			panic(err)
 		}

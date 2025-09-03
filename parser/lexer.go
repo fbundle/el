@@ -19,7 +19,7 @@ func Tokenize(s string) []Token {
 	)
 }
 
-func TokenizeWithInfixOperator(s string) []Token {
+func TokenizeWithListAndInfix(s string) []Token {
 	return tokenize(s,
 		removeComment("#"),
 		mapping(map[string]string{

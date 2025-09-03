@@ -10,7 +10,7 @@ import (
 )
 
 func testRuntime() {
-	tokens := parser.TokenizeWithInfixOperator(`
+	tokens := parser.TokenizeWithListAndInfix(`
 		# simple example
 		(let
 			y 20
@@ -197,7 +197,7 @@ func testRuntime() {
 	var err error
 	ctx := context.Background()
 	for len(tokens) > 0 {
-		e, tokens, err = parser.ParseWithInfixOperator(tokens)
+		e, tokens, err = parser.ParseWithInfix(tokens)
 		if err != nil {
 			panic(err)
 		}

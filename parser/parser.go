@@ -54,7 +54,7 @@ func Parse(tokenList []Token) (ast.Expr, []Token, error) {
 	return ast.Lambda(argList), tokenList, nil
 }
 
-func ParseWithInfixOperator(tokenList []Token) (ast.Expr, []Token, error) {
+func ParseWithInfix(tokenList []Token) (ast.Expr, []Token, error) {
 	tokenList, head, err := pop(tokenList)
 	if err != nil {
 		return nil, tokenList, err
@@ -63,14 +63,14 @@ func ParseWithInfixOperator(tokenList []Token) (ast.Expr, []Token, error) {
 	switch head {
 	case "(":
 		// parse until seeing `)`
-		argList, tokenList, err := parseArgList(ParseWithInfixOperator, ")", tokenList)
+		argList, tokenList, err := parseArgList(ParseWithInfix, ")", tokenList)
 		if err != nil {
 			return nil, tokenList, err
 		}
 		return ast.Lambda(argList), tokenList, nil
 	case "{":
 		// parse until seeing `}`
-		argList, tokenList, err := parseArgList(ParseWithInfixOperator, "}", tokenList)
+		argList, tokenList, err := parseArgList(ParseWithInfix, "}", tokenList)
 		if err != nil {
 			return nil, tokenList, err
 		}
