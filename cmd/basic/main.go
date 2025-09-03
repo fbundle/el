@@ -38,14 +38,14 @@ func testRuntime() {
 			# implement map -> hence for loop
 			map (lambda l f (match (le (len l) 0)
 				true (list) 											# if l is empty then return empty list
-				false (let
+				 (let
 					first_elem (get l 0)
 					first_value (f first_elem)
 					rest (slice l (range 1 (len l)))
 					rest_values (map rest f)
 					(list first_value *rest_values)
 				)
-				_														# wildcard case - will fail if no case is matched
+																		# wildcard case - will fail if no case is matched
 			))
 
 			another (map (range 5 10) (lambda x [x mul 2]))				
