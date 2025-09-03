@@ -28,7 +28,7 @@ func NewBasicRuntime() (Runtime, Stack) {
 		},
 	}
 	sh := stackHelper{stack: runtime_core.NewBuiltinStack()}
-	sh = sh.LoadExtension(listExtension, lenExtension, sliceExtension)
+	sh = sh.LoadExtension(listExtension, lenExtension, sliceExtension, rangeExtension)
 	sh = sh.Load("true", True).Load("false", False)
 	sh = sh.LoadExtension(eqExtension, neExtension, ltExtension, leExtension, gtExtension, geExtension)
 	sh = sh.LoadExtension(addExtension, subExtension, mulExtension, divExtension, modExtension)

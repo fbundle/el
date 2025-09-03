@@ -60,3 +60,25 @@ var sliceExtension = Extension{
 		return value(output)
 	},
 }
+
+var rangeExtension = Extension{
+	Name: "range",
+	Exec: func(ctx context.Context, values ...Value) adt.Result[Value] {
+		if len(values) != 2 {
+			return errValueString("range requires 2 arguments")
+		}
+		var i, j Int
+		if ok := adt.Cast[Int](values[0]).Unwrap(&i); !ok {
+			return errValueString("range beg must be an integer")
+		}
+		if ok := adt.Cast[Int](values[1]).Unwrap(&j); !ok {
+			return errValueString("range end must be an integer")
+		}
+		output := List{}
+		for k := i.int; k < j.int; k++ {
+			output = List{output.Ins(output.Len(), Int{k})}
+		}
+		return value(output)
+	},
+	Man: "module: (range m n) - make a list of integers from m to n-1",
+}
