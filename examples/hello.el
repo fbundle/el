@@ -1,3 +1,5 @@
 # Hello World - Basic EL Program
-(print "Hello, World!")
-(print "Welcome to the EL programming language!")
+_ (print "Hello, World!")
+_ (print "Welcome to the EL programming language!")
+
+nil

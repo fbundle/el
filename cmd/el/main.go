@@ -274,17 +274,25 @@ func withTemplate(s string) string {
 	return fmt.Sprintf(`
 (let
 
-# Core utilities
 # identity - identity function
 unit (lambda x x) 
 
-# list operations
 # get - get element from list
 get (lambda l i (unit * (slice l (range i (add i 1)))))			# get l[i]
 head (lambda l (get l 0))							# get l[0]
 rest (lambda l (slice l (range 1 (len l))))			# get l[1:]
 last (lambda l (get l (sub (len l) 1)))				# get last element
 init (lambda l (slice l (range 0 (sub (len l) 1))))	# get all but last
+
+# operator aliases
++ add - sub x mul / div %% mod
+== eq != ne <= le < lt > gt >= ge
+
+# conditional
+if (lambda cond then else (match cond
+	true then
+	else
+))
 
 # list constructors
 cons (lambda x xs (list x *xs))						# cons x xs
@@ -298,31 +306,7 @@ append (lambda xs ys (match (len xs)
 	)
 ))
 
-# operators - shorthand for common operators
-+ add - sub * mul / div %% mod
-== eq != ne <= le < lt > gt >= ge
-
-# boolean operations
-and (lambda x y (match x
-	false false
-	y
-))
-or (lambda x y (match x
-	true true
-	y
-))
-not (lambda x (match x
-	true false
-	true
-))
-
-# conditional
-if (lambda cond then else (match cond
-	true then
-	else
-))
-
-# list processing
+# map
 map (lambda l f (match (len l)
 	0 []					# if len l == 0 then return empty list
 	(let
@@ -334,6 +318,7 @@ map (lambda l f (match (len l)
 	)
 ))
 
+# filter
 filter (lambda l pred (match (len l)
 	0 []
 	(let
@@ -347,6 +332,7 @@ filter (lambda l pred (match (len l)
 	)
 ))
 
+# fold operations
 foldl (lambda l init f (match (len l)
 	0 init
 	(let
@@ -357,25 +343,13 @@ foldl (lambda l init f (match (len l)
 	)
 ))
 
-foldr (lambda l init f (match (len l)
-	0 init
-	(let
-		first_elem (head l)
-		rest_elems (rest l)
-		rest_result (foldr rest_elems init f)
-		(f init first_elem rest_result)
-	)
-))
-
-# list utilities
-reverse (lambda l (foldl l [] (lambda acc x (cons x acc))))
-length (lambda l (len l))
+# utility functions
 sum (lambda l (foldl l 0 add))
 product (lambda l (foldl l 1 mul))
-max_list (lambda l (foldl l (head l) (lambda acc x (if {x > acc} x acc))))
-min_list (lambda l (foldl l (head l) (lambda acc x (if {x < acc} x acc))))
+max_list (lambda l (foldl l (head l) (lambda acc n (if {n > acc} n acc))))
+min_list (lambda l (foldl l (head l) (lambda acc n (if {n < acc} n acc))))
 
-# range and sequence generation
+# range generation
 range (lambda start end (match {start >= end}
 	true []
 	(let
@@ -392,43 +366,8 @@ range_step (lambda start end step (match {start >= end}
 	)
 ))
 
-# string operations (basic)
-str_concat (lambda s1 s2 (match (type s1)
-	"string" (match (type s2)
-		"string" (let
-			# Simple string concatenation using list operations
-			chars1 (slice s1 (range 0 (len s1)))
-			chars2 (slice s2 (range 0 (len s2)))
-			combined (append chars1 chars2)
-			combined
-		)
-		s1
-	)
-	s1
-))
-
-# mathematical functions
-factorial (lambda n (match {n <= 1}
-	true 1
-	{mul n (factorial {n - 1})}
-))
-
-fibonacci (lambda n (match {n <= 1}
-	true n
-	(let
-		p (fibonacci {n - 1})
-		q (fibonacci {n - 2})
-		{p + q}
-	)
-))
-
-# higher-order functions
-compose (lambda f g (lambda x (f (g x))))
-curry (lambda f (lambda x (lambda y (f x y))))
-uncurry (lambda f (lambda x y (f x y)))
-
-# list comprehensions (simulated)
-# take n elements from list
+# list utilities
+reverse (lambda l (foldl l [] (lambda acc n (cons n acc))))
 take (lambda n l (match {n <= 0}
 	true []
 	(match (len l)
@@ -442,65 +381,12 @@ take (lambda n l (match {n <= 0}
 	)
 ))
 
-# drop n elements from list
 drop (lambda n l (match {n <= 0}
 	true l
 	(match (len l)
 		0 []
 		(drop {n - 1} (rest l))
 	)
-))
-
-# zip two lists
-zip (lambda l1 l2 (match (len l1)
-	0 []
-	(match (len l2)
-		0 []
-		(let
-			first1 (head l1)
-			first2 (head l2)
-			rest1 (rest l1)
-			rest2 (rest l2)
-			rest_zipped (zip rest1 rest2)
-			(cons (list first1 first2) rest_zipped)
-		)
-	)
-))
-
-# unzip a list of pairs
-unzip (lambda l (match (len l)
-	0 (list [] [])
-	(let
-		first (head l)
-		rest (rest l)
-		rest_unzipped (unzip rest)
-		first_list (get rest_unzipped 0)
-		second_list (get rest_unzipped 1)
-		first_pair_first (get first 0)
-		first_pair_second (get first 1)
-		(list (cons first_pair_first first_list) (cons first_pair_second second_list))
-	)
-))
-
-# debugging and introspection
-debug_print (lambda x (let
-	_ (print "DEBUG:")
-	_ (print "  value:" x)
-	_ (print "  type:" (type x))
-	x
-))
-
-trace (lambda name x (let
-	_ (print "TRACE" name ":" x)
-	x
-))
-
-# performance testing
-time_it (lambda name f (let
-	_ (print "Starting" name)
-	result f
-	_ (print "Finished" name)
-	result
 ))
 
 %s
