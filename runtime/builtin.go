@@ -131,7 +131,7 @@ func makeLambdaExec(paramList []Name, body ast.Expr, closure Frame) Exec {
 		*/
 		// 0. sanity check
 		if len(argList) < len(paramList) {
-			errValue(ErrorNotEnoughArguments)
+			return errValue(ErrorNotEnoughArguments)
 		}
 		// 1. evaluate arguments
 		var args []Object
