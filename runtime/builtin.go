@@ -45,12 +45,12 @@ var letFunc = Function{
 
 		s = s.Push(Frame{}) // push a new empty frame
 
-		var lvalue ast.Leaf
+		var lvalue ast.Name
 		var rvalue Object
 		for i := 0; i < len(argList)-1; i += 2 {
 			lexpr, rexpr := argList[i], argList[i+1]
-			if ok := adt.Cast[ast.Leaf](lexpr).Unwrap(&lvalue); !ok {
-				return errValueString("lvalue must be a Leaf")
+			if ok := adt.Cast[ast.Name](lexpr).Unwrap(&lvalue); !ok {
+				return errValueString("lvalue must be a Name")
 			}
 			if err := r.Step(ctx, s, rexpr).Unwrap(&rvalue); err != nil {
 				return errValue(err)
@@ -99,11 +99,11 @@ var lambdaFunc = Function{
 		}
 
 		paramList := make([]Name, 0, len(argList)-1)
-		var lvalue ast.Leaf
+		var lvalue ast.Name
 		for i := 0; i < len(argList)-1; i++ {
 			lexpr := argList[i]
-			if ok := adt.Cast[ast.Leaf](lexpr).Unwrap(&lvalue); !ok {
-				return errValueString("lvalue must be a Leaf")
+			if ok := adt.Cast[ast.Name](lexpr).Unwrap(&lvalue); !ok {
+				return errValueString("lvalue must be a Name")
 			}
 			paramList = append(paramList, Name(lvalue))
 		}

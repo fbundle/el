@@ -19,7 +19,7 @@ func errValueString(msg string) adt.Result[Object] {
 	return errValue(errors.New(msg))
 }
 
-func getCmd(e ast.Node) adt.Option2[ast.Expr, []ast.Expr] {
+func getCmd(e ast.Lambda) adt.Option2[ast.Expr, []ast.Expr] {
 	if len(e) == 0 {
 		return adt.None2[ast.Expr, []ast.Expr]()
 	}

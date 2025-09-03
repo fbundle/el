@@ -4,24 +4,22 @@ import "strings"
 
 // A very simple AST
 
-type Token = string
-
-// Expr - union of Leaf, Node
+// Expr - union of Name, Lambda
 type Expr interface {
 	String() string
 }
 
-// Leaf - a name, a number, a string, etc.
-type Leaf Token
+// Name - a name, a number, a string, etc.
+type Name string
 
-func (e Leaf) String() string {
+func (e Name) String() string {
 	return string(e)
 }
 
-// Node - S-expression - every enclosed by a pair of parentheses e.g. (cmd ...)
-type Node []Expr
+// Lambda - S-expression - every enclosed by a pair of parentheses e.g. (cmd ...)
+type Lambda []Expr
 
-func (e Node) String() string {
+func (e Lambda) String() string {
 	children := make([]string, 0, len(e))
 	for _, child := range e {
 		children = append(children, child.String())

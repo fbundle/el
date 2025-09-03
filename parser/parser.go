@@ -23,8 +23,8 @@ func parseUntilClose(tokenList []Token, close Token, parseOnce Parser) ([]ast.Ex
 		if err != nil {
 			return nil, tokenList, err
 		}
-		// detect end of Node
-		if nameExpr, ok := arg.(ast.Leaf); ok && string(nameExpr) == close {
+		// detect end of Lambda
+		if nameExpr, ok := arg.(ast.Name); ok && string(nameExpr) == close {
 			break
 		}
 		argList = append(argList, arg)
@@ -46,14 +46,14 @@ func Parse(tokenList []Token) (ast.Expr, []Token, error) {
 		}
 		switch len(argList) {
 		case 0:
-			return nil, tokenList, errors.New("empty Node")
+			return nil, tokenList, errors.New("empty Lambda")
 		case 1:
 			return argList[0], tokenList, nil
 		default:
-			return ast.Node(argList), tokenList, nil
+			return ast.Lambda(argList), tokenList, nil
 		}
 	} else {
-		return ast.Leaf(head), tokenList, nil
+		return ast.Name(head), tokenList, nil
 	}
 }
 
@@ -70,9 +70,9 @@ func ParseWithInfixOperator(tokenList []Token) (ast.Expr, []Token, error) {
 			return nil, tokenList, err
 		}
 		if len(argList) == 0 {
-			return nil, tokenList, errors.New("empty Node")
+			return nil, tokenList, errors.New("empty Lambda")
 		}
-		return ast.Node(argList), tokenList, nil
+		return ast.Lambda(argList), tokenList, nil
 	} else if head == "[" {
 		argList, tokenList, err := parseUntilClose(tokenList, "]", ParseWithInfixOperator)
 		if err != nil {
@@ -93,7 +93,7 @@ func ParseWithInfixOperator(tokenList []Token) (ast.Expr, []Token, error) {
 				return nil, err
 			}
 
-			return ast.Node([]ast.Expr{cmdExpr, left, right}), nil
+			return ast.Lambda([]ast.Expr{cmdExpr, left, right}), nil
 
 		}
 
@@ -103,6 +103,6 @@ func ParseWithInfixOperator(tokenList []Token) (ast.Expr, []Token, error) {
 		}
 		return expr, tokenList, nil
 	} else {
-		return ast.Leaf(head), tokenList, nil
+		return ast.Name(head), tokenList, nil
 	}
 }
