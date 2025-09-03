@@ -29,6 +29,8 @@ func NewBasicRuntime() (Runtime, Stack) {
 	}
 	sh := stackHelper{stack: runtime_core.NewBuiltinStack()}
 	sh = sh.LoadExtension(listExtension, lenExtension, sliceExtension)
+	sh = sh.Load("true", Bool{true}).Load("false", Bool{false})
+
 	return r, sh.stack
 }
 
