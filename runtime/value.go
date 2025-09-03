@@ -8,13 +8,15 @@ import (
 	"github.com/fbundle/lab_public/lab/go_util/pkg/adt"
 )
 
+type Exec = func(r Runtime, ctx context.Context, s Stack, argList []ast.Expr) adt.Result[Value]
+
 type Value interface {
 	Type() Type
 	String() string
 }
 type Function interface {
 	Value
-	apply(r Runtime, ctx context.Context, s Stack, argList []ast.Expr) adt.Result[Value]
+	exec() Exec
 }
 
 func DataType(name string) Type {
@@ -63,39 +65,39 @@ func (l Lambda) String() string {
 	return s
 }
 
-func (l Lambda) apply(r Runtime, ctx context.Context, s Stack, argList []ast.Expr) adt.Result[Value] {
-	// 0. sanity check
-	if len(argList) < len(l.ParamList) {
-		errValue(ErrorNotEnoughArguments)
-	}
-	// 1. evaluate arguments
-	var args []Value
-	if err := r.stepAndUnwrapArgs(ctx, s, argList).Unwrap(&args); err != nil {
-		return errValue(err)
-	}
-	// 2. make call stack
-	local := l.Closure
-	for i := 0; i < len(l.ParamList); i++ {
-		param, arg := l.ParamList[i], args[i]
-		local = local.Set(param, arg)
-	}
+func (l Lambda) exec() Exec {
+	return func(r Runtime, ctx context.Context, s Stack, argList []ast.Expr) adt.Result[Value] {
+		// 0. sanity check
+		if len(argList) < len(l.ParamList) {
+			errValue(ErrorNotEnoughArguments)
+		}
+		// 1. evaluate arguments
+		var args []Value
+		if err := r.stepAndUnwrapArgs(ctx, s, argList).Unwrap(&args); err != nil {
+			return errValue(err)
+		}
+		// 2. make call stack
+		local := l.Closure
+		for i := 0; i < len(l.ParamList); i++ {
+			param, arg := l.ParamList[i], args[i]
+			local = local.Set(param, arg)
+		}
 
-	var callStack Stack
-	if isTailCall(ctx) {
-		callStack = s.Pop().Push(local)
-	} else {
-		callStack = s.Push(local)
+		var callStack Stack
+		if isTailCall(ctx) {
+			callStack = s.Pop().Push(local)
+		} else {
+			callStack = s.Push(local)
+		}
+		// 3. make call with new stack - signal tailcall to children
+		childCtx := withTailCall(ctx)
+		var o Value
+		if err := r.Step(childCtx, callStack, l.Body).Unwrap(&o); err != nil {
+			return errValue(err)
+		}
+		return value(o)
 	}
-	// 3. make call with new stack - signal tailcall to children
-	childCtx := withTailCall(ctx)
-	var o Value
-	if err := r.Step(childCtx, callStack, l.Body).Unwrap(&o); err != nil {
-		return errValue(err)
-	}
-	return value(o)
 }
-
-type Exec = func(r Runtime, ctx context.Context, s Stack, args []ast.Expr) adt.Result[Value]
 
 // Module - a function built-in to the language
 type Module struct {
@@ -112,6 +114,6 @@ func (m Module) String() string {
 	return fmt.Sprintf("[%s]", m.Man)
 }
 
-func (m Module) apply(r Runtime, ctx context.Context, s Stack, args []ast.Expr) adt.Result[Value] {
-	return m.Exec(r, ctx, s, args)
+func (m Module) exec() Exec {
+	return m.Exec
 }

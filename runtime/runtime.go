@@ -79,7 +79,7 @@ func (r Runtime) Step(ctx context.Context, s Stack, e ast.Expr) adt.Result[Value
 		}
 		var function Function
 		if ok := adt.Cast[Function](cmd).Unwrap(&function); ok {
-			return function.apply(r, ctx, s, e.Args)
+			return function.exec()(r, ctx, s, e.Args)
 		}
 		return errValue(ErrorCannotExecuteExpression(e))
 	default:
