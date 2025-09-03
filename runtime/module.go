@@ -114,7 +114,11 @@ var lambdaModule = Module{
 		}
 
 		body := argList[len(argList)-1]
-		closure := s.Peek() // capture top of the stack - support one-level the recursive call
+		/*
+			capture top of the stack - support one-level the recursive call
+			we can't delete everything since our function is anonymous
+		*/
+		closure := s.Peek()
 		for _, name := range paramList {
 			closure = closure.Del(name) // remove all the parameters from the closure
 		}
