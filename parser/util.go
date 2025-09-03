@@ -18,14 +18,6 @@ var specialTokens = map[Token]struct{}{
 	TokenUnwrap:     {},
 }
 
-var specialChars = map[rune]struct{}{
-	'(': {},
-	')': {},
-	'{': {},
-	'}': {},
-	'*': {},
-}
-
 func matchName(cond ast.Name) func(ast.Expr) bool {
 	return func(arg ast.Expr) bool {
 		if name, ok := arg.(ast.Name); ok {
