@@ -1,0 +1,6 @@
+# github.com/fbundle/lab_public/lab/go_util v0.0.0-20250903053342-cf6f72219b8b
+## explicit; go 1.24.5
+github.com/fbundle/lab_public/lab/go_util/pkg/adt
+github.com/fbundle/lab_public/lab/go_util/pkg/persistent/ordered_map
+github.com/fbundle/lab_public/lab/go_util/pkg/persistent/seq
+github.com/fbundle/lab_public/lab/go_util/pkg/persistent/stack
