@@ -114,7 +114,6 @@ var lambdaModule = Module{
 		}
 
 		body := argList[len(argList)-1]
-		// closure := collapseStack(s) // capture everything on the stack
 		closure := s.Peek() // capture top of the stack
 		for _, name := range paramList {
 			closure = closure.Del(name) // remove all the parameters from the closure
