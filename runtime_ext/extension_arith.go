@@ -29,7 +29,7 @@ func makeArithExtension(name string, f func(...Int) (Int, error)) Extension {
 			}
 			return value(output)
 		},
-		Man: fmt.Sprintf("arithmetic extension: %s", name),
+		Man: fmt.Sprintf("{arithmetic_extension: %s}", name),
 	}
 }
 
