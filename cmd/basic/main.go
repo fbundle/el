@@ -159,7 +159,7 @@ func testRuntime() {
 			x 2
 			y 4
 
-			[[ (if [x < 3] "less_than" "bigger_than") (if [y < 3] "less_than" "bigger_than") ]]
+			[[ (if [x < 3] "x less than 3" "x bigger than 3") (if [y < 3] "y less than 3" "y bigger than 3") ]]
 		)
 	`)
 
