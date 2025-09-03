@@ -2,7 +2,7 @@ package ast
 
 import "strings"
 
-// A very simple AST
+// A very simple AST - just a tree where leaf nodes are Name
 
 // Expr - union of Name, Lambda
 type Expr interface {
