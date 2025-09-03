@@ -12,14 +12,20 @@ type Stack = runtime.Stack
 func NewBasicRuntime() (Runtime, Stack) {
 	r := Runtime{
 		MaxStackDepth: 1000,
-		ParseLiteralOpt: func(lit string) adt.Result[Value] {
+		ParseLiteral: func(lit string) adt.Result[Value] {
 			val, err := parseLiteral(lit)
 			return adt.Result[Value]{
 				Val: val,
 				Err: err,
 			}
 		},
-		PostProcessArgsOpt: func(args []Value) adt.Result[[]Value] {
+		UnwrapArgs: func(argsOpt adt.Result[[]Value]) adt.Result[[]Value] {
+			var args []Value
+			if err := argsOpt.Unwrap(&args); err != nil {
+				return adt.Result[[]Value]{
+					Err: err,
+				}
+			}
 			unwrappedArgs, err := unwrapArgs(args)
 			return adt.Result[[]Value]{
 				Val: unwrappedArgs,

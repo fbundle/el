@@ -21,13 +21,8 @@ func (ext Extension) Module() Module {
 	return Module{
 		Man: ext.Man,
 		Exec: func(r Runtime, ctx context.Context, s Stack, argList []expr.Expr) adt.Result[Value] {
-			args := make([]Value, len(argList))
-			for i, argExpr := range argList {
-				if err := r.Step(ctx, s, argExpr).Unwrap(&args[i]); err != nil {
-					return errValue(err)
-				}
-			}
-			if err := r.PostProcessArgsOpt(args).Unwrap(&args); err != nil {
+			var args []Value
+			if err := r.StepAndUnwrapArgs(ctx, s, argList).Unwrap(&args); err != nil {
 				return errValue(err)
 			}
 

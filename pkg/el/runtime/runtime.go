@@ -32,9 +32,9 @@ var ErrorCannotExecuteExpression = func(e expr.Expr) error {
 var ErrorNotEnoughArguments = errors.New("not enough arguments")
 
 type Runtime struct {
-	MaxStackDepth      int
-	ParseLiteralOpt    func(lit string) adt.Result[Value]
-	PostProcessArgsOpt func(args []Value) adt.Result[[]Value]
+	MaxStackDepth int
+	ParseLiteral  func(lit string) adt.Result[Value]
+	UnwrapArgs    func(argsOpt adt.Result[[]Value]) adt.Result[[]Value]
 }
 
 func (r Runtime) Step(ctx context.Context, s Stack, e expr.Expr) adt.Result[Value] {
@@ -70,7 +70,7 @@ func (r Runtime) Step(ctx context.Context, s Stack, e expr.Expr) adt.Result[Valu
 	case expr.Name:
 		// parse literal
 		var o Value
-		if err := r.ParseLiteralOpt(string(e)).Unwrap(&o); err == nil {
+		if err := r.ParseLiteral(string(e)).Unwrap(&o); err == nil {
 			return value(o)
 		}
 		// search name on stack
@@ -93,27 +93,31 @@ func (r Runtime) Step(ctx context.Context, s Stack, e expr.Expr) adt.Result[Valu
 	}
 }
 
-// StepMany executes the expressions in parallel and returns the results in the same order as the input expressions
-func (r Runtime) StepMany(ctx context.Context, s Stack, es ...expr.Expr) adt.Result[[]Value] {
-	outputs := make([]Value, len(es))
+// StepAndUnwrapArgs executes the argument expressions in parallel and unwraps the results
+func (r Runtime) StepAndUnwrapArgs(ctx context.Context, s Stack, argList []expr.Expr) adt.Result[[]Value] {
+	args := make([]Value, len(argList))
 	errHolder := &atomic.Value{}
 	subCtx, cancel := context.WithCancel(ctx)
 	defer cancel()
 	wg := &sync.WaitGroup{}
-	for i := 0; i < len(es); i++ {
+	for i := 0; i < len(argList); i++ {
 		wg.Add(1)
 		go func(i int) {
 			defer wg.Done()
-			e := es[i]
-			if subErr := r.Step(subCtx, s, e).Unwrap(&outputs[i]); subErr != nil {
+			e := argList[i]
+			if subErr := r.Step(subCtx, s, e).Unwrap(&args[i]); subErr != nil {
 				errHolder.CompareAndSwap(nil, subErr) // set the error only once
 				cancel()                              // stop all other goroutines
 			}
 		}(i)
 	}
 	wg.Wait()
-	if err := errHolder.Load(); err != nil {
-		return adt.Err[[]Value](err.(error))
+
+	var argsOpt = adt.Result[[]Value]{
+		Val: args,
 	}
-	return adt.Ok[[]Value](outputs)
+	if err := errHolder.Load(); err != nil {
+		argsOpt.Err = err.(error)
+	}
+	return r.UnwrapArgs(argsOpt)
 }
