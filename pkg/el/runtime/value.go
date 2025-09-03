@@ -1,4 +1,4 @@
-package runtime_core
+package runtime
 
 import (
 	"context"

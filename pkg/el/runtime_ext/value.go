@@ -1,7 +1,7 @@
 package runtime_ext
 
 import (
-	"el/pkg/el/runtime_core"
+	"el/pkg/el/runtime"
 	"errors"
 	"fmt"
 	"strings"
@@ -10,7 +10,7 @@ import (
 	"github.com/fbundle/lab_public/lab/go_util/pkg/persistent/seq"
 )
 
-type Value = runtime_core.Value
+type Value = runtime.Value
 
 type Unwrap struct{}
 

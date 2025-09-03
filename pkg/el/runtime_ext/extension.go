@@ -3,13 +3,13 @@ package runtime_ext
 import (
 	"context"
 	"el/pkg/el/expr"
-	"el/pkg/el/runtime_core"
+	"el/pkg/el/runtime"
 
 	"github.com/fbundle/lab_public/lab/go_util/pkg/adt"
 )
 
-type Name = runtime_core.Name
-type Module = runtime_core.Module
+type Name = runtime.Name
+type Module = runtime.Module
 
 type Extension struct {
 	Name Name

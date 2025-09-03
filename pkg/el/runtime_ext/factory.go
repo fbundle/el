@@ -1,13 +1,13 @@
 package runtime_ext
 
 import (
-	"el/pkg/el/runtime_core"
+	"el/pkg/el/runtime"
 
 	"github.com/fbundle/lab_public/lab/go_util/pkg/adt"
 )
 
-type Runtime = runtime_core.Runtime
-type Stack = runtime_core.Stack
+type Runtime = runtime.Runtime
+type Stack = runtime.Stack
 
 func NewBasicRuntime() (Runtime, Stack) {
 	r := Runtime{
@@ -27,7 +27,7 @@ func NewBasicRuntime() (Runtime, Stack) {
 			}
 		},
 	}
-	sh := stackHelper{stack: runtime_core.NewBuiltinStack()}
+	sh := stackHelper{stack: runtime.NewBuiltinStack()}
 	sh = sh.LoadExtension(listExtension, lenExtension, sliceExtension, rangeExtension)
 	sh = sh.Load("true", True).Load("false", False)
 	sh = sh.LoadExtension(eqExtension, neExtension, ltExtension, leExtension, gtExtension, geExtension)
@@ -41,7 +41,7 @@ type stackHelper struct {
 }
 
 func (sh stackHelper) Load(name Name, value Value) stackHelper {
-	stack := runtime_core.UpdateHead(sh.stack, func(frame runtime_core.Frame) runtime_core.Frame {
+	stack := runtime.UpdateHead(sh.stack, func(frame runtime.Frame) runtime.Frame {
 		return frame.Set(name, value)
 	})
 	return stackHelper{stack: stack}

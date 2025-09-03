@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"el/pkg/el/expr"
-	"el/pkg/el/runtime_core"
+	"el/pkg/el/runtime"
 	"el/pkg/el/runtime_ext"
 	"fmt"
 )
@@ -154,7 +154,7 @@ func testRuntime() {
 	r, s := runtime_ext.NewBasicRuntime()
 
 	var e expr.Expr
-	var o runtime_core.Value
+	var o runtime.Value
 	var err error
 	ctx := context.Background()
 	for len(tokens) > 0 {
