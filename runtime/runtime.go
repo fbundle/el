@@ -73,7 +73,7 @@ func (r Runtime) Step(ctx context.Context, s Stack, e ast.Expr) adt.Result[Value
 		if err := r.ParseLiteral(string(e)).Unwrap(&o); err == nil {
 			return value(o)
 		}
-		// search name on stack
+		// search name on the stack
 		if ok := searchOnStack(s, Name(e)).Unwrap(&o); ok {
 			return value(o)
 		}
