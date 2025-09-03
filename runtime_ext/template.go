@@ -6,12 +6,6 @@ func WithTemplate(s string) string {
 	return fmt.Sprintf(`
 (let
 
-# if else
-if (lambda cond then else (match cond
-	true then
-		 else
-))
-
 # identity - identity function
 unit (lambda x x) 
 
@@ -25,9 +19,8 @@ rest (lambda l (slice l (range 1 (len l))))			# get l[1:]
 == eq != ne <= le < lt > gt >= ge
 
 # map
-map (lambda l f (if
-	(eq (len l) 0)
-	[]					# if len l == 0 then return empty list
+map (lambda l f (match (len l)
+	0 []					# if len l == 0 then return empty list
 	(let
 		first_elem (head l)
 		first_elem2 (f first_elem)

@@ -38,9 +38,10 @@ func NewBasicRuntime() (Runtime, Frame) {
 			LoadExtension(listExtension, lenExtension, sliceExtension, rangeExtension).
 			Load("true", True).Load("false", False).Load("nil", nil).
 			LoadExtension(eqExtension, neExtension, ltExtension, leExtension, gtExtension, geExtension).
-			LoadExtension(addExtension, subExtension, mulExtension, divExtension, modExtension).frame
+			LoadExtension(addExtension, subExtension, mulExtension, divExtension, modExtension).
+			LoadExtension(printExtension)
 
-	return r, f
+	return r, f.frame
 }
 
 type frameHelper struct {

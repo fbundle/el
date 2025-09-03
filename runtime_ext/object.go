@@ -56,7 +56,7 @@ type String struct {
 }
 
 func (s String) String() string {
-	return fmt.Sprintf("\"%s\"", s.string)
+	return s.string
 }
 
 func (s String) Type() Object {

@@ -10,8 +10,12 @@ import (
 )
 
 var program = `
-	(map (list 1 2 3) (lambda x (add x 2)))
-`
+(let
+    _ (print "hello world")
+	_ (print [])
+	_ (print (map (list 1 2 3) (lambda x {x + 2})))
+	nil
+)`
 
 func testRuntime() {
 	tokens := parser.TokenizeWithListAndInfix(runtime_ext.WithTemplate(program))
@@ -31,7 +35,7 @@ func testRuntime() {
 		if err := r.Step(ctx, s, e).Unwrap(&o); err != nil {
 			panic(err)
 		}
-		fmt.Println("output\t", o.String())
+		fmt.Println("output\t", o)
 		fmt.Println()
 	}
 }
