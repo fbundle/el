@@ -93,8 +93,8 @@ func (r Runtime) Step(ctx context.Context, s Stack, e ast.Expr) adt.Result[Value
 	}
 }
 
-// StepAndUnwrapArgs executes the argument expressions in parallel and unwraps the results
-func (r Runtime) StepAndUnwrapArgs(ctx context.Context, s Stack, argList []ast.Expr) adt.Result[[]Value] {
+// stepAndUnwrapArgs executes the argument expressions in parallel and unwraps the results
+func (r Runtime) stepAndUnwrapArgs(ctx context.Context, s Stack, argList []ast.Expr) adt.Result[[]Value] {
 	args := make([]Value, len(argList))
 	errHolder := &atomic.Value{}
 	subCtx, cancel := context.WithCancel(ctx)

@@ -70,7 +70,7 @@ func (l Lambda) apply(r Runtime, ctx context.Context, s Stack, argList []ast.Exp
 	}
 	// 1. evaluate arguments
 	var args []Value
-	if err := r.StepAndUnwrapArgs(ctx, s, argList).Unwrap(&args); err != nil {
+	if err := r.stepAndUnwrapArgs(ctx, s, argList).Unwrap(&args); err != nil {
 		return errValue(err)
 	}
 	// 2. make call stack
@@ -79,10 +79,17 @@ func (l Lambda) apply(r Runtime, ctx context.Context, s Stack, argList []ast.Exp
 		param, arg := l.ParamList[i], args[i]
 		local = local.Set(param, arg)
 	}
-	callStack := s.Push(local)
-	// 3. make call with new stack
+
+	var callStack Stack
+	if isTailCall(ctx) {
+		callStack = s.Pop().Push(local)
+	} else {
+		callStack = s.Push(local)
+	}
+	// 3. make call with new stack - signal tailcall to children
+	childCtx := withTailCall(ctx)
 	var o Value
-	if err := r.Step(ctx, callStack, l.Body).Unwrap(&o); err != nil {
+	if err := r.Step(childCtx, callStack, l.Body).Unwrap(&o); err != nil {
 		return errValue(err)
 	}
 	return value(o)

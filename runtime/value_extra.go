@@ -134,7 +134,7 @@ func (ext Extension) Module() Module {
 		Man:  ext.Man,
 		Exec: func(r Runtime, ctx context.Context, s Stack, argList []ast.Expr) adt.Result[Value] {
 			var args []Value
-			if err := r.StepAndUnwrapArgs(ctx, s, argList).Unwrap(&args); err != nil {
+			if err := r.stepAndUnwrapArgs(ctx, s, argList).Unwrap(&args); err != nil {
 				return errValue(err)
 			}
 
