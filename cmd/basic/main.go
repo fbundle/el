@@ -78,6 +78,9 @@ var program = `
 	# simple match sanity
 	_ (print "match 1==1 ->" (match 1 1 "ok" "no"))
 	_ (print "match 1==2 ->" (match 1 2 "ok" "no"))
+
+	# arrow function 
+	_ (print "arrow function:" {x y => {x + y}})
 	nil
 )`
 

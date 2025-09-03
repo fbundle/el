@@ -126,7 +126,7 @@ func makeLambdaRepr(paramList []Name, body ast.Expr, closure Frame) string {
 	for _, name := range paramList {
 		paramNameList = append(paramNameList, string(name))
 	}
-	return fmt.Sprintf("(closure{...}; %s -> %s)", strings.Join(paramNameList, " "), body.String())
+	return fmt.Sprintf("{closure{...}; %s => %s}", strings.Join(paramNameList, " "), body.String())
 }
 
 func makeLambdaExec(paramList []Name, body ast.Expr, closure Frame) Exec {
