@@ -147,23 +147,19 @@ func testRuntime() {
 
 		# if else
 		(let
-			if (lambda cond_func true_func false_func state (
-				match (cond_func state)
-				true	(true_func state)
-						(false_func state)
+			if (lambda cond true_value false_value (
+				match cond
+				true  true_value
+						false_value
 			))
 
 			+ add - sub x mul / div % mod			# short hand for common operator
 			== eq != ne <= le < lt > gt >= ge
 
-			cond_func (lambda state [state > 3])
-			true_func (lambda state true)
-			false_func (lambda state false)
+			x 2
+			y 4
 
-			state1 2
-			state2 4
-
-			[[ (if cond_func true_func false_func state1) (if cond_func true_func false_func state2) ]]
+			[[ (if [x < 3] "less_than" "bigger_than") (if [y < 3] "less_than" "bigger_than") ]]
 		)
 	`)
 
