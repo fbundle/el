@@ -45,6 +45,7 @@ func testRuntime() {
 					rest_values (map rest f)
 					(list first_value *rest_values)
 				)
+				_														# wildcard case - will fail if no case is matched
 			))
 
 			another (map (range 5 10) (lambda x [x mul 2]))				
@@ -57,19 +58,21 @@ func testRuntime() {
 			count (lambda n (match (le n 0)
 				true 0 								# if n <= 0 then 0
 				false (add n (count (sub n 1)))		# else n + count(n-1)
+                _
 			))
-			count 200
+			(count 200)
 		)
 
 		# test recursion
 		(let
 			fib (lambda x (match (le x 1)
 				true x 								# if x <= 1 then x
-				false (let							# _ is the wildcard symbol
+				false (let							
 					y (fib (sub x 1))				# else y = fib(x-1), z = fib(x-2), y + z
 					z (fib (sub x 2))
 					(add y z)
 				)
+				_
 			))
 			(fib 20)
 		)
@@ -79,10 +82,12 @@ func testRuntime() {
 			even (lambda n (match (le n 0)
 				true true 							# if n <= 0 then true
 				false (odd (sub n 1))				# else odd(n-1)
+				_
 			))
 			odd (lambda n (match (le n 0)
 				true false 							# if n <= 0 then false
 				false (even (sub n 1))				# else even(n-1)
+				_
 			))
 			[[ (odd 10) (even 10) (odd 11) (even 11) (odd 12) (even 12) ]]
 		)
@@ -102,6 +107,7 @@ func testRuntime() {
 					q (fib [n - 2])
 					[p + q]
 				}
+				_
 			))
 			(fib 20)
 		}
@@ -123,7 +129,7 @@ func testRuntime() {
 			while (lambda cond_func body_func state (
 				match (cond_func state)
 				false	state
-				_		(while cond_func body_func (body_func state))	# does not have TCO here 
+				 		(while cond_func body_func (body_func state))	# does not have TCO here 
 					
 			))
 			
