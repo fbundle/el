@@ -88,7 +88,7 @@ func (r Runtime) Step(ctx context.Context, s Stack, e ast.Expr) adt.Result[Objec
 	}
 }
 
-// stepAndUnwrapArgs executes the argument expressions in parallel and unwraps the results
+// stepAndUnwrapArgs executes the argument expressions and unwraps the results
 func (r Runtime) stepAndUnwrapArgs(ctx context.Context, s Stack, argList []ast.Expr) adt.Result[[]Object] {
 	args := make([]Object, len(argList))
 	for i, e := range argList {
