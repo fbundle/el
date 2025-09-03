@@ -8,28 +8,27 @@ import (
 	"github.com/fbundle/lab_public/lab/go_util/pkg/adt"
 )
 
-type Object = runtime_core.Value
 type Name = runtime_core.Name
 type Module = runtime_core.Module
 
 type Extension struct {
 	Name Name
-	Exec func(ctx context.Context, values ...Object) adt.Result[Object]
+	Exec func(ctx context.Context, values ...Value) adt.Result[Value]
 	Man  string
 }
 
 func (ext Extension) Module() Module {
 	return Module{
 		Man: ext.Man,
-		Exec: func(r Runtime, ctx context.Context, s Stack, argList []expr.Expr) adt.Result[Object] {
-			args := make([]Object, len(argList))
+		Exec: func(r Runtime, ctx context.Context, s Stack, argList []expr.Expr) adt.Result[Value] {
+			args := make([]Value, len(argList))
 			for i, argExpr := range argList {
 				if err := r.Step(ctx, s, argExpr).Unwrap(&args[i]); err != nil {
-					return errorObject(err)
+					return errValue(err)
 				}
 			}
 			if err := r.PostProcessArgsOpt(args).Unwrap(&args); err != nil {
-				return errorObject(err)
+				return errValue(err)
 			}
 
 			return ext.Exec(ctx, args...)
@@ -40,54 +39,54 @@ func (ext Extension) Module() Module {
 var listExtension = Extension{
 	Name: "list",
 	Man:  "Module: (list 1 2 (lambda x (add x 1))) - make a list",
-	Exec: func(ctx context.Context, values ...Object) adt.Result[Object] {
+	Exec: func(ctx context.Context, values ...Value) adt.Result[Value] {
 		l := List{}
 		for _, v := range values {
 			l = List{l.Ins(l.Len(), v)}
 		}
-		return adt.Some[Object](l)
+		return value(l)
 	},
 }
 
 var lenExtension = Extension{
 	Name: "len",
 	Man:  "Module: (len (list 1 2 3)) - get the length of a list",
-	Exec: func(ctx context.Context, values ...Object) adt.Result[Object] {
+	Exec: func(ctx context.Context, values ...Value) adt.Result[Value] {
 		if len(values) != 1 {
-			return errorObjectString("len requires 1 argument")
+			return errValueString("len requires 1 argument")
 		}
 		l, ok := values[0].(List)
 		if !ok {
-			return errorObjectString("len argument must be a list")
+			return errValueString("len argument must be a list")
 		}
-		return object(Int{l.Len()})
+		return value(Int{l.Len()})
 	},
 }
 
 var sliceExtension = Extension{
 	Name: "slice",
 	Man:  "Module: (get (list 1 2 3) (list 0 2)) - get the 0th and 2nd element of a list",
-	Exec: func(ctx context.Context, values ...Object) adt.Result[Object] {
+	Exec: func(ctx context.Context, values ...Value) adt.Result[Value] {
 		if len(values) != 2 {
-			return errorObjectString("slice requires 2 arguments")
+			return errValueString("slice requires 2 arguments")
 		}
 		l, ok := values[0].(List)
 		if !ok {
-			return errorObjectString("slice first argument not a list")
+			return errValueString("slice first argument not a list")
 		}
 		i, ok := values[1].(List)
 		if !ok {
-			return errorObjectString("slice first argument not a list")
+			return errValueString("slice first argument not a list")
 		}
 		output := List{}
-		for _, index := range i.Iter {
-			if index, ok := index.(Int); ok {
-				v := l.Get(index.int)
-				output = List{output.Ins(output.Len(), v)}
-			} else {
-				return errorObjectString("slice index must be an integer")
+		for _, o := range i.Iter {
+			var index Int
+			if ok := cast[Int](o).Unwrap(&index); !ok {
+				return errValueString("slice index must be an integer")
 			}
+			v := l.Get(index.int)
+			output = List{output.Ins(output.Len(), v)}
 		}
-		return object(output)
+		return value(output)
 	},
 }

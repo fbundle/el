@@ -13,12 +13,12 @@ func NewBasicRuntime() (Runtime, Stack) {
 	r := Runtime{
 		MaxStackDepth: 1000,
 		ParseLiteralOpt: func(lit string) adt.Result[runtime_core.Value] {
-			return adt.Wrap(func() (Object, error) {
+			return adt.Wrap(func() (Value, error) {
 				return parseLiteral(lit)
 			})()
 		},
 		PostProcessArgsOpt: func(args []runtime_core.Value) adt.Result[[]runtime_core.Value] {
-			return adt.Wrap(func() ([]Object, error) {
+			return adt.Wrap(func() ([]Value, error) {
 				return unwrapArgs(args)
 			})()
 		},

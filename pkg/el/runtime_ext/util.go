@@ -8,11 +8,11 @@ import (
 	"github.com/fbundle/lab_public/lab/go_util/pkg/adt"
 )
 
-func unwrapArgs(args []Object) ([]Object, error) {
-	var unwrapArgsLoop func(args []Object) ([]Object, bool, error)
-	unwrapArgsLoop = func(args []Object) ([]Object, bool, error) {
+func unwrapArgs(args []Value) ([]Value, error) {
+	var unwrapArgsLoop func(args []Value) ([]Value, bool, error)
+	unwrapArgsLoop = func(args []Value) ([]Value, bool, error) {
 		unwrapped := false
-		unwrappedArgs := make([]Object, 0, len(args))
+		unwrappedArgs := make([]Value, 0, len(args))
 		for len(args) > 0 {
 			head := args[0]
 			if _, ok := head.(Unwrap); ok {
@@ -52,7 +52,7 @@ func unwrapArgs(args []Object) ([]Object, error) {
 
 var ErrorEmptyLiteral = errors.New("empty literal")
 
-func parseLiteral(lit string) (Object, error) {
+func parseLiteral(lit string) (Value, error) {
 	if len(lit) == 0 {
 		return nil, ErrorEmptyLiteral
 	}
@@ -73,14 +73,14 @@ func parseLiteral(lit string) (Object, error) {
 	i, err := strconv.Atoi(lit)
 	return Int{i}, err
 }
-func object(o Object) adt.Result[Object] {
-	return adt.Some[Object](o)
-}
 
-func errorObject(err error) adt.Result[Object] {
-	return adt.Error[Object](err)
-}
-
-func errorObjectString(msg string) adt.Result[Object] {
-	return errorObject(errors.New(msg))
+func cast[T any](o any) adt.Option[T] {
+	if o == nil {
+		return adt.None[T]()
+	}
+	v, ok := o.(T)
+	if !ok {
+		return adt.None[T]()
+	}
+	return adt.Some[T](v)
 }
