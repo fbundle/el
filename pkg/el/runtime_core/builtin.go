@@ -19,7 +19,7 @@ func NewBuiltinStack() Stack {
 
 var letModule = Module{
 	Name: "let",
-	Exec: func(r Runtime, ctx context.Context, s Stack, args []expr.Expr) adt.Option[Value] {
+	Exec: func(r Runtime, ctx context.Context, s Stack, args []expr.Expr) adt.Result[Value] {
 		if len(args) < 1 {
 			return errorValueString("let requires at least 1 arguments")
 		}
@@ -54,7 +54,7 @@ var letModule = Module{
 
 var lambdaModule = Module{
 	Name: "lambda",
-	Exec: func(r Runtime, ctx context.Context, s Stack, args []expr.Expr) adt.Option[Value] {
+	Exec: func(r Runtime, ctx context.Context, s Stack, args []expr.Expr) adt.Result[Value] {
 		if len(args) < 1 {
 			return errorValueString("lambda requires at least 1 arguments")
 		}
@@ -80,7 +80,7 @@ var lambdaModule = Module{
 
 var matchModule = Module{
 	Name: "match",
-	Exec: func(r Runtime, ctx context.Context, s Stack, argList []expr.Expr) adt.Option[Value] {
+	Exec: func(r Runtime, ctx context.Context, s Stack, argList []expr.Expr) adt.Result[Value] {
 		if len(argList) < 3 {
 			return errorValueString("match requires at least 3 arguments")
 		}
@@ -106,6 +106,6 @@ var matchModule = Module{
 	Man: "Module: (match x 1 2 4 5 6) - match, if x=1 then return 3, if x=4 the return 5, otherwise return 6",
 }
 
-func errorValueString(msg string) adt.Option[Value] {
+func errorValueString(msg string) adt.Result[Value] {
 	return errorValue(errors.New(msg))
 }

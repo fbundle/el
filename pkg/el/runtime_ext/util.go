@@ -73,14 +73,14 @@ func parseLiteral(lit string) (Object, error) {
 	i, err := strconv.Atoi(lit)
 	return Int{i}, err
 }
-func object(o Object) adt.Option[Object] {
+func object(o Object) adt.Result[Object] {
 	return adt.Some[Object](o)
 }
 
-func errorObject(err error) adt.Option[Object] {
+func errorObject(err error) adt.Result[Object] {
 	return adt.Error[Object](err)
 }
 
-func errorObjectString(msg string) adt.Option[Object] {
+func errorObjectString(msg string) adt.Result[Object] {
 	return errorObject(errors.New(msg))
 }

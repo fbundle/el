@@ -12,12 +12,12 @@ type Stack = runtime_core.Stack
 func NewBasicRuntime() (Runtime, Stack) {
 	r := Runtime{
 		MaxStackDepth: 1000,
-		ParseLiteralOpt: func(lit string) adt.Option[runtime_core.Value] {
+		ParseLiteralOpt: func(lit string) adt.Result[runtime_core.Value] {
 			return adt.Wrap(func() (Object, error) {
 				return parseLiteral(lit)
 			})()
 		},
-		PostProcessArgsOpt: func(args []runtime_core.Value) adt.Option[[]runtime_core.Value] {
+		PostProcessArgsOpt: func(args []runtime_core.Value) adt.Result[[]runtime_core.Value] {
 			return adt.Wrap(func() ([]Object, error) {
 				return unwrapArgs(args)
 			})()

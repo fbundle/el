@@ -31,11 +31,11 @@ var ErrorNotEnoughArguments = errors.New("not enough arguments")
 
 type Runtime struct {
 	MaxStackDepth      int
-	ParseLiteralOpt    func(lit string) adt.Option[Value]
-	PostProcessArgsOpt func(args []Value) adt.Option[[]Value]
+	ParseLiteralOpt    func(lit string) adt.Result[Value]
+	PostProcessArgsOpt func(args []Value) adt.Result[[]Value]
 }
 
-func (r Runtime) StepOpt(ctx context.Context, s Stack, e expr.Expr) adt.Option[Value] {
+func (r Runtime) StepOpt(ctx context.Context, s Stack, e expr.Expr) adt.Result[Value] {
 	deadline, ok := ctx.Deadline()
 	if ok && time.Now().After(deadline) {
 		return errorValue(ErrorTimeout(ctx.Err()))
@@ -90,10 +90,10 @@ func (r Runtime) StepOpt(ctx context.Context, s Stack, e expr.Expr) adt.Option[V
 	}
 }
 
-func value(o Value) adt.Option[Value] {
+func value(o Value) adt.Result[Value] {
 	return adt.Some[Value](o)
 }
 
-func errorValue(err error) adt.Option[Value] {
+func errorValue(err error) adt.Result[Value] {
 	return adt.Error[Value](err)
 }

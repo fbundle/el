@@ -14,14 +14,14 @@ type Module = runtime_core.Module
 
 type Extension struct {
 	Name Name
-	Exec func(ctx context.Context, values ...Object) adt.Option[Object]
+	Exec func(ctx context.Context, values ...Object) adt.Result[Object]
 	Man  string
 }
 
 func (ext Extension) Module() Module {
 	return Module{
 		Man: ext.Man,
-		Exec: func(r Runtime, ctx context.Context, s Stack, argList []expr.Expr) adt.Option[Object] {
+		Exec: func(r Runtime, ctx context.Context, s Stack, argList []expr.Expr) adt.Result[Object] {
 			args := make([]Object, len(argList))
 			for i, argExpr := range argList {
 				if err := r.StepOpt(ctx, s, argExpr).Unwrap(&args[i]); err != nil {
@@ -40,7 +40,7 @@ func (ext Extension) Module() Module {
 var listExtension = Extension{
 	Name: "list",
 	Man:  "Module: (list 1 2 (lambda x (add x 1))) - make a list",
-	Exec: func(ctx context.Context, values ...Object) adt.Option[Object] {
+	Exec: func(ctx context.Context, values ...Object) adt.Result[Object] {
 		l := List{}
 		for _, v := range values {
 			l = List{l.Ins(l.Len(), v)}
@@ -52,7 +52,7 @@ var listExtension = Extension{
 var lenExtension = Extension{
 	Name: "len",
 	Man:  "Module: (len (list 1 2 3)) - get the length of a list",
-	Exec: func(ctx context.Context, values ...Object) adt.Option[Object] {
+	Exec: func(ctx context.Context, values ...Object) adt.Result[Object] {
 		if len(values) != 1 {
 			return errorObjectString("len requires 1 argument")
 		}
@@ -67,7 +67,7 @@ var lenExtension = Extension{
 var sliceExtension = Extension{
 	Name: "slice",
 	Man:  "Module: (get (list 1 2 3) (list 0 2)) - get the 0th and 2nd element of a list",
-	Exec: func(ctx context.Context, values ...Object) adt.Option[Object] {
+	Exec: func(ctx context.Context, values ...Object) adt.Result[Object] {
 		if len(values) != 2 {
 			return errorObjectString("slice requires 2 arguments")
 		}

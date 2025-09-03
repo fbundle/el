@@ -15,7 +15,7 @@ type Value interface {
 
 type Command interface {
 	Value
-	Apply(r Runtime, ctx context.Context, s Stack, argList []expr.Expr) adt.Option[Value]
+	Apply(r Runtime, ctx context.Context, s Stack, argList []expr.Expr) adt.Result[Value]
 }
 
 type Lambda struct {
@@ -36,7 +36,7 @@ func (l Lambda) String() string {
 
 func (l Lambda) MustValue() {}
 
-func (l Lambda) Apply(r Runtime, ctx context.Context, s Stack, argList []expr.Expr) adt.Option[Value] {
+func (l Lambda) Apply(r Runtime, ctx context.Context, s Stack, argList []expr.Expr) adt.Result[Value] {
 	// 0. sanity check
 	if len(argList) < len(l.Params) {
 		errorValue(ErrorNotEnoughArguments)
@@ -68,7 +68,7 @@ func (l Lambda) Apply(r Runtime, ctx context.Context, s Stack, argList []expr.Ex
 
 type Module struct {
 	Name Name
-	Exec func(r Runtime, ctx context.Context, s Stack, args []expr.Expr) adt.Option[Value]
+	Exec func(r Runtime, ctx context.Context, s Stack, args []expr.Expr) adt.Result[Value]
 	Man  string
 }
 
@@ -77,6 +77,6 @@ func (m Module) String() string {
 }
 func (m Module) MustValue() {}
 
-func (m Module) Apply(r Runtime, ctx context.Context, s Stack, args []expr.Expr) adt.Option[Value] {
+func (m Module) Apply(r Runtime, ctx context.Context, s Stack, args []expr.Expr) adt.Result[Value] {
 	return m.Exec(r, ctx, s, args)
 }
