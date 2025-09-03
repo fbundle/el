@@ -275,7 +275,7 @@ func withTemplate(s string) string {
 unit (lambda x x) 
 
 # get - get element from list
-get (lambda l i (unit * (slice l (range i (add i 1)))))			# get l[i]
+get (lambda l i (unit $(slice l (range i (add i 1)))))			# get l[i]
 head (lambda l (get l 0))							# get l[0]
 rest (lambda l (slice l (range 1 (len l))))			# get l[1:]
 last (lambda l (get l (sub (len l) 1)))				# get last element
@@ -292,7 +292,7 @@ if (lambda cond then else (match cond
 ))
 
 # list constructors
-cons (lambda x xs (list x *xs))						# cons x xs
+cons (lambda x xs (list x $xs))						# cons x xs
 append (lambda xs ys (match (len xs)
 	0 ys
 	(let
