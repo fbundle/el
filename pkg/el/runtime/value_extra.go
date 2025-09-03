@@ -85,6 +85,9 @@ var lambdaModule = Module{
 
 		body := argList[len(argList)-1]
 		closure := s.Peek() // capture only the top of the frame stack
+		for _, name := range paramList {
+			closure = closure.Del(name) // remove all the parameters from the closure
+		}
 		return value(Lambda{
 			ParamList: paramList,
 			Body:      body,
