@@ -182,6 +182,7 @@ func testRuntime() {
 			f (lambda x (add x y))
 			y 2
 			(f 3)		# this works since function call uses the current stack
+			# TODO - this should fails - make all functions pure
 		)
 	`)
 
