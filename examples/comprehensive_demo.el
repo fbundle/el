@@ -97,10 +97,10 @@
     _ (print "Type of type of type:" (type (type (type nil))))
 
     # 9. Advanced List Operations
-    _ (print "\n9. Advanced List Operations:")
+    # _ (print "\n9. Advanced List Operations:")
     # Zip two lists
-    list1 [1 2 3 4]
-    list2 ["a" "b" "c" "d"]
+    # list1 [1 2 3 4]
+    # list2 ["a" "b" "c" "d"]
     # zipped (zip list1 list2)
     # _ (print "Zip [1 2 3 4] and ['a' 'b' 'c' 'd']:" zipped)
 
@@ -138,14 +138,14 @@
     _ (print "Is 15 prime?" (is_prime 15))
 
     # 11. String Operations (simulated)
-    (print "\n11. String Operations:")
-    words ["hello" "world" "functional" "programming"]
-    (print "Words:" words)
-    (print "Word lengths:" (map words (lambda w (len w))))
-    (print "Long words:" (filter words (lambda w {len w > 5})))
+    # _ (print "\n11. String Operations:")
+    # words ["hello" "world" "functional" "programming"]
+    # _ (print "Words:" words)
+    # _ (print "Word lengths:" (map words (lambda w (len w))))
+    # _ (print "Long words:" (filter words (lambda w {len w > 5})))
 
     # 12. Complex Data Structures
-    (print "\n12. Complex Data Structures:")
+    _ (print "\n12. Complex Data Structures:")
     # Simple tree operations
     tree_insert (lambda tree val (match (len tree)
         0 (list val [] [])
@@ -175,26 +175,26 @@
     # Build and traverse tree
     tree (tree_insert (tree_insert (tree_insert [] 5) 3) 7)
     tree (tree_insert (tree_insert tree 1) 9)
-    (print "Tree as list (in-order):" (tree_to_list tree))
+    _ (print "Tree as list (in-order):" (tree_to_list tree))
 
     # 13. Performance and Optimization
-    (print "\n13. Performance and Optimization:")
+    _ (print "\n13. Performance and Optimization:")
     # Tail-recursive countdown
     countdown (lambda n (match {n <= 0}
         true 0
         (countdown {n - 1})
     ))
-    (print "Countdown from 1000:" (countdown 1000))
+    _ (print "Countdown from 1000:" (countdown 1000))
 
     # 14. Error Handling and Edge Cases
-    (print "\n14. Error Handling:")
+    _ (print "\n14. Error Handling:")
     # Safe division
     safe_div (lambda a b (match {b == 0}
         true "Division by zero"
         {a / b}
     ))
-    (print "10 / 2:" (safe_div 10 2))
-    (print "10 / 0:" (safe_div 10 0))
+    _ (print "10 / 2:" (safe_div 10 2))
+    _ (print "10 / 0:" (safe_div 10 0))
 
     # Safe list access
     safe_get (lambda lst i (match {i >= 0}
@@ -204,11 +204,11 @@
         )
         "Negative index"
     ))
-    (print "Safe get [1 2 3] at index 1:" (safe_get [1 2 3] 1))
-    (print "Safe get [1 2 3] at index 5:" (safe_get [1 2 3] 5))
+    _ (print "Safe get [1 2 3] at index 1:" (safe_get [1 2 3] 1))
+    _ (print "Safe get [1 2 3] at index 5:" (safe_get [1 2 3] 5))
 
     # 15. Functional Programming Patterns
-    (print "\n15. Functional Programming Patterns:")
+    _ (print "\n15. Functional Programming Patterns:")
     # Pipeline
     pipeline (lambda lst (let
         step1 (map lst (lambda x {x + 1}))
@@ -216,12 +216,12 @@
         step3 (map step2 (lambda x {x * 2}))
         step3
     ))
-    (print "Pipeline [1 2 3 4 5]:" (pipeline [1 2 3 4 5]))
+    _ (print "Pipeline [1 2 3 4 5]:" (pipeline [1 2 3 4 5]))
 
     # Currying
-    curried_add (curry add)
-    add_5 (curried_add 5)
-    (print "Curried add 5 to 10:" (add_5 10))
+    # curried_add (curry add)
+    # add_5 (curried_add 5)
+    # (print "Curried add 5 to 10:" (add_5 10))
 
     _ (print "\n=== Demo Complete ===")
 
