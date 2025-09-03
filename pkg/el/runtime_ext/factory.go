@@ -28,7 +28,7 @@ func NewBasicRuntime() (Runtime, Stack) {
 		},
 	}
 	sh := stackHelper{stack: runtime_core.NewBuiltinStack()}
-	sh.LoadExtension(listExtension, lenExtension, sliceExtension)
+	sh = sh.LoadExtension(listExtension, lenExtension, sliceExtension)
 	return r, sh.stack
 }
 
@@ -45,7 +45,7 @@ func (sh stackHelper) Load(name Name, value Value) stackHelper {
 
 func (sh stackHelper) LoadExtension(exts ...Extension) stackHelper {
 	for _, ext := range exts {
-		sh.Load(ext.Name, ext.Module())
+		sh = sh.Load(ext.Name, ext.Module())
 	}
 	return sh
 }

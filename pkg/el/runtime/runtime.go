@@ -131,7 +131,7 @@ func (r *Runtime) Step(ctx context.Context, e expr.Expr) (Object, error) {
 			}
 			return v, nil
 		default:
-			return nil, fmt.Errorf("expression cannot be executed: %s", e.String())
+			return nil, fmt.Errorf("expression cannot be executed: %s", e.MustString())
 		}
 	default:
 		return nil, fmt.Errorf("unknown expression type")

@@ -102,7 +102,7 @@ var matchModule = Module{
 					return i, nil
 				}
 			}
-			return 0, fmt.Errorf("no case matched: %s", e.String())
+			return 0, fmt.Errorf("no case matched: %s", e.MustString())
 		}()
 		if err != nil {
 			return nil, err

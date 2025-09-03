@@ -14,30 +14,26 @@ type Value = runtime_core.Value
 
 type Unwrap struct{}
 
-func (u Unwrap) String() string {
+func (u Unwrap) MustString() string {
 	return "*"
 }
-
-func (u Unwrap) MustValue() {}
 
 type Int struct {
 	int
 }
 
-func (i Int) String() string {
+func (i Int) MustString() string {
 	return fmt.Sprintf("%d", i.int)
 }
-
-func (i Int) MustValue() {}
 
 type List struct {
 	seq.Seq[Value]
 }
 
-func (l List) String() string {
+func (l List) MustString() string {
 	ls := make([]string, 0, l.Len())
 	for _, o := range l.Iter {
-		ls = append(ls, o.String())
+		ls = append(ls, o.MustString())
 	}
 	s := strings.Join(ls, ",")
 	s = fmt.Sprintf("[%s]", s)
@@ -45,7 +41,17 @@ func (l List) String() string {
 
 }
 
-func (l List) MustValue() {}
+type Bool struct {
+	bool
+}
+
+func (b Bool) MustString() string {
+	if b.bool {
+		return "true"
+	} else {
+		return "false"
+	}
+}
 
 // helpers
 func value(o Value) adt.Result[Value] {

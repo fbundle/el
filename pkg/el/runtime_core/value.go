@@ -10,8 +10,7 @@ import (
 )
 
 type Value interface {
-	String() string
-	MustValue() // for type-safety every Value must implement this
+	MustString() string
 }
 
 type Function interface {
@@ -26,17 +25,15 @@ type Lambda struct {
 	Closure   Frame     `json:"closure,omitempty"`
 }
 
-func (l Lambda) String() string {
+func (l Lambda) MustString() string {
 	s := fmt.Sprintf("(<closure_%p>; lambda ", l.Closure)
 	for _, param := range l.ParamList {
 		s += string(param) + " "
 	}
-	s += l.Body.String()
+	s += l.Body.MustString()
 	s += ")"
 	return s
 }
-
-func (l Lambda) MustValue() {}
 
 func (l Lambda) Apply(r Runtime, ctx context.Context, s Stack, argList []expr.Expr) adt.Result[Value] {
 	// 0. sanity check
@@ -77,10 +74,9 @@ type Module struct {
 	Man  string
 }
 
-func (m Module) String() string {
+func (m Module) MustString() string {
 	return fmt.Sprintf("[%s]", m.Man)
 }
-func (m Module) MustValue() {}
 
 func (m Module) Apply(r Runtime, ctx context.Context, s Stack, args []expr.Expr) adt.Result[Value] {
 	return m.Exec(r, ctx, s, args)

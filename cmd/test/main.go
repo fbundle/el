@@ -32,7 +32,7 @@ func testRuntime() {
 		if err := r.Step(ctx, s, e).Unwrap(&o); err != nil {
 			panic(err)
 		}
-		fmt.Println("output\t", o)
+		fmt.Println("output\t", o.MustString())
 		fmt.Println()
 	}
 }
