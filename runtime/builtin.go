@@ -19,9 +19,6 @@ func init() {
 	frame = frame.Set("let", letFunc)
 	frame = frame.Set("lambda", lambdaFunc)
 	frame = frame.Set("match", matchFunc)
-	frame = frame.Set("nil", Nil{})
-	frame = frame.Set("function", Function{}.Type())
-	frame = frame.Set("nil_type", Nil{}.Type())
 	BuiltinFrame = frame
 }
 

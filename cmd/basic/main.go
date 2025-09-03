@@ -84,8 +84,8 @@ var program = `
 
 	# type check
 	is_func (lambda x (match (type x)
-		function true
-				 false
+		(type (lambda 1))	true
+				 			false
 	))
 
 	_ (print (is_func (lambda x x)) (is_func 1))
