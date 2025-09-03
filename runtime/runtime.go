@@ -62,16 +62,12 @@ func (r Runtime) Step(ctx context.Context, s Stack, e ast.Expr) adt.Result[Objec
 	}
 	switch e := e.(type) {
 	case ast.Name:
+		name := Name(e)
 		var o Object
-		// search name on the stack
-		if ok := findStack(s, Name(e)).Unwrap(&o); ok {
-			return value(o)
+		if ok := r.resolveName(s, name).Unwrap(&o); !ok {
+			return errValue(ErrorNameNotFound(name))
 		}
-		// parse literal
-		if err := r.ParseLiteral(string(e)).Unwrap(&o); err == nil {
-			return value(o)
-		}
-		return errValue(ErrorNameNotFound(Name(e)))
+		return value(o)
 	case ast.Lambda:
 		var cmd cmd
 		if ok := getCmd(e).Unwrap(&cmd); !ok {
@@ -101,4 +97,17 @@ func (r Runtime) stepAndUnwrapArgs(ctx context.Context, s Stack, argList []ast.E
 		}
 	}
 	return r.UnwrapArgs(adt.Ok(args))
+}
+
+func (r Runtime) resolveName(s Stack, name Name) adt.Option[Object] {
+	var o Object
+	// search name on the stack
+	if ok := findStack(s, name).Unwrap(&o); ok {
+		return adt.Some(o)
+	}
+	// parse literal
+	if err := r.ParseLiteral(string(name)).Unwrap(&o); err == nil {
+		return adt.Some(o)
+	}
+	return adt.None[Object]()
 }
