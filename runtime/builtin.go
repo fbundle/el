@@ -12,7 +12,7 @@ var BuiltinStack Stack
 
 func init() {
 	s := Stack{}.Push(Frame{})
-	s = UpdateHead(s, func(frame Frame) Frame {
+	s = updateHead(s, func(frame Frame) Frame {
 		frame = frame.Set("type", typeFunc)
 		frame = frame.Set("let", letFunc)
 		frame = frame.Set("lambda", lambdaFunc)
@@ -56,7 +56,7 @@ var letFunc = Function{
 				return errValue(err)
 			}
 			// update stack
-			s = UpdateHead(s, func(f Frame) Frame {
+			s = updateHead(s, func(f Frame) Frame {
 				return f.Set(Name(lvalue), rvalue)
 			})
 		}

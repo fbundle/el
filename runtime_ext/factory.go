@@ -1,13 +1,13 @@
 package runtime_ext
 
 import (
-	runtime2 "el/runtime"
+	runtime "el/runtime"
 
 	"github.com/fbundle/lab_public/lab/go_util/pkg/adt"
 )
 
-type Runtime = runtime2.Runtime
-type Stack = runtime2.Stack
+type Runtime = runtime.Runtime
+type Stack = runtime.Stack
 
 func NewBasicRuntime() (Runtime, Stack) {
 	r := Runtime{
@@ -33,29 +33,31 @@ func NewBasicRuntime() (Runtime, Stack) {
 			}
 		},
 	}
-	sh := stackHelper{stack: runtime2.BuiltinStack}
-	sh = sh.LoadExtension(listExtension, lenExtension, sliceExtension, rangeExtension)
-	sh = sh.Load("true", True).Load("false", False)
-	sh = sh.LoadExtension(eqExtension, neExtension, ltExtension, leExtension, gtExtension, geExtension)
-	sh = sh.LoadExtension(addExtension, subExtension, mulExtension, divExtension, modExtension)
+	s :=
+		(&stackHelper{stack: runtime.BuiltinStack}).
+			LoadExtension(listExtension, lenExtension, sliceExtension, rangeExtension).
+			Load("true", True).Load("false", False).
+			LoadExtension(eqExtension, neExtension, ltExtension, leExtension, gtExtension, geExtension).
+			LoadExtension(addExtension, subExtension, mulExtension, divExtension, modExtension).stack
 
-	return r, sh.stack
+	return r, s
 }
 
 type stackHelper struct {
 	stack Stack
 }
 
-func (sh stackHelper) Load(name Name, value Object) stackHelper {
-	stack := runtime2.UpdateHead(sh.stack, func(frame runtime2.Frame) runtime2.Frame {
-		return frame.Set(name, value)
-	})
-	return stackHelper{stack: stack}
+func (sh *stackHelper) Load(name Name, value Object) *stackHelper {
+	head := sh.stack.Peek()
+	sh.stack = sh.stack.Pop()
+	head = head.Set(name, value)
+	sh.stack = sh.stack.Push(head)
+	return sh
 }
 
-func (sh stackHelper) LoadExtension(exts ...Extension) stackHelper {
+func (sh *stackHelper) LoadExtension(exts ...Extension) *stackHelper {
 	for _, ext := range exts {
-		sh = sh.Load(ext.Name, ext.Module())
+		sh.Load(ext.Name, ext.Module())
 	}
 	return sh
 }

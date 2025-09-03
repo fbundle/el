@@ -14,8 +14,8 @@ type Frame = ordered_map.OrderedMap[Name, Object]
 // Stack - stack frame
 type Stack = stack.Stack[Frame]
 
-// UpdateHead - update top of the stack
-func UpdateHead(s Stack, f func(Frame) Frame) Stack {
+// updateHead - update top of the stack
+func updateHead(s Stack, f func(Frame) Frame) Stack {
 	h := s.Peek()
 	h = f(h)
 	return s.Pop().Push(h)
