@@ -28,7 +28,7 @@ func NewBasicRuntime() (Runtime, Stack) {
 }
 
 func loadExtension(s Stack, exts ...Extension) Stack {
-	return runtime_core.PeekAndUpdate(s, func(frame runtime_core.Frame) runtime_core.Frame {
+	return runtime_core.UpdateHead(s, func(frame runtime_core.Frame) runtime_core.Frame {
 		for _, ext := range exts {
 			frame = frame.Set(ext.Name, ext.Module())
 		}

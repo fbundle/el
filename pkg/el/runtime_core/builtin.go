@@ -9,7 +9,7 @@ import (
 )
 
 func NewBuiltinStack() Stack {
-	return PeekAndUpdate(Stack{}.Push(Frame{}), func(frame Frame) Frame {
+	return UpdateHead(Stack{}.Push(Frame{}), func(frame Frame) Frame {
 		for _, m := range []Module{letModule, lambdaModule, matchModule} {
 			frame = frame.Set(m.Name, m)
 		}
@@ -37,17 +37,17 @@ var letModule = Module{
 			}
 
 			var rvalue Value
-			if err := r.StepOpt(ctx, s, rexpr).Unwrap(&rvalue); err != nil {
-				return errorValue(err)
+			if err := r.Step(ctx, s, rexpr).Unwrap(&rvalue); err != nil {
+				return errValue(err)
 			}
 
 			// update stack
-			s = PeekAndUpdate(s, func(f Frame) Frame {
+			s = UpdateHead(s, func(f Frame) Frame {
 				return f.Set(Name(lvalue), rvalue)
 			})
 		}
 
-		return r.StepOpt(ctx, s, args[len(args)-1])
+		return r.Step(ctx, s, args[len(args)-1])
 	},
 	Man: "Module: (let x 3) - assign value 3 to local variable x",
 }
@@ -70,9 +70,9 @@ var lambdaModule = Module{
 		closure := s.Peek() // capture only top of stack // TODO - capture more but only necessary variables
 
 		return value(Lambda{
-			Params:  paramList,
-			Body:    implementation,
-			Closure: closure,
+			ParamList: paramList,
+			Body:      implementation,
+			Closure:   closure,
 		})
 	},
 	Man: "Module: (lambda x y (add x y) - declare a function",
@@ -88,24 +88,24 @@ var matchModule = Module{
 			return errorValueString("match requires even number of arguments")
 		}
 		var cond Value
-		if err := r.StepOpt(ctx, s, argList[0]).Unwrap(&cond); err != nil {
-			return errorValue(err)
+		if err := r.Step(ctx, s, argList[0]).Unwrap(&cond); err != nil {
+			return errValue(err)
 		}
 
 		for i := 1; i < len(argList)-1; i += 2 {
 			var comp Value
-			if err := r.StepOpt(ctx, s, argList[i]).Unwrap(&comp); err != nil {
-				return errorValue(err)
+			if err := r.Step(ctx, s, argList[i]).Unwrap(&comp); err != nil {
+				return errValue(err)
 			}
 			if comp == cond {
-				return r.StepOpt(ctx, s, argList[i+1])
+				return r.Step(ctx, s, argList[i+1])
 			}
 		}
-		return r.StepOpt(ctx, s, argList[len(argList)-1])
+		return r.Step(ctx, s, argList[len(argList)-1])
 	},
 	Man: "Module: (match x 1 2 4 5 6) - match, if x=1 then return 3, if x=4 the return 5, otherwise return 6",
 }
 
 func errorValueString(msg string) adt.Result[Value] {
-	return errorValue(errors.New(msg))
+	return errValue(errors.New(msg))
 }

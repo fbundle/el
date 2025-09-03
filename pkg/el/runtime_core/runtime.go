@@ -35,14 +35,14 @@ type Runtime struct {
 	PostProcessArgsOpt func(args []Value) adt.Result[[]Value]
 }
 
-func (r Runtime) StepOpt(ctx context.Context, s Stack, e expr.Expr) adt.Result[Value] {
+func (r Runtime) Step(ctx context.Context, s Stack, e expr.Expr) adt.Result[Value] {
 	deadline, ok := ctx.Deadline()
 	if ok && time.Now().After(deadline) {
-		return errorValue(ErrorTimeout(ctx.Err()))
+		return errValue(ErrorTimeout(ctx.Err()))
 	}
 	select {
 	case <-ctx.Done():
-		return errorValue(ErrorInterrupt(ctx.Err()))
+		return errValue(ErrorInterrupt(ctx.Err()))
 	default:
 	}
 
@@ -62,7 +62,7 @@ func (r Runtime) StepOpt(ctx context.Context, s Stack, e expr.Expr) adt.Result[V
 	*/
 
 	if s.Depth() > r.MaxStackDepth {
-		return errorValue(ErrorStackOverflow)
+		return errValue(ErrorStackOverflow)
 	}
 	switch e := e.(type) {
 	case expr.Name:
@@ -72,28 +72,20 @@ func (r Runtime) StepOpt(ctx context.Context, s Stack, e expr.Expr) adt.Result[V
 			return value(o)
 		}
 		// search name on stack
-		if o, ok := searchOnStack(s, Name(e)); ok {
+		if ok := searchOnStack(s, Name(e)).Unwrap(&o); ok {
 			return value(o)
 		}
-		return errorValue(ErrorNameNotFound(Name(e)))
+		return errValue(ErrorNameNotFound(Name(e)))
 	case expr.Lambda:
 		var cmd Value
-		if err := r.StepOpt(ctx, s, e.Cmd).Unwrap(&cmd); err != nil {
-			return errorValue(err)
+		if err := r.Step(ctx, s, e.Cmd).Unwrap(&cmd); err != nil {
+			return errValue(err)
 		}
-		if cmd, ok := cmd.(Command); ok {
+		if cmd, ok := cmd.(Function); ok {
 			return cmd.Apply(r, ctx, s, e.Args)
 		}
-		return errorValue(ErrorCannotExecuteExpression(e))
+		return errValue(ErrorCannotExecuteExpression(e))
 	default:
-		return errorValue(ErrorUnknownExpression(e))
+		return errValue(ErrorUnknownExpression(e))
 	}
-}
-
-func value(o Value) adt.Result[Value] {
-	return adt.Some[Value](o)
-}
-
-func errorValue(err error) adt.Result[Value] {
-	return adt.Error[Value](err)
 }

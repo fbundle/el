@@ -29,7 +29,7 @@ func testRuntime() {
 			panic(err)
 		}
 		fmt.Println("expr\t", e)
-		if err := r.StepOpt(ctx, s, e).Unwrap(&o); err != nil {
+		if err := r.Step(ctx, s, e).Unwrap(&o); err != nil {
 			panic(err)
 		}
 		fmt.Println("output\t", o)
