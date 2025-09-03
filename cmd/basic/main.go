@@ -83,12 +83,19 @@ var program = `
 	_ (print "arrow function:" {x y => {x + y}})
 
 	# type check
+	function (type (lambda 1))
+	nil_type (type nil)
 	is_func (lambda x (match (type x)
-		(type (lambda 1))	true
-				 			false
+		function	true
+					false
+	))
+	is_nil_type (lambda x (match (type x)
+		nil_type	true
+					false
 	))
 
 	_ (print (is_func (lambda x x)) (is_func 1))
+	_ (print (is_nil_type nil (is_func 1))
 	
 	nil
 )`
