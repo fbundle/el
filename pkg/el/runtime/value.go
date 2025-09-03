@@ -8,6 +8,15 @@ import (
 	"github.com/fbundle/lab_public/lab/go_util/pkg/adt"
 )
 
+type Value interface {
+	Type() Type
+	String() string
+}
+type Function interface {
+	Value
+	Apply(r Runtime, ctx context.Context, s Stack, argList []expr.Expr) adt.Result[Value]
+}
+
 func DataType(name string) Type {
 	return Type{
 		level: 0,
@@ -31,16 +40,6 @@ func (t Type) Type() Type {
 	return Type{
 		level: t.level + 1,
 	}
-}
-
-type Value interface {
-	Type() Type
-	String() string
-}
-
-type Function interface {
-	Value
-	Apply(r Runtime, ctx context.Context, s Stack, argList []expr.Expr) adt.Result[Value]
 }
 
 // Lambda - a function written in S-expression
