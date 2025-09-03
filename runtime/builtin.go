@@ -24,7 +24,7 @@ func init() {
 
 var typeFunc = Function{
 	repr: "[module: (type (list 1 2 3)) - get the type of an arbitrary object]",
-	exec: func(r Runtime, ctx context.Context, s Stack, argList []ast.Node) adt.Result[Object] {
+	exec: func(r Runtime, ctx context.Context, s Stack, argList []ast.Expr) adt.Result[Object] {
 		if len(argList) != 1 {
 			return errValueString("type requires 1 argument")
 		}
@@ -38,19 +38,19 @@ var typeFunc = Function{
 
 var letFunc = Function{
 	repr: "[module: (let x 3) - assign value 3 to local variable x]",
-	exec: func(r Runtime, ctx context.Context, s Stack, argList []ast.Node) adt.Result[Object] {
+	exec: func(r Runtime, ctx context.Context, s Stack, argList []ast.Expr) adt.Result[Object] {
 		if len(argList) < 1 || len(argList)%2 != 1 {
 			return errValueString("let requires at least 1 arguments and odd number of arguments")
 		}
 
 		s = s.Push(Frame{}) // push a new empty frame
 
-		var lvalue ast.Name
+		var lvalue ast.Leaf
 		var rvalue Object
 		for i := 0; i < len(argList)-1; i += 2 {
 			lexpr, rexpr := argList[i], argList[i+1]
-			if ok := adt.Cast[ast.Name](lexpr).Unwrap(&lvalue); !ok {
-				return errValueString("lvalue must be a Name")
+			if ok := adt.Cast[ast.Leaf](lexpr).Unwrap(&lvalue); !ok {
+				return errValueString("lvalue must be a Leaf")
 			}
 			if err := r.Step(ctx, s, rexpr).Unwrap(&rvalue); err != nil {
 				return errValue(err)
@@ -66,7 +66,7 @@ var letFunc = Function{
 
 var matchFunc = Function{
 	repr: "[module: (match x 1 2 4 5 6) - match, if x=1 then return 3, if x=4 the return 5, otherwise return 6]",
-	exec: func(r Runtime, ctx context.Context, s Stack, argList []ast.Node) adt.Result[Object] {
+	exec: func(r Runtime, ctx context.Context, s Stack, argList []ast.Expr) adt.Result[Object] {
 		if len(argList) < 2 || len(argList)%2 != 0 {
 			return errValueString("match requires at least 2 arguments and even number of arguments")
 		}
@@ -75,7 +75,7 @@ var matchFunc = Function{
 			return errValue(err)
 		}
 
-		var finalRexpr ast.Node = argList[len(argList)-1]
+		var finalRexpr ast.Expr = argList[len(argList)-1]
 		var comp Object
 		for i := 1; i < len(argList)-1; i += 2 {
 			lexpr, rexpr := argList[i], argList[i+1]
@@ -93,17 +93,17 @@ var matchFunc = Function{
 
 var lambdaFunc = Function{
 	repr: "[module: (lambda x y (add x y) - declare a function]",
-	exec: func(r Runtime, ctx context.Context, s Stack, argList []ast.Node) adt.Result[Object] {
+	exec: func(r Runtime, ctx context.Context, s Stack, argList []ast.Expr) adt.Result[Object] {
 		if len(argList) < 1 {
 			return errValueString("lambda requires at least 1 arguments")
 		}
 
 		paramList := make([]Name, 0, len(argList)-1)
-		var lvalue ast.Name
+		var lvalue ast.Leaf
 		for i := 0; i < len(argList)-1; i++ {
 			lexpr := argList[i]
-			if ok := adt.Cast[ast.Name](lexpr).Unwrap(&lvalue); !ok {
-				return errValueString("lvalue must be a Name")
+			if ok := adt.Cast[ast.Leaf](lexpr).Unwrap(&lvalue); !ok {
+				return errValueString("lvalue must be a Leaf")
 			}
 			paramList = append(paramList, Name(lvalue))
 		}
@@ -121,7 +121,7 @@ var lambdaFunc = Function{
 	},
 }
 
-func makeLambdaRepr(paramList []Name, body ast.Node, local Frame) string {
+func makeLambdaRepr(paramList []Name, body ast.Expr, local Frame) string {
 	repr := fmt.Sprintf("(%s;", local.Repr())
 	for _, param := range paramList {
 		repr += string(param) + " "
@@ -131,8 +131,8 @@ func makeLambdaRepr(paramList []Name, body ast.Node, local Frame) string {
 	return repr
 }
 
-func makeLambdaExec(paramList []Name, body ast.Node, local Frame) Exec {
-	return func(r Runtime, ctx context.Context, s Stack, argList []ast.Node) adt.Result[Object] {
+func makeLambdaExec(paramList []Name, body ast.Expr, local Frame) Exec {
+	return func(r Runtime, ctx context.Context, s Stack, argList []ast.Expr) adt.Result[Object] {
 		/*
 			for recursive function, the name of that function is in s Stack
 		*/

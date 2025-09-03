@@ -1,32 +1,30 @@
 package ast
 
+import "strings"
+
 // A very simple AST
 
-// Node - union of Name, Function
-type Node interface {
+type Token = string
+
+// Expr - union of Leaf, Node
+type Expr interface {
 	String() string
 }
 
-// Name - a name, a number, a string, etc.
-type Name string
+// Leaf - a name, a number, a string, etc.
+type Leaf Token
 
-func (e Name) String() string {
+func (e Leaf) String() string {
 	return string(e)
 }
 
-// Function - S-expression - every enclosed by a pair of parentheses e.g. (cmd ...)
-type Function struct {
-	Cmd  Node
-	Args []Node
-}
+// Node - S-expression - every enclosed by a pair of parentheses e.g. (cmd ...)
+type Node []Expr
 
-func (e Function) String() string {
-	s := ""
-	s += "("
-	s += e.Cmd.String()
-	for _, arg := range e.Args {
-		s += " " + arg.String()
+func (e Node) String() string {
+	children := make([]string, 0, len(e))
+	for _, child := range e {
+		children = append(children, child.String())
 	}
-	s += ")"
-	return s
+	return "(" + strings.Join(children, " ") + ")"
 }

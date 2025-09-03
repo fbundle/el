@@ -16,7 +16,7 @@ type Extension struct {
 func (ext Extension) Module() Function {
 	return Function{
 		repr: ext.Man,
-		exec: func(r Runtime, ctx context.Context, s Stack, argList []ast.Node) adt.Result[Object] {
+		exec: func(r Runtime, ctx context.Context, s Stack, argList []ast.Expr) adt.Result[Object] {
 			var args []Object
 			if err := r.stepAndUnwrapArgs(ctx, s, argList).Unwrap(&args); err != nil {
 				return errValue(err)
