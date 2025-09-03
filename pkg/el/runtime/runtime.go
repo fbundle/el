@@ -5,6 +5,8 @@ import (
 	"el/pkg/el/expr"
 	"errors"
 	"fmt"
+	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/fbundle/lab_public/lab/go_util/pkg/adt"
@@ -89,4 +91,28 @@ func (r Runtime) Step(ctx context.Context, s Stack, e expr.Expr) adt.Result[Valu
 	default:
 		return errValue(ErrorUnknownExpression(e))
 	}
+}
+
+func (r Runtime) stepParallel(ctx context.Context, s Stack, es ...expr.Expr) adt.Result[[]Value] {
+	outputs := make([]Value, len(es))
+	errHolder := &atomic.Value{}
+	subCtx, cancel := context.WithCancel(ctx)
+	defer cancel()
+	wg := &sync.WaitGroup{}
+	for i := 0; i < len(es); i++ {
+		wg.Add(1)
+		go func(i int) {
+			defer wg.Done()
+			e := es[i]
+			if subErr := r.Step(subCtx, s, e).Unwrap(&outputs[i]); subErr != nil {
+				errHolder.CompareAndSwap(nil, subErr) // set the error only once
+				cancel()                              // stop all other goroutines
+			}
+		}(i)
+	}
+	wg.Wait()
+	if err := errHolder.Load(); err != nil {
+		return adt.Err[[]Value](err.(error))
+	}
+	return adt.Ok[[]Value](outputs)
 }

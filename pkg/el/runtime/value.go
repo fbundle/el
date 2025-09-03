@@ -41,11 +41,9 @@ func (l Lambda) Apply(r Runtime, ctx context.Context, s Stack, argList []expr.Ex
 		errValue(ErrorNotEnoughArguments)
 	}
 	// 1. evaluate arguments
-	args := make([]Value, len(argList))
-	for i, argExpr := range argList {
-		if err := r.Step(ctx, s, argExpr).Unwrap(&args[i]); err != nil {
-			return errValue(err)
-		}
+	var args []Value
+	if err := r.stepParallel(ctx, s, argList...).Unwrap(&args); err != nil {
+		return errValue(err)
 	}
 	if err := r.PostProcessArgsOpt(args).Unwrap(&args); err != nil {
 		return errValue(err)
