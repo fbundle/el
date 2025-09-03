@@ -16,10 +16,10 @@ var ErrorNameNotFound = func(name Name) error {
 	return fmt.Errorf("object not found %s", name)
 }
 var ErrorInterrupt = func(err error) error {
-	return fmt.Errorf("interrupted: %s", err)
+	return fmt.Errorf("interrupted: %s", err.Error())
 }
 var ErrorTimeout = func(err error) error {
-	return fmt.Errorf("timeout: %s", err)
+	return fmt.Errorf("timeout: %s", err.Error())
 }
 var ErrorStackOverflow = errors.New("stack overflow")
 
