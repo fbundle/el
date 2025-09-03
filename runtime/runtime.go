@@ -25,7 +25,7 @@ var ErrorCannotExecuteExpression = func(e ast.Expr) error {
 var ErrorNotEnoughArguments = errors.New("not enough arguments")
 
 type Runtime struct {
-	MaxStackDepth int
+	MaxStackDepth int // TODO - delete
 	ParseLiteral  func(lit string) adt.Result[Object]
 	UnwrapArgs    func(argsOpt adt.Result[[]Object]) adt.Result[[]Object]
 }
