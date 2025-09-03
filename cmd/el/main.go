@@ -17,7 +17,6 @@ import (
 var (
 	verbose     = flag.Bool("v", false, "verbose output - show parsed expressions")
 	timeout     = flag.Duration("timeout", 30*time.Second, "execution timeout")
-	maxStack    = flag.Int("max-stack", 10000, "maximum stack depth")
 	showHelp    = flag.Bool("help", false, "show help message")
 	showVersion = flag.Bool("version", false, "show version information")
 	repl        = flag.Bool("repl", false, "start interactive REPL")
@@ -88,7 +87,6 @@ func executeProgram(program string) error {
 
 	// Create runtime
 	r, s := runtime_ext.NewBasicRuntime()
-	r.MaxStackDepth = *maxStack
 
 	// Create context with timeout
 	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
@@ -132,7 +130,6 @@ func startREPL() {
 	fmt.Println()
 
 	r, s := runtime_ext.NewBasicRuntime()
-	r.MaxStackDepth = *maxStack
 
 	ctx := context.Background()
 
