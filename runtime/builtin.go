@@ -109,14 +109,14 @@ var lambdaFunc = Function{
 		}
 
 		body := argList[len(argList)-1]
-		closure := s.Peek()
+		local := s.Peek()
 		for _, name := range paramList {
-			closure = closure.Del(name) // remove all the parameters from the closure
+			local = local.Del(name) // remove all the parameters from the local
 		}
 
 		return value(Function{
-			repr: makeLambdaRepr(paramList, body, closure),
-			exec: makeLambdaExec(paramList, body, closure),
+			repr: makeLambdaRepr(paramList, body, local),
+			exec: makeLambdaExec(paramList, body, local),
 		})
 	},
 }
