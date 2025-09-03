@@ -15,12 +15,8 @@ import (
 var ErrorNameNotFound = func(name Name) error {
 	return fmt.Errorf("object not found %s", name)
 }
-var ErrorInterrupt = func(err error) error {
-	return fmt.Errorf("interrupted: %s", err.Error())
-}
-var ErrorTimeout = func(err error) error {
-	return fmt.Errorf("timeout: %s", err.Error())
-}
+var ErrorInterrupt = errors.New("interrupted")
+var ErrorTimeout = errors.New("timeout")
 var ErrorStackOverflow = errors.New("stack overflow")
 
 var ErrorUnknownExpression = func(e ast.Expr) error {
@@ -40,11 +36,11 @@ type Runtime struct {
 func (r Runtime) Step(ctx context.Context, s Stack, e ast.Expr) adt.Result[Value] {
 	deadline, ok := ctx.Deadline()
 	if ok && time.Now().After(deadline) {
-		return errValue(ErrorTimeout(ctx.Err()))
+		return errValue(ErrorTimeout)
 	}
 	select {
 	case <-ctx.Done():
-		return errValue(ErrorInterrupt(ctx.Err()))
+		return errValue(ErrorInterrupt)
 	default:
 	}
 
