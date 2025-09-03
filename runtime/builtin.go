@@ -3,7 +3,9 @@ package runtime
 import (
 	"context"
 	"el/ast"
+	"errors"
 	"fmt"
+	"reflect"
 	"strings"
 
 	"github.com/fbundle/lab_public/lab/go_util/pkg/adt"
@@ -76,8 +78,11 @@ var matchFunc = Function{
 			if err := r.Step(ctx, frame, lexpr).Unwrap(&comp); err != nil {
 				return errValue(err)
 			}
-			if comp == cond {
-				// TODO - should be comp.Equal(cond)
+			var isEqual bool
+			if err := equal(cond, comp).Unwrap(&isEqual); err != nil {
+				return errValue(err)
+			}
+			if isEqual {
 				finalRexpr = rexpr
 				break
 			}
@@ -156,4 +161,16 @@ func makeLambdaExec(paramList []Name, body ast.Expr, closure Frame) Exec {
 		}
 		return value(o)
 	}
+}
+
+func equal(o1 Object, o2 Object) adt.Result[bool] {
+	t1 := reflect.TypeOf(o1)
+	t2 := reflect.TypeOf(o2)
+	if t1 == nil || t2 == nil || !t1.Comparable() || !t2.Comparable() {
+		return adt.Err[bool](errors.New("match comparison: non-comparable object"))
+	}
+	if t1 != t2 {
+		return adt.Err[bool](errors.New("match comparison: different types"))
+	}
+	return adt.Ok(o1 == o2)
 }
