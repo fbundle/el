@@ -2,7 +2,7 @@ package runtime
 
 import (
 	"context"
-	"el/pkg/el/ast"
+	"el/ast"
 
 	"github.com/fbundle/lab_public/lab/go_util/pkg/adt"
 )

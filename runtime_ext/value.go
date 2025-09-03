@@ -1,7 +1,7 @@
 package runtime_ext
 
 import (
-	"el/pkg/el/runtime"
+	"el/runtime"
 	"fmt"
 	"strings"
 

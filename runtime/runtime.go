@@ -2,7 +2,7 @@ package runtime
 
 import (
 	"context"
-	"el/pkg/el/ast"
+	"el/ast"
 	"errors"
 	"fmt"
 	"sync"
