@@ -41,18 +41,6 @@ func (l List) String() string {
 
 }
 
-type Bool struct {
-	bool
-}
-
-func (b Bool) String() string {
-	if b.bool {
-		return "true"
-	} else {
-		return "false"
-	}
-}
-
 // helpers
 func value(o Value) adt.Result[Value] {
 	return adt.Ok[Value](o)

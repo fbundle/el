@@ -43,7 +43,7 @@ var letModule = Module{
 
 		return r.Step(ctx, s, argList[len(argList)-1])
 	},
-	Man: "Module: (let x 3) - assign value 3 to local variable x",
+	Man: "module: (let x 3) - assign value 3 to local variable x",
 }
 
 var lambdaModule = Module{
@@ -71,7 +71,7 @@ var lambdaModule = Module{
 			Closure:   closure,
 		})
 	},
-	Man: "Module: (lambda x y (add x y) - declare a function",
+	Man: "module: (lambda x y (add x y) - declare a function",
 }
 
 var matchModule = Module{
@@ -97,5 +97,5 @@ var matchModule = Module{
 		}
 		return r.Step(ctx, s, argList[len(argList)-1])
 	},
-	Man: "Module: (match x 1 2 4 5 6) - match, if x=1 then return 3, if x=4 the return 5, otherwise return 6",
+	Man: "module: (match x 1 2 4 5 6) - match, if x=1 then return 3, if x=4 the return 5, otherwise return 6",
 }
