@@ -185,6 +185,9 @@ func testRuntime() {
 			(f 3)		# this works since function call uses the current stack
 			# TODO - this should fails - make all functions pure
 		)
+
+		# empty expression
+		()
 	`)
 
 	r, s := runtime_ext.NewBasicRuntime()
@@ -202,7 +205,7 @@ func testRuntime() {
 		if err := r.Step(ctx, s, e).Unwrap(&o); err != nil {
 			panic(err)
 		}
-		fmt.Println("output\t", o.String())
+		fmt.Println("output\t", o)
 		fmt.Println()
 	}
 }

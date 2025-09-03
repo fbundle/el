@@ -69,9 +69,6 @@ func ParseWithInfixOperator(tokenList []Token) (ast.Expr, []Token, error) {
 		if err != nil {
 			return nil, tokenList, err
 		}
-		if len(argList) == 0 {
-			return nil, tokenList, errors.New("empty Lambda")
-		}
 		return ast.Lambda(argList), tokenList, nil
 	} else if head == "[" {
 		argList, tokenList, err := parseUntilClose(tokenList, "]", ParseWithInfixOperator)
