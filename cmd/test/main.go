@@ -72,7 +72,12 @@ var program = `
 
 	# nil
 	_ (print (list () nil))
+	_ (print "type(nil)=" (type nil))
+	_ (print "empty()=" ())
 
+	# simple match sanity
+	_ (print "match 1==1 ->" (match 1 1 "ok" "no"))
+	_ (print "match 1==2 ->" (match 1 2 "ok" "no"))
 	nil
 )`
 
