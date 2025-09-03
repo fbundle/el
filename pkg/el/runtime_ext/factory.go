@@ -12,15 +12,19 @@ type Stack = runtime_core.Stack
 func NewBasicRuntime() (Runtime, Stack) {
 	r := Runtime{
 		MaxStackDepth: 1000,
-		ParseLiteralOpt: func(lit string) adt.Result[runtime_core.Value] {
-			return adt.Wrap(func() (Value, error) {
-				return parseLiteral(lit)
-			})()
+		ParseLiteralOpt: func(lit string) adt.Result[Value] {
+			val, err := parseLiteral(lit)
+			return adt.Result[Value]{
+				Val: val,
+				Err: err,
+			}
 		},
-		PostProcessArgsOpt: func(args []runtime_core.Value) adt.Result[[]runtime_core.Value] {
-			return adt.Wrap(func() ([]Value, error) {
-				return unwrapArgs(args)
-			})()
+		PostProcessArgsOpt: func(args []Value) adt.Result[[]Value] {
+			unwrappedArgs, err := unwrapArgs(args)
+			return adt.Result[[]Value]{
+				Val: unwrappedArgs,
+				Err: err,
+			}
 		},
 	}
 	s := loadExtension(runtime_core.NewBuiltinStack(), listExtension, lenExtension, sliceExtension)
