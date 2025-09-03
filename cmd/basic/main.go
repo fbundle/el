@@ -185,7 +185,7 @@ func testRuntime() {
 			(f 3)		# this works since function call uses the current frame
 		)
 
-		# empty expression
+		# empty expression -> nil
 		()
 	`)
 
