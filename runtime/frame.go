@@ -21,6 +21,18 @@ func UpdateHead(s Stack, f func(Frame) Frame) Stack {
 	return s.Pop().Push(h)
 }
 
+func collapseStack(s Stack) Frame {
+	head := Frame{}
+	for _, frame := range s.Iter {
+		for k, v := range frame.Iter {
+			if _, ok := head.Get(k); !ok {
+				head = head.Set(k, v)
+			}
+		}
+	}
+	return head
+}
+
 func searchOnStack(s Stack, name Name) adt.Option[Value] {
 	for _, frame := range s.Iter {
 		if o, ok := frame.Get(name); ok {
