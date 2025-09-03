@@ -40,7 +40,7 @@ type List struct {
 func (l List) String() string {
 	ls := make([]string, 0, l.Len())
 	for _, o := range l.Iter {
-		ls = append(ls, o.String())
+		ls = append(ls, fmt.Sprint(o))
 	}
 	s := strings.Join(ls, " ")
 	s = fmt.Sprintf("[%s]", s)

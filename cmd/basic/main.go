@@ -186,7 +186,8 @@ func testRuntime() {
 		)
 
 		# empty expression -> nil
-		()
+		(list () nil)
+		
 	`)
 
 	r, s := runtime_ext.NewBasicRuntime()
@@ -204,7 +205,7 @@ func testRuntime() {
 		if err := r.Step(ctx, s, e).Unwrap(&o); err != nil {
 			panic(err)
 		}
-		fmt.Println("output\t", o)
+		fmt.Println("output\t", o.String())
 		fmt.Println()
 	}
 }

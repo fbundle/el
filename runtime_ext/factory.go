@@ -36,7 +36,7 @@ func NewBasicRuntime() (Runtime, Frame) {
 	f :=
 		(&frameHelper{frame: runtime.BuiltinFrame}).
 			LoadExtension(listExtension, lenExtension, sliceExtension, rangeExtension).
-			Load("true", True).Load("false", False).
+			Load("true", True).Load("false", False).Load("nil", nil).
 			LoadExtension(eqExtension, neExtension, ltExtension, leExtension, gtExtension, geExtension).
 			LoadExtension(addExtension, subExtension, mulExtension, divExtension, modExtension).frame
 
