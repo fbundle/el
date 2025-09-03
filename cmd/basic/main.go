@@ -86,34 +86,34 @@ func testRuntime() {
 				true false 							# if n <= 0 then false
 				(even (sub n 1))				# else even(n-1)
 			))
-			[[ (odd 10) (even 10) (odd 11) (even 11) (odd 12) (even 12) ]]
+			[ (odd 10) (even 10) (odd 11) (even 11) (odd 12) (even 12) ]
 		)
 
 		# syntactic sugar for list
-		[[ 1 2 3 4 5 ]]
+		[ 1 2 3 4 5 ]
 
 		# rewrite fib
-		{											# { is the same as (let, } is the same as )
+		(let											# { is the same as (let, } is the same as )
 			+ add - sub x mul / div % mod			# short hand for common operator
 			== eq != ne <= le < lt > gt >= ge
 
-			fib (lambda n (match [n <= 1]			# [n <= 1] is the same as (<= n 1)
+			fib (lambda n (match {n <= 1}			# {n <= 1} is the same as (<= n 1)
 				true n 								# if n <= 1 then n
-				{								# else p = fib(n-1), q = fib(n-2), p + q
-					p (fib [n - 1])
-					q (fib [n - 2])
-					[p + q]
-				}
+				(let								    # else p = fib(n-1), q = fib(n-2), p + q
+					p (fib {n - 1})
+					q (fib {n - 2})
+					{p + q}
+				)
 			))
 			(fib 20)
-		}
+		)
 
 		# more infix operator
-		{
+		(let
 			+ add - sub x mul / div % mod			# short hand for common operator
 			== eq != ne <= le < lt > gt >= ge
-			[1 + 2 - 3 + -4]
-		}
+			{1 + 2 - 3 + -4}
+		)
 
 		# map filter reduce
 
@@ -160,14 +160,14 @@ func testRuntime() {
 			x 2
 			y 4
 
-			[[ (if [x < 3] "x less than 3" "x bigger than 3") (if [y < 3] "y less than 3" "y bigger than 3") ]]
+			[ (if [x < 3] "x less than 3" "x bigger than 3") (if [y < 3] "y less than 3" "y bigger than 3") ]
 		)
 
 		# type system
 		(let
 			x 1
 			y (list 1 2 3)
-			z (lambda x [x+y])
+			z (lambda x {x+y})
 			x1 (type x)
 			y1 (type y)
 			z1 (type z)
@@ -175,7 +175,7 @@ func testRuntime() {
 			x3 (type (type (type x)))
 			t (type type)
 
-			[[x y z x1 y1 z1 x2 x3 t]]
+			[x y z x1 y1 z1 x2 x3 t]
 		)
 		
 		# weird implementation

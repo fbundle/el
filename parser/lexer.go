@@ -23,10 +23,8 @@ func TokenizeWithInfixOperator(s string) []Token {
 	return tokenize(s,
 		removeComment("#"),
 		mapping(map[string]string{
-			"[[": " (list ",
-			"]]": " ) ",
-			"{":  " (let ",
-			"}":  " ) ",
+			"[": " (list ",
+			"]": " ) ",
 		}),
 		splitString([]string{
 			"(",
@@ -34,6 +32,8 @@ func TokenizeWithInfixOperator(s string) []Token {
 			"*",
 			"[",
 			"]",
+			"{",
+			"}",
 		}),
 	)
 }

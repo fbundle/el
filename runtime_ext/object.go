@@ -42,7 +42,7 @@ func (l List) String() string {
 	for _, o := range l.Iter {
 		ls = append(ls, o.String())
 	}
-	s := strings.Join(ls, ",")
+	s := strings.Join(ls, " ")
 	s = fmt.Sprintf("[%s]", s)
 	return s
 }
