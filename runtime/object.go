@@ -51,3 +51,12 @@ func (f Function) Type() Object {
 func (f Function) String() string {
 	return f.repr
 }
+
+type Nil struct{}
+
+func (Nil) Type() Object {
+	return DataType("nil")
+}
+func (Nil) String() string {
+	return "nil"
+}
