@@ -55,5 +55,5 @@ func testSimpleTCO(n int) {
 }
 
 func main() {
-	testSimpleTCO(2000)
+	testSimpleTCO(10000)
 }

@@ -7,9 +7,9 @@ import (
 )
 
 type Runtime = runtime.Runtime
-type Stack = runtime.Stack
+type Frame = runtime.Frame
 
-func NewBasicRuntime() (Runtime, Stack) {
+func NewBasicRuntime() (Runtime, Frame) {
 	r := Runtime{
 		MaxStackDepth: 1000,
 		ParseLiteral: func(lit string) adt.Result[Object] {
@@ -33,29 +33,26 @@ func NewBasicRuntime() (Runtime, Stack) {
 			}
 		},
 	}
-	s :=
-		(&stackHelper{stack: runtime.BuiltinStack}).
+	f :=
+		(&frameHelper{frame: runtime.BuiltinFrame}).
 			LoadExtension(listExtension, lenExtension, sliceExtension, rangeExtension).
 			Load("true", True).Load("false", False).
 			LoadExtension(eqExtension, neExtension, ltExtension, leExtension, gtExtension, geExtension).
-			LoadExtension(addExtension, subExtension, mulExtension, divExtension, modExtension).stack
+			LoadExtension(addExtension, subExtension, mulExtension, divExtension, modExtension).frame
 
-	return r, s
+	return r, f
 }
 
-type stackHelper struct {
-	stack Stack
+type frameHelper struct {
+	frame Frame
 }
 
-func (sh *stackHelper) Load(name Name, value Object) *stackHelper {
-	head := sh.stack.Peek()
-	sh.stack = sh.stack.Pop()
-	head = head.Set(name, value)
-	sh.stack = sh.stack.Push(head)
+func (sh *frameHelper) Load(name Name, value Object) *frameHelper {
+	sh.frame = sh.frame.Set(name, value)
 	return sh
 }
 
-func (sh *stackHelper) LoadExtension(exts ...Extension) *stackHelper {
+func (sh *frameHelper) LoadExtension(exts ...Extension) *frameHelper {
 	for _, ext := range exts {
 		sh.Load(ext.Name, ext.Module())
 	}

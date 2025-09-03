@@ -31,7 +31,7 @@ type Runtime struct {
 	UnwrapArgs    func(argsOpt adt.Result[[]Object]) adt.Result[[]Object]
 }
 
-func (r Runtime) Step(ctx context.Context, s Stack, e ast.Expr) adt.Result[Object] {
+func (r Runtime) Step(ctx context.Context, frame Frame, e ast.Expr) adt.Result[Object] {
 	deadline, ok := ctx.Deadline()
 	if ok && time.Now().After(deadline) {
 		return errValue(ErrorTimeout)
@@ -57,14 +57,11 @@ func (r Runtime) Step(ctx context.Context, s Stack, e ast.Expr) adt.Result[Objec
 				bind parameters and previously captured variables in lambda
 	*/
 
-	if s.Depth() > r.MaxStackDepth {
-		return errValue(ErrorStackOverflow)
-	}
 	switch e := e.(type) {
 	case ast.Name:
 		name := Name(e)
 		var o Object
-		if ok := r.resolveName(s, name).Unwrap(&o); !ok {
+		if ok := r.resolveName(frame, name).Unwrap(&o); !ok {
 			return errValue(ErrorNameNotFound(name))
 		}
 		return value(o)
@@ -74,14 +71,14 @@ func (r Runtime) Step(ctx context.Context, s Stack, e ast.Expr) adt.Result[Objec
 			return errValue(nil) // empty expression
 		}
 		var cmdObject Object
-		if err := r.Step(ctx, s, cmd.cmdExpr).Unwrap(&cmdObject); err != nil {
+		if err := r.Step(ctx, frame, cmd.cmdExpr).Unwrap(&cmdObject); err != nil {
 			return errValue(err)
 		}
 		var funcObject Function
 		if ok := adt.Cast[Function](cmdObject).Unwrap(&funcObject); !ok {
 			return errValue(ErrorCannotExecuteExpression(e))
 		}
-		return funcObject.exec(r, ctx, s, cmd.argList)
+		return funcObject.exec(r, ctx, frame, cmd.argList)
 
 	default:
 		return errValue(ErrorUnknownExpression(e))
@@ -89,20 +86,20 @@ func (r Runtime) Step(ctx context.Context, s Stack, e ast.Expr) adt.Result[Objec
 }
 
 // stepAndUnwrapArgs executes the argument expressions and unwraps the results
-func (r Runtime) stepAndUnwrapArgs(ctx context.Context, s Stack, argList []ast.Expr) adt.Result[[]Object] {
+func (r Runtime) stepAndUnwrapArgs(ctx context.Context, frame Frame, argList []ast.Expr) adt.Result[[]Object] {
 	args := make([]Object, len(argList))
 	for i, e := range argList {
-		if err := r.Step(ctx, s, e).Unwrap(&args[i]); err != nil {
+		if err := r.Step(ctx, frame, e).Unwrap(&args[i]); err != nil {
 			return adt.Err[[]Object](err)
 		}
 	}
 	return r.UnwrapArgs(adt.Ok(args))
 }
 
-func (r Runtime) resolveName(s Stack, name Name) adt.Option[Object] {
-	var o Object
+func (r Runtime) resolveName(frame Frame, name Name) adt.Option[Object] {
 	// search name on the stack
-	if ok := findStack(s, name).Unwrap(&o); ok {
+	o, ok := frame.Get(name)
+	if ok {
 		return adt.Some(o)
 	}
 	// parse literal
