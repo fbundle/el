@@ -1,6 +1,7 @@
 package runtime_ext
 
 import (
+	"el/ast"
 	"encoding/json"
 	"errors"
 	"strconv"
@@ -69,10 +70,10 @@ func parseLiteral(lit string) (Object, error) {
 	if len(lit) == 0 {
 		return nil, ErrorEmptyLiteral
 	}
-	if lit == "*" {
+	if lit == ast.TokenUnwrap {
 		return Unwrap{}, nil
 	}
-	if lit[0] == '"' && lit[len(lit)-1] == '"' {
+	if string(lit[0]) == ast.TokenStringBeg && string(lit[len(lit)-1]) == ast.TokenStringEnd {
 		str := ""
 		if err := json.Unmarshal([]byte(lit), &str); err != nil {
 			return nil, err

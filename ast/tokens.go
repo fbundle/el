@@ -8,9 +8,11 @@ const (
 	TokenSugarBegin Token = "{"
 	TokenSugarEnd   Token = "}"
 	TokenUnwrap     Token = "*"
+	TokenStringBeg  Token = "\""
+	TokenStringEnd  Token = "\""
 )
 
-var SpecialTokens = map[Token]struct{}{
+var SplitTokens = map[Token]struct{}{
 	TokenBlockBegin: {},
 	TokenBlockEnd:   {},
 	TokenSugarBegin: {},

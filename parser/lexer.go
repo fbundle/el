@@ -11,7 +11,7 @@ type Token = string
 
 func Tokenize(s string) []Token {
 	return tokenize(s,
-		ast.SpecialTokens,
+		ast.SplitTokens,
 		removeComment("#"),
 		mapping(map[string]string{
 			"[": " (list ",
