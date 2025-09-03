@@ -3,7 +3,7 @@ package runtime
 import "context"
 
 const (
-	ENABLE_TCO = false
+	ENABLE_TCO = false // TCO true doesn't work yet'
 )
 
 type tailcallCtxKeyType struct{}
