@@ -95,7 +95,7 @@ var program = `
 	))
 
 	_ (print (is_func (lambda x x)) (is_func 1))
-	_ (print (is_nil_type nil (is_func 1))
+	_ (print (is_nil_type nil) (is_func 1))
 	
 	nil
 )`
