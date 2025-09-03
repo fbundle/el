@@ -62,11 +62,8 @@ func parseLiteral(lit string) (Value, error) {
 		if err := json.Unmarshal([]byte(lit), &str); err != nil {
 			return nil, err
 		}
-		strList := List{}
-		for _, ch := range []rune(str) {
-			strList = List{strList.Ins(strList.Len(), Int{int(ch)})}
-		}
-		return strList, nil
+		return String{str}, nil
+
 	}
 	i, err := strconv.Atoi(lit)
 	return Int{i}, err

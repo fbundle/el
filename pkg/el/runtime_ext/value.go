@@ -41,6 +41,14 @@ func (l List) String() string {
 
 }
 
+type String struct {
+	string
+}
+
+func (s String) String() string {
+	return fmt.Sprintf("\"%s\"", s.string)
+}
+
 // helpers
 func value(o Value) adt.Result[Value] {
 	return adt.Ok[Value](o)
