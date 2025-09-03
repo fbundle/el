@@ -4,14 +4,14 @@ package expr
 
 // Expr : union of Name, Lambda
 type Expr interface {
-	MustString() string
+	String() string
 	MustTypeExpr() // for type-safety every Expr must implement this
 }
 
 // Name - a name, a number, a string, etc.
 type Name string
 
-func (e Name) MustString() string {
+func (e Name) String() string {
 	return string(e)
 }
 
@@ -24,12 +24,12 @@ type Lambda struct {
 	Args []Expr
 }
 
-func (e Lambda) MustString() string {
+func (e Lambda) String() string {
 	s := ""
 	s += "("
-	s += e.Cmd.MustString()
+	s += e.Cmd.String()
 	for _, arg := range e.Args {
-		s += " " + arg.MustString()
+		s += " " + arg.String()
 	}
 	s += ")"
 	return s

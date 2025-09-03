@@ -9,13 +9,13 @@ import (
 
 // Object : union - TODO : introduce new data types
 type Object interface {
-	MustString() string
+	String() string
 	MustValue() // for type-safety every Object must implement this
 }
 
 type Int int
 
-func (i Int) MustString() string {
+func (i Int) String() string {
 	return fmt.Sprintf("%d", i)
 }
 
@@ -26,7 +26,7 @@ var False = Int(0)
 
 type Unwrap struct{}
 
-func (u Unwrap) MustString() string {
+func (u Unwrap) String() string {
 	return "*"
 }
 
@@ -34,7 +34,7 @@ func (u Unwrap) MustValue() {}
 
 type Wildcard struct{}
 
-func (w Wildcard) MustString() string {
+func (w Wildcard) String() string {
 	return "_"
 }
 
@@ -46,12 +46,12 @@ type Lambda struct {
 	Closure        Frame     `json:"closure,omitempty"`
 }
 
-func (l Lambda) MustString() string {
+func (l Lambda) String() string {
 	s := fmt.Sprintf("(<closure_%p>; lambda ", l.Closure)
 	for _, param := range l.ParamNameList {
 		s += string(param) + " "
 	}
-	s += l.Implementation.MustString()
+	s += l.Implementation.String()
 	s += ")"
 	return s
 }
@@ -64,7 +64,7 @@ type Module struct {
 	Man  string `json:"man,omitempty"`
 }
 
-func (m Module) MustString() string {
+func (m Module) String() string {
 	return fmt.Sprintf("[%s]", m.Man)
 }
 
@@ -72,10 +72,10 @@ func (m Module) MustValue() {}
 
 type List []Object
 
-func (l List) MustString() string {
+func (l List) String() string {
 	ls := make([]string, 0, len(l))
 	for _, o := range l {
-		ls = append(ls, o.MustString())
+		ls = append(ls, o.String())
 	}
 	s := strings.Join(ls, ",")
 	s = fmt.Sprintf("[%s]", s)

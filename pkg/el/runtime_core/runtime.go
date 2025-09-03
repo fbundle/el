@@ -22,10 +22,10 @@ var ErrorTimeout = func(err error) error {
 var ErrorStackOverflow = errors.New("stack overflow")
 
 var ErrorUnknownExpression = func(e expr.Expr) error {
-	return fmt.Errorf("unknown expression type %s", e.MustString())
+	return fmt.Errorf("unknown expression type %s", e.String())
 }
 var ErrorCannotExecuteExpression = func(e expr.Expr) error {
-	return fmt.Errorf("expression cannot be executed: %s", e.MustString())
+	return fmt.Errorf("expression cannot be executed: %s", e.String())
 }
 var ErrorNotEnoughArguments = errors.New("not enough arguments")
 
