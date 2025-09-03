@@ -84,6 +84,9 @@ var program = `
 	nil
 )`
 
+func main() {
+	testRuntime()
+}
 func testRuntime() {
 	tokens := parser.Tokenize(withTemplate(program))
 
@@ -105,10 +108,6 @@ func testRuntime() {
 		fmt.Println("output\t", o)
 		fmt.Println()
 	}
-}
-
-func main() {
-	testRuntime()
 }
 
 // withTemplate - add some common template to the code
