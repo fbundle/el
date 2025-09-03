@@ -8,7 +8,33 @@ import (
 	"github.com/fbundle/lab_public/lab/go_util/pkg/adt"
 )
 
+func DataType(name string) Type {
+	return Type{
+		level: 0,
+		name:  name,
+	}
+}
+
+type Type struct {
+	level int
+	name  string
+}
+
+func (t Type) String() string {
+	if t.level == 0 {
+		return t.name
+	}
+	return fmt.Sprintf("type_%d", t.level)
+}
+
+func (t Type) Type() Type {
+	return Type{
+		level: t.level + 1,
+	}
+}
+
 type Value interface {
+	Type() Type
 	String() string
 }
 
@@ -22,6 +48,10 @@ type Lambda struct {
 	ParamList []Name    `json:"param_list,omitempty"`
 	Body      expr.Expr `json:"body,omitempty"`
 	Closure   Frame     `json:"closure,omitempty"`
+}
+
+func (l Lambda) Type() Type {
+	return DataType("lambda")
 }
 
 func (l Lambda) String() string {
@@ -64,8 +94,12 @@ type Exec = func(r Runtime, ctx context.Context, s Stack, args []expr.Expr) adt.
 // Module - a function built-in to the language
 type Module struct {
 	Name Name
-	Exec Exec
 	Man  string
+	Exec Exec
+}
+
+func (m Module) Type() Type {
+	return DataType("module")
 }
 
 func (m Module) String() string {

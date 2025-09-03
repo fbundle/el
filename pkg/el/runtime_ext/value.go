@@ -2,14 +2,13 @@ package runtime_ext
 
 import (
 	"el/pkg/el/runtime"
-	"errors"
 	"fmt"
 	"strings"
 
-	"github.com/fbundle/lab_public/lab/go_util/pkg/adt"
 	"github.com/fbundle/lab_public/lab/go_util/pkg/persistent/seq"
 )
 
+type Type = runtime.Type
 type Value = runtime.Value
 
 type Unwrap struct{}
@@ -18,12 +17,20 @@ func (u Unwrap) String() string {
 	return "*"
 }
 
+func (u Unwrap) Type() Type {
+	return runtime.DataType("unwrap")
+}
+
 type Int struct {
 	int
 }
 
 func (i Int) String() string {
 	return fmt.Sprintf("%d", i.int)
+}
+
+func (i Int) Type() Type {
+	return runtime.DataType("int")
 }
 
 type List struct {
@@ -38,7 +45,10 @@ func (l List) String() string {
 	s := strings.Join(ls, ",")
 	s = fmt.Sprintf("[%s]", s)
 	return s
+}
 
+func (l List) Type() Type {
+	return runtime.DataType("list")
 }
 
 type String struct {
@@ -49,15 +59,6 @@ func (s String) String() string {
 	return fmt.Sprintf("\"%s\"", s.string)
 }
 
-// helpers
-func value(o Value) adt.Result[Value] {
-	return adt.Ok[Value](o)
-}
-
-func errValue(err error) adt.Result[Value] {
-	return adt.Err[Value](err)
-}
-
-func errValueString(msg string) adt.Result[Value] {
-	return errValue(errors.New(msg))
+func (s String) Type() Type {
+	return runtime.DataType("string")
 }
