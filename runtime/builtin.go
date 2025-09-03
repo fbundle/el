@@ -15,12 +15,18 @@ var BuiltinFrame Frame
 
 func init() {
 	frame := Frame{}
-	frame = frame.Set("type", typeFunc)
-	frame = frame.Set("let", letFunc)
-	frame = frame.Set("lambda", lambdaFunc)
-	frame = frame.Set("match", matchFunc)
-	frame = frame.Set("nil", Nil{})
+	for name, object := range builtinObject {
+		frame = frame.Set(name, object)
+	}
 	BuiltinFrame = frame
+}
+
+var builtinObject = map[Name]Object{
+	"type":   typeFunc,
+	"let":    letFunc,
+	"match":  matchFunc,
+	"lambda": lambdaFunc,
+	"nil":    Nil{},
 }
 
 var typeFunc = Function{
