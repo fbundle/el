@@ -3,14 +3,14 @@ package main
 import (
 	"context"
 	"el/ast"
-	ast2 "el/parser"
+	"el/parser"
 	"el/runtime"
 	"el/runtime_ext"
 	"fmt"
 )
 
 func testRuntime() {
-	tokens := ast2.TokenizeWithInfixOperator(`
+	tokens := parser.TokenizeWithInfixOperator(`
 		# simple example
 		(let
 			y 20
@@ -194,7 +194,7 @@ func testRuntime() {
 	var err error
 	ctx := context.Background()
 	for len(tokens) > 0 {
-		e, tokens, err = ast2.ParseWithInfixOperator(tokens)
+		e, tokens, err = parser.ParseWithInfixOperator(tokens)
 		if err != nil {
 			panic(err)
 		}
