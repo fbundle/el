@@ -62,13 +62,13 @@ func (r Runtime) Step(ctx context.Context, s Stack, e ast.Expr) adt.Result[Objec
 	}
 	switch e := e.(type) {
 	case ast.Name:
-		// parse literal
 		var o Object
-		if err := r.ParseLiteral(string(e)).Unwrap(&o); err == nil {
-			return value(o)
-		}
 		// search name on the stack
 		if ok := findStack(s, Name(e)).Unwrap(&o); ok {
+			return value(o)
+		}
+		// parse literal
+		if err := r.ParseLiteral(string(e)).Unwrap(&o); err == nil {
 			return value(o)
 		}
 		return errValue(ErrorNameNotFound(Name(e)))
