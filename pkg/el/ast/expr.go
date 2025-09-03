@@ -2,7 +2,7 @@ package ast
 
 // A very simple AST, each node is either an Expr or a list of Expr
 
-// Expr : union of Atom, SExpr
+// Expr - union of Atom, SExpr
 type Expr interface {
 	String() string
 }
