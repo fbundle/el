@@ -245,7 +245,7 @@ go run cmd/el/main.go examples/3_lists_and_operations.el
 
 ```bash
 # Functions and lambdas
-go run cmd/el/main.go examples/functions_and_lambdas.el
+go run cmd/el/main.go examples/4_functions_and_lambdas.el
 
 # Pattern matching
 go run cmd/el/main.go examples/pattern_matching.el
