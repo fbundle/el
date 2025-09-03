@@ -10,6 +10,8 @@ import (
 )
 
 func testTCOComparison() {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 	fmt.Println("Tail Call Optimization (TCO) Comparison Test")
 	fmt.Println("=============================================")
 	fmt.Println("Demonstrating two types of recursion:")
@@ -24,20 +26,20 @@ func testTCOComparison() {
 	// Test 1: Tail recursion (can be optimized)
 	fmt.Println("1. TAIL RECURSION - Simple counter (TCO optimized):")
 	fmt.Println("   Pattern: (while cond body) -> recursive call is last operation")
-	testTailRecursion(10000)
+	testTailRecursion(ctx, 10000)
 
 	// Test 2: Non-tail recursion (needs stack)
 	fmt.Println("\n2. NON-TAIL RECURSION - Map function (needs stack):")
 	fmt.Println("   Pattern: (map rest f) -> work happens after recursive call")
-	testNonTailRecursion(5)
+	testNonTailRecursion(ctx, 5)
 
 	// Test 3: While loop (tail recursion pattern)
 	fmt.Println("\n3. WHILE LOOP - Iterative pattern (TCO optimized):")
 	fmt.Println("   Pattern: (while cond body) -> recursive call is last operation")
-	testWhileLoop(1000)
+	testWhileLoop(ctx, 1000)
 }
 
-func testTailRecursion(n int) {
+func testTailRecursion(ctx context.Context, n int) {
 	// This demonstrates tail recursion using while loop pattern
 	// The recursive call is the last operation - TCO can optimize this
 	tokens := ast.TokenizeWithInfixOperator(fmt.Sprintf(`
@@ -95,7 +97,7 @@ func testTailRecursion(n int) {
 	fmt.Printf("Counted from %d to 0: %s (took %v) - TCO OPTIMIZED!\n", n, o.String(), duration)
 }
 
-func testNonTailRecursion(n int) {
+func testNonTailRecursion(ctx context.Context, n int) {
 	// This demonstrates non-tail recursion using map function
 	// We need to do work AFTER the recursive call - TCO cannot optimize this
 	tokens := ast.TokenizeWithInfixOperator(fmt.Sprintf(`
@@ -125,7 +127,6 @@ func testNonTailRecursion(n int) {
 	`, n))
 
 	r, s := runtime_ext.NewBasicRuntime()
-	ctx := context.Background()
 
 	start := time.Now()
 
@@ -148,7 +149,7 @@ func testNonTailRecursion(n int) {
 	fmt.Printf("Mapped list of size %d: %s (took %v) - STACK PRESERVED!\n", n, o.String(), duration)
 }
 
-func testWhileLoop(n int) {
+func testWhileLoop(ctx context.Context, n int) {
 	// While loop is essentially tail recursion - the recursive call is the last operation
 	tokens := ast.TokenizeWithInfixOperator(fmt.Sprintf(`
 		(let
@@ -180,7 +181,6 @@ func testWhileLoop(n int) {
 	`, n, n))
 
 	r, s := runtime_ext.NewBasicRuntime()
-	ctx := context.Background()
 
 	start := time.Now()
 
