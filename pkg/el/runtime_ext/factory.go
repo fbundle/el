@@ -27,7 +27,10 @@ func NewBasicRuntime() (Runtime, Stack) {
 			}
 		},
 	}
-	s := loadExtension(runtime_core.NewBuiltinStack(), listExtension, lenExtension, sliceExtension)
+	s := loadExtension(
+		runtime_core.NewBuiltinStack(),
+		listExtension, lenExtension, sliceExtension,
+	)
 	return r, s
 }
 
