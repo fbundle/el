@@ -114,10 +114,6 @@ var lambdaModule = Module{
 		}
 
 		body := argList[len(argList)-1]
-		/*
-			capture top of the stack - support one-level the recursive call
-			we can't delete everything since our function is anonymous
-		*/
 		closure := s.Peek()
 		for _, name := range paramList {
 			closure = closure.Del(name) // remove all the parameters from the closure
@@ -142,6 +138,9 @@ func makeLambdaRepr(paramList []Name, body ast.Expr, local Frame) string {
 
 func makeLambdaExec(paramList []Name, body ast.Expr, local Frame) Exec {
 	return func(r Runtime, ctx context.Context, s Stack, argList []ast.Expr) adt.Result[Value] {
+		/*
+			for recursive function, the name of that function is in s Stack
+		*/
 		// 0. sanity check
 		if len(argList) < len(paramList) {
 			errValue(ErrorNotEnoughArguments)
