@@ -54,7 +54,7 @@ func testRuntime() {
 			(list length sublist second another)
 		)
 
-		# does not have tco here 
+		# does not have deep_recursion here 
 		(let
 			count (lambda n (match (le n 0)
 				true 0 								# if n <= 0 then 0

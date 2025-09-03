@@ -141,16 +141,19 @@ func makeLambdaExec(paramList []Name, body ast.Expr, closure Frame) Exec {
 			return errValue(err)
 		}
 		// 2. make the call frame
+		// for non-recursive function, callFrame = closure + params
+		// for recursive function, callFrame = frame + closure + params
+		callFrame := frame
 		for k, v := range closure.Iter {
-			frame = frame.Set(k, v)
+			callFrame = callFrame.Set(k, v)
 		}
 		for i := 0; i < len(paramList); i++ {
 			param, arg := paramList[i], args[i]
-			frame = frame.Set(param, arg)
+			callFrame = callFrame.Set(param, arg)
 		}
 		// 3. make call with new stack - signal tailcall to children
 		var o Object
-		if err := r.Step(ctx, frame, body).Unwrap(&o); err != nil {
+		if err := r.Step(ctx, callFrame, body).Unwrap(&o); err != nil {
 			return errValue(err)
 		}
 		return value(o)
