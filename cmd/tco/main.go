@@ -10,7 +10,8 @@ import (
 )
 
 func testTCOComparison() {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	fmt.Println("Tail Call Optimization (TCO) Comparison Test")
 	fmt.Println("=============================================")
@@ -74,7 +75,6 @@ func testTailRecursion(ctx context.Context, n int) {
 	`, n))
 
 	r, s := runtime_ext.NewBasicRuntime()
-	ctx := context.Background()
 
 	start := time.Now()
 
