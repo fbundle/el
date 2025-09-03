@@ -2,11 +2,16 @@ package runtime_ext
 
 import (
 	"context"
+	"el/pkg/el/runtime"
 	"errors"
 	"fmt"
 
 	"github.com/fbundle/lab_public/lab/go_util/pkg/adt"
 )
+
+type Name = runtime.Name
+
+type Extension = runtime.Extension
 
 func makeArithExtension(name string, f func(...Int) (Int, error)) Extension {
 	return Extension{

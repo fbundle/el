@@ -3,7 +3,6 @@ package runtime
 import (
 	"context"
 	"el/pkg/el/expr"
-	"errors"
 	"fmt"
 
 	"github.com/fbundle/lab_public/lab/go_util/pkg/adt"
@@ -75,16 +74,4 @@ func (m Module) String() string {
 
 func (m Module) Apply(r Runtime, ctx context.Context, s Stack, args []expr.Expr) adt.Result[Value] {
 	return m.Exec(r, ctx, s, args)
-}
-
-// helpers
-func value(o Value) adt.Result[Value] {
-	return adt.Ok[Value](o)
-}
-
-func errValue(err error) adt.Result[Value] {
-	return adt.Err[Value](err)
-}
-func errValueString(msg string) adt.Result[Value] {
-	return errValue(errors.New(msg))
 }
