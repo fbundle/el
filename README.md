@@ -48,7 +48,7 @@ Create a file `hello.el`:
 Run it:
 
 ```bash
-go run cmd/el/main.go hello.el
+go run cmd/el/main.go 1_hello.el
 ```
 
 ### Interactive REPL
@@ -232,13 +232,13 @@ add (lambda x y {x + y})
 
 ```bash
 # Hello World
-go run cmd/el/main.go examples/hello.el
+go run cmd/el/main.go examples/1_hello.el
 
 # Basic arithmetic
-go run cmd/el/main.go examples/basic_arithmetic.el
+go run cmd/el/main.go examples/2_basic_arithmetic.el
 
 # Lists and operations
-go run cmd/el/main.go examples/lists_and_operations.el
+go run cmd/el/main.go examples/3_lists_and_operations.el
 ```
 
 ### Advanced Examples
@@ -322,7 +322,7 @@ go run cmd/el/main.go [OPTIONS] [FILE]
 
 ```bash
 # Run a file
-go run cmd/el/main.go examples/hello.el
+go run cmd/el/main.go examples/1_hello.el
 
 # Run from stdin
 echo '(print "hello world")' | go run cmd/el/main.go

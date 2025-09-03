@@ -226,7 +226,7 @@ OPTIONS:
 
 EXAMPLES:
     # Run a file
-    go run cmd/el/main.go examples/hello.el
+    go run cmd/el/main.go examples/1_hello.el
     
     # Run from stdin
     echo '(print "hello world")' | go run cmd/el/main.go
