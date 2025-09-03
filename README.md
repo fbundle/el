@@ -260,7 +260,7 @@ go run cmd/el/main.go examples/functional_programming.el
 go run cmd/el/main.go examples/type_system.el
 
 # Comprehensive demo
-go run cmd/el/main.go examples/comprehensive_demo.el
+go run cmd/el/main.go examples/0_comprehensive_demo.el
 ```
 
 ### Example Programs
