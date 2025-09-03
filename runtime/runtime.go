@@ -77,16 +77,16 @@ func (r Runtime) Step(ctx context.Context, s Stack, e ast.Expr) adt.Result[Objec
 		if ok := getCmd(e).Unwrap(&cmd); !ok {
 			return errValue(nil) // empty expression
 		}
-
 		var cmdObject Object
 		if err := r.Step(ctx, s, cmd.cmdExpr).Unwrap(&cmdObject); err != nil {
 			return errValue(err)
 		}
 		var funcObject Function
-		if ok := adt.Cast[Function](cmdObject).Unwrap(&funcObject); ok {
-			return funcObject.exec(r, ctx, s, cmd.argList)
+		if ok := adt.Cast[Function](cmdObject).Unwrap(&funcObject); !ok {
+			return errValue(ErrorCannotExecuteExpression(e))
 		}
-		return errValue(ErrorCannotExecuteExpression(e))
+		return funcObject.exec(r, ctx, s, cmd.argList)
+
 	default:
 		return errValue(ErrorUnknownExpression(e))
 	}
