@@ -27,18 +27,25 @@ func NewBasicRuntime() (Runtime, Stack) {
 			}
 		},
 	}
-	s := loadExtension(
-		runtime_core.NewBuiltinStack(),
-		listExtension, lenExtension, sliceExtension,
-	)
-	return r, s
+	sh := stackHelper{stack: runtime_core.NewBuiltinStack()}
+	sh.LoadExtension(listExtension, lenExtension, sliceExtension)
+	return r, sh.stack
 }
 
-func loadExtension(s Stack, exts ...Extension) Stack {
-	return runtime_core.UpdateHead(s, func(frame runtime_core.Frame) runtime_core.Frame {
-		for _, ext := range exts {
-			frame = frame.Set(ext.Name, ext.Module())
-		}
-		return frame
+type stackHelper struct {
+	stack Stack
+}
+
+func (sh stackHelper) Load(name Name, value Value) stackHelper {
+	stack := runtime_core.UpdateHead(sh.stack, func(frame runtime_core.Frame) runtime_core.Frame {
+		return frame.Set(name, value)
 	})
+	return stackHelper{stack: stack}
+}
+
+func (sh stackHelper) LoadExtension(exts ...Extension) stackHelper {
+	for _, ext := range exts {
+		sh.Load(ext.Name, ext.Module())
+	}
+	return sh
 }
