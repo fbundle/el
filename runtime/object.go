@@ -58,5 +58,5 @@ func (Nil) Type() Object {
 	return DataType("nil_type")
 }
 func (Nil) String() string {
-	return "nil_value"
+	return "nil"
 }
