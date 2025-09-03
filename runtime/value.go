@@ -14,10 +14,6 @@ type Value interface {
 	Type() Type
 	String() string
 }
-type Function interface {
-	Value
-	exec() Exec
-}
 
 func DataType(name string) Type {
 	return Type{
@@ -44,76 +40,14 @@ func (t Type) Type() Type {
 	}
 }
 
-// Lambda - a function written in S-expression
-type Lambda struct {
-	ParamList []Name   `json:"param_list,omitempty"`
-	Body      ast.Expr `json:"body,omitempty"`
-	Closure   Frame    `json:"closure,omitempty"`
-}
-
-func (l Lambda) Type() Type {
-	return DataType("lambda")
-}
-
-func (l Lambda) String() string {
-	s := fmt.Sprintf("(<closure_%s>; lambda ", l.Closure.Repr())
-	for _, param := range l.ParamList {
-		s += string(param) + " "
-	}
-	s += l.Body.String()
-	s += ")"
-	return s
-}
-
-func (l Lambda) exec() Exec {
-	return func(r Runtime, ctx context.Context, s Stack, argList []ast.Expr) adt.Result[Value] {
-		// 0. sanity check
-		if len(argList) < len(l.ParamList) {
-			errValue(ErrorNotEnoughArguments)
-		}
-		// 1. evaluate arguments
-		var args []Value
-		if err := r.stepAndUnwrapArgs(ctx, s, argList).Unwrap(&args); err != nil {
-			return errValue(err)
-		}
-		// 2. make call stack
-		local := l.Closure
-		for i := 0; i < len(l.ParamList); i++ {
-			param, arg := l.ParamList[i], args[i]
-			local = local.Set(param, arg)
-		}
-
-		var callStack Stack
-		if isTailCall(ctx) {
-			callStack = s.Pop().Push(local)
-		} else {
-			callStack = s.Push(local)
-		}
-		// 3. make call with new stack - signal tailcall to children
-		childCtx := withTailCall(ctx)
-		var o Value
-		if err := r.Step(childCtx, callStack, l.Body).Unwrap(&o); err != nil {
-			return errValue(err)
-		}
-		return value(o)
-	}
-}
-
-// Module - a function built-in to the language
 type Module struct {
-	Name Name
-	Man  string
-	Exec Exec
+	repr string
+	exec Exec
 }
 
 func (m Module) Type() Type {
 	return DataType("module")
 }
-
 func (m Module) String() string {
-	return fmt.Sprintf("[%s]", m.Man)
-}
-
-func (m Module) exec() Exec {
-	return m.Exec
+	return m.repr
 }

@@ -170,9 +170,11 @@ func testRuntime() {
 			x1 (type x)
 			y1 (type y)
 			z1 (type z)
-			x2 (type x1)
+			x2 (type (type x))
+			x3 (type (type (type x)))
+			t (type type)
 
-			[[x y z x1 y1 z1 x2]]
+			[[x y z x1 y1 z1 x2 x3 t]]
 		)
 	`)
 
