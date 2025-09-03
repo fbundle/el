@@ -12,6 +12,5 @@ func isTailCall(ctx context.Context) bool {
 }
 
 func withTailCall(ctx context.Context) context.Context {
-	return ctx
-	//return context.WithValue(ctx, tailcallCtxKey, true)
+	return context.WithValue(ctx, tailcallCtxKey, true)
 }
