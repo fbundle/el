@@ -5,8 +5,6 @@ import (
 	"el/ast"
 	"errors"
 	"fmt"
-	"sync"
-	"sync/atomic"
 	"time"
 
 	"github.com/fbundle/lab_public/lab/go_util/pkg/adt"
@@ -92,28 +90,10 @@ func (r Runtime) Step(ctx context.Context, s Stack, e ast.Expr) adt.Result[Value
 // stepAndUnwrapArgs executes the argument expressions in parallel and unwraps the results
 func (r Runtime) stepAndUnwrapArgs(ctx context.Context, s Stack, argList []ast.Expr) adt.Result[[]Value] {
 	args := make([]Value, len(argList))
-	errHolder := &atomic.Value{}
-	subCtx, cancel := context.WithCancel(ctx)
-	defer cancel()
-	wg := &sync.WaitGroup{}
-	for i := 0; i < len(argList); i++ {
-		wg.Add(1)
-		go func(i int) {
-			defer wg.Done()
-			e := argList[i]
-			if subErr := r.Step(subCtx, s, e).Unwrap(&args[i]); subErr != nil {
-				errHolder.CompareAndSwap(nil, subErr) // set the error only once
-				cancel()                              // stop all other goroutines
-			}
-		}(i)
+	for i, e := range argList {
+		if err := r.Step(ctx, s, e).Unwrap(&args[i]); err != nil {
+			return adt.Err[[]Value](err)
+		}
 	}
-	wg.Wait()
-
-	var argsOpt = adt.Result[[]Value]{
-		Val: args,
-	}
-	if err := errHolder.Load(); err != nil {
-		argsOpt.Err = err.(error)
-	}
-	return r.UnwrapArgs(argsOpt)
+	return r.UnwrapArgs(adt.Ok(args))
 }

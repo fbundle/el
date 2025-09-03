@@ -44,7 +44,9 @@ var letModule = Module{
 			return errValueString("let requires at least 1 arguments and odd number of arguments")
 		}
 
-		s = s.Push(Frame{}) // push a new empty frame
+		if !isTailCall(ctx) {
+			s = s.Push(Frame{}) // push a new empty frame
+		}
 
 		var lvalue ast.Leaf
 		var rvalue Value
