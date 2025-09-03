@@ -105,17 +105,17 @@
     # _ (print "Zip [1 2 3 4] and ['a' 'b' 'c' 'd']:" zipped)
 
     # Range generation
-    (print "Range 1 to 10:" (range 1 11))
-    (print "Range with step 2:" (range_step 0 20 2))
+    _ (print "Range 1 to 10:" (range 1 11))
+    _ (print "Range with step 2:" (range_step 0 20 2))
 
     # 10. Mathematical Functions
-    (print "\n10. Mathematical Functions:")
+    _ (print "\n10. Mathematical Functions:")
     # Greatest Common Divisor
     gcd (lambda a b (match {b == 0}
         true a
         (gcd b {a % b})
     ))
-    (print "GCD of 48 and 18:" (gcd 48 18))
+    _ (print "GCD of 48 and 18:" (gcd 48 18))
 
     # Prime checking (simplified)
     is_prime (lambda n (match {n < 2}
@@ -134,8 +134,8 @@
             false
         )
     ))
-    (print "Is 17 prime?" (is_prime 17))
-    (print "Is 15 prime?" (is_prime 15))
+    _ (print "Is 17 prime?" (is_prime 17))
+    _ (print "Is 15 prime?" (is_prime 15))
 
     # 11. String Operations (simulated)
     (print "\n11. String Operations:")
