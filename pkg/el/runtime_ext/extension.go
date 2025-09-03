@@ -55,8 +55,8 @@ var lenExtension = Extension{
 		if len(values) != 1 {
 			return errValueString("len requires 1 argument")
 		}
-		l, ok := values[0].(List)
-		if !ok {
+		var l List
+		if ok := adt.Cast[List](values[0]).Unwrap(&l); !ok {
 			return errValueString("len argument must be a list")
 		}
 		return value(Int{l.Len()})
@@ -70,19 +70,19 @@ var sliceExtension = Extension{
 		if len(values) != 2 {
 			return errValueString("slice requires 2 arguments")
 		}
-		l, ok := values[0].(List)
-		if !ok {
-			return errValueString("slice first argument not a list")
+		var l List
+		if ok := adt.Cast[List](values[0]).Unwrap(&l); !ok {
+			return errValueString("slice first argument must be a list")
 		}
-		i, ok := values[1].(List)
-		if !ok {
-			return errValueString("slice first argument not a list")
+		var i List
+		if ok := adt.Cast[List](values[1]).Unwrap(&i); !ok {
+			return errValueString("slice second argument must be a list of integers")
 		}
 		output := List{}
 		for _, o := range i.Iter {
 			var index Int
-			if ok := cast[Int](o).Unwrap(&index); !ok {
-				return errValueString("slice index must be an integer")
+			if ok := adt.Cast[Int](o).Unwrap(&index); !ok {
+				return errValueString("slice second argument must be a list of integers")
 			}
 			v := l.Get(index.int)
 			output = List{output.Ins(output.Len(), v)}

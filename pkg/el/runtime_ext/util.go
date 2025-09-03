@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"strconv"
-
-	"github.com/fbundle/lab_public/lab/go_util/pkg/adt"
 )
 
 func unwrapArgs(args []Value) ([]Value, error) {
@@ -72,15 +70,4 @@ func parseLiteral(lit string) (Value, error) {
 	}
 	i, err := strconv.Atoi(lit)
 	return Int{i}, err
-}
-
-func cast[T any](o any) adt.Option[T] {
-	if o == nil {
-		return adt.None[T]()
-	}
-	v, ok := o.(T)
-	if !ok {
-		return adt.None[T]()
-	}
-	return adt.Some[T](v)
 }

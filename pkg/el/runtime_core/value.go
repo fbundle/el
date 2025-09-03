@@ -3,6 +3,7 @@ package runtime_core
 import (
 	"context"
 	"el/pkg/el/expr"
+	"errors"
 	"fmt"
 
 	"github.com/fbundle/lab_public/lab/go_util/pkg/adt"
@@ -92,4 +93,7 @@ func value(o Value) adt.Result[Value] {
 
 func errValue(err error) adt.Result[Value] {
 	return adt.Err[Value](err)
+}
+func errValueString(msg string) adt.Result[Value] {
+	return errValue(errors.New(msg))
 }

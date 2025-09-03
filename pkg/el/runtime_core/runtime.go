@@ -81,8 +81,9 @@ func (r Runtime) Step(ctx context.Context, s Stack, e expr.Expr) adt.Result[Valu
 		if err := r.Step(ctx, s, e.Cmd).Unwrap(&cmd); err != nil {
 			return errValue(err)
 		}
-		if cmd, ok := cmd.(Function); ok {
-			return cmd.Apply(r, ctx, s, e.Args)
+		var function Function
+		if ok := adt.Cast[Function](cmd).Unwrap(&function); ok {
+			return function.Apply(r, ctx, s, e.Args)
 		}
 		return errValue(ErrorCannotExecuteExpression(e))
 	default:
