@@ -176,6 +176,13 @@ func testRuntime() {
 
 			[[x y z x1 y1 z1 x2 x3 t]]
 		)
+		
+		# weird implementation
+		(let
+			f (lambda x (add x y))
+			y 2
+			(f 3)
+		)
 	`)
 
 	r, s := runtime_ext.NewBasicRuntime()
