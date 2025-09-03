@@ -3,7 +3,8 @@ package main
 import (
 	"context"
 	"el/pkg/el/expr"
-	"el/pkg/el/runtime"
+	"el/pkg/el/runtime_core"
+	"el/pkg/el/runtime_ext"
 	"fmt"
 )
 
@@ -44,6 +45,7 @@ func testRuntime() {
 					rest_values (map rest f)
 					(list first_value *rest_values)
 				)
+				_														# wildcard case - will fail if no case is matched
 			))
 
 			another (map (range 5 10) (lambda x [x mul 2]))				
@@ -56,19 +58,21 @@ func testRuntime() {
 			count (lambda n (match (le n 0)
 				true 0 								# if n <= 0 then 0
 				false (add n (count (sub n 1)))		# else n + count(n-1)
+                _
 			))
-			count 200
+			(count 200)
 		)
 
 		# test recursion
 		(let
 			fib (lambda x (match (le x 1)
 				true x 								# if x <= 1 then x
-				false (let							# _ is the wildcard symbol
+				false (let							
 					y (fib (sub x 1))				# else y = fib(x-1), z = fib(x-2), y + z
 					z (fib (sub x 2))
 					(add y z)
 				)
+				_
 			))
 			(fib 20)
 		)
@@ -78,10 +82,12 @@ func testRuntime() {
 			even (lambda n (match (le n 0)
 				true true 							# if n <= 0 then true
 				false (odd (sub n 1))				# else odd(n-1)
+				_
 			))
 			odd (lambda n (match (le n 0)
 				true false 							# if n <= 0 then false
 				false (even (sub n 1))				# else even(n-1)
+				_
 			))
 			[[ (odd 10) (even 10) (odd 11) (even 11) (odd 12) (even 12) ]]
 		)
@@ -101,6 +107,7 @@ func testRuntime() {
 					q (fib [n - 2])
 					[p + q]
 				}
+				_
 			))
 			(fib 20)
 		}
@@ -122,7 +129,7 @@ func testRuntime() {
 			while (lambda cond_func body_func state (
 				match (cond_func state)
 				false	state
-				_		(while cond_func body_func (body_func state))	# does not have TCO here 
+				 		(while cond_func body_func (body_func state))	# does not have TCO here 
 					
 			))
 			
@@ -144,9 +151,10 @@ func testRuntime() {
 		)
 	`)
 
-	r := runtime.NewBasicRuntime()
+	r, s := runtime_ext.NewBasicRuntime()
 
 	var e expr.Expr
+	var o runtime_core.Value
 	var err error
 	ctx := context.Background()
 	for len(tokens) > 0 {
@@ -155,11 +163,10 @@ func testRuntime() {
 			panic(err)
 		}
 		fmt.Println("expr\t", e)
-		o, err := r.Step(ctx, e)
-		if err != nil {
+		if err := r.Step(ctx, s, e).Unwrap(&o); err != nil {
 			panic(err)
 		}
-		fmt.Println("output\t", o)
+		fmt.Println("output\t", o.String())
 		fmt.Println()
 	}
 }
