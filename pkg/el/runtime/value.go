@@ -42,7 +42,7 @@ func (l Lambda) Apply(r Runtime, ctx context.Context, s Stack, argList []expr.Ex
 	}
 	// 1. evaluate arguments
 	var args []Value
-	if err := r.stepParallel(ctx, s, argList...).Unwrap(&args); err != nil {
+	if err := r.StepMany(ctx, s, argList...).Unwrap(&args); err != nil {
 		return errValue(err)
 	}
 	if err := r.PostProcessArgsOpt(args).Unwrap(&args); err != nil {

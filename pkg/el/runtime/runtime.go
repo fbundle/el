@@ -93,7 +93,8 @@ func (r Runtime) Step(ctx context.Context, s Stack, e expr.Expr) adt.Result[Valu
 	}
 }
 
-func (r Runtime) stepParallel(ctx context.Context, s Stack, es ...expr.Expr) adt.Result[[]Value] {
+// StepMany executes the expressions in parallel and returns the results in the same order as the input expressions
+func (r Runtime) StepMany(ctx context.Context, s Stack, es ...expr.Expr) adt.Result[[]Value] {
 	outputs := make([]Value, len(es))
 	errHolder := &atomic.Value{}
 	subCtx, cancel := context.WithCancel(ctx)
