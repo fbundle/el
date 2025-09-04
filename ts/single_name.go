@@ -37,7 +37,7 @@ func (s singleName) Length() int {
 	return 1
 }
 
-func (s singleName) LE(dst Sort) bool {
+func (s singleName) LessEqual(dst Sort) bool {
 	if s.Length() != dst.Length() || s.Level() != dst.Level() {
 		return false
 	}

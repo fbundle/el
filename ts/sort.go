@@ -13,7 +13,7 @@ type Sort interface {
 	String() string
 	Parent() Sort
 	Length() int
-	LE(dst Sort) bool
+	LessEqual(dst Sort) bool
 
 	prepend(param Sort) Sort
 }

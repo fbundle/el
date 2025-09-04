@@ -59,7 +59,7 @@ func (s chain) Length() int {
 	return len(s.params.Repr()) + 1
 }
 
-func (s chain) LE(dst Sort) bool {
+func (s chain) LessEqual(dst Sort) bool {
 	if s.Length() != dst.Length() || s.Level() != dst.Level() {
 		return false
 	}
@@ -71,14 +71,14 @@ func (s chain) LE(dst Sort) bool {
 	for i := 0; i < length; i++ {
 		sParam := s.params.Repr()[i]
 		dParam := d.params.Repr()[i]
-		if !dParam.LE(sParam) {
+		if !dParam.LessEqual(sParam) {
 			// reverse cast - similar to contravariant functor
 			// {int} can be cast into {any}
 			// {any -> int} can be cast into {int -> int}
 			return false
 		}
 	}
-	return s.body.LE(d.body)
+	return s.body.LessEqual(d.body)
 }
 
 func (s chain) prepend(param Sort) Sort {
