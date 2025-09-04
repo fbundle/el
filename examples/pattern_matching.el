@@ -70,20 +70,5 @@
         nil
     )
 
-    # Type checking with pattern matching
-    _ (let
-        type_check (lambda x (match (type x)
-            "number" "It's a number"
-            "string" "It's a string"
-            "list" "It's a list"
-            "function" "It's a function"
-            "unknown type"
-        ))
-        _ (print "Type of 42:" (type_check 42))
-        _ (print "Type of 'hello':" (type_check "hello"))
-        _ (print "Type of [1 2 3]:" (type_check [1 2 3]))
-        nil
-    )
-
     nil
 )
