@@ -18,7 +18,7 @@ func AddRule(srcName string, dstName string) {
 	leMap[rule{srcName, dstName}] = struct{}{}
 }
 
-func LE(srcName string, dstName string) bool {
+func leName(srcName string, dstName string) bool {
 	if srcName == Initial || dstName == Final {
 		return true
 	}
