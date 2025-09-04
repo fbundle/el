@@ -5,19 +5,14 @@ import "github.com/fbundle/lab_public/lab/go_util/pkg/adt"
 const TypeName = "type"
 
 func MustSingleName(level int, name string) Sort {
-	if level < 1 {
+	var sort Sort
+	if ok := SingleName(level, name).Unwrap(&sort); !ok {
 		panic("type_error")
 	}
-	return singleName{
-		level: level,
-		name:  name,
-	}
+	return sort
 }
 
 func SingleName(level int, name string) adt.Option[Sort] {
-	if level < 1 {
-		return adt.None[Sort]()
-	}
 	return adt.Some[Sort](singleName{
 		level: level,
 		name:  name,

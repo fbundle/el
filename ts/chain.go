@@ -6,7 +6,24 @@ import (
 	"github.com/fbundle/lab_public/lab/go_util/pkg/adt"
 )
 
-var _ Sort = chain{}
+func MustChain(sorts ...Sort) Sort {
+	var sort Sort
+	if ok := Chain(sorts...).Unwrap(&sort); !ok {
+		panic("type_error")
+	}
+	return sort
+}
+
+func Chain(sorts ...Sort) adt.Option[Sort] {
+	if len(sorts) == 0 {
+		return adt.None[Sort]()
+	}
+	sort := sorts[len(sorts)-1]
+	for i := len(sorts) - 2; i >= 0; i-- {
+		sort = sort.prepend(sorts[i])
+	}
+	return adt.Some[Sort](sort)
+}
 
 // chain - represent arrow type A -> B -> C
 type chain struct {

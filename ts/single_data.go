@@ -4,7 +4,15 @@ import (
 	"github.com/fbundle/lab_public/lab/go_util/pkg/adt"
 )
 
-func SortData(level int, data Data, parent Sort) adt.Option[Sort] {
+func MustSingleData(level int, data Data, parent Sort) Sort {
+	var sort Sort
+	if ok := SingleData(level, data, parent).Unwrap(&sort); !ok {
+		panic("type_error")
+	}
+	return sort
+}
+
+func SingleData(level int, data Data, parent Sort) adt.Option[Sort] {
 	if parent.Level() != level+1 {
 		return adt.None[Sort]()
 	}
