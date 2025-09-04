@@ -61,7 +61,7 @@ func (s singleData) le(dst Sort) bool {
 
 func (s singleData) prepend(param Sort) Sort {
 	return chain{
-		parm: adt.MustNonEmpty([]Sort{param}),
-		ret:  s,
+		params: adt.MustNonEmpty([]Sort{param}),
+		body:   s,
 	}
 }

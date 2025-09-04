@@ -2,6 +2,8 @@ package ts
 
 import "github.com/fbundle/lab_public/lab/go_util/pkg/adt"
 
+const TypeName = "type"
+
 func MustSingleName(level int, name string) Sort {
 	if level < 1 {
 		panic("type_error")
@@ -68,7 +70,7 @@ func (s singleName) le(dst Sort) bool {
 
 func (s singleName) prepend(param Sort) Sort {
 	return chain{
-		parm: adt.MustNonEmpty([]Sort{param}),
-		ret:  s,
+		params: adt.MustNonEmpty([]Sort{param}),
+		body:   s,
 	}
 }

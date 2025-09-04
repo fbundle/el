@@ -6,11 +6,6 @@ import (
 	"github.com/fbundle/lab_public/lab/go_util/pkg/adt"
 )
 
-const (
-	TypeName = "type"
-	Arrow    = "->"
-)
-
 func Unmarshal(typeMake string, e ast.Expr) adt.Result[Sort] {
 	panic("not implemented")
 }
