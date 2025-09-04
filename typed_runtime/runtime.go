@@ -115,7 +115,7 @@ func objValue(o Object) adt.Result[Object] {
 	return adt.Ok(o)
 }
 func dataValue(data Data, parent Object) adt.Result[Object] {
-	return adt.Ok(objectDict.MakeData(data, parent))
+	return adt.Ok(Pool.MakeData(data, parent))
 }
 
 func errValue(err error) adt.Result[Object] {

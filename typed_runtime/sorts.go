@@ -8,32 +8,38 @@ import (
 
 type Sort = sorts.Sort
 
-var objectDict = &_objectDict{data: make(map[string]Object)}
-
-type _objectDict struct {
-	data map[string]Object
+type TypePool interface {
+	Iter(yield func(name string, dtype Object) bool)
+	MakeType(name string) Object
+	MakeData(data Data, parent Object) Object
 }
 
-func (d *_objectDict) Iter(yield func(name string, dtype Object) bool) {
-	for name, obj := range d.data {
+var Pool TypePool = &_sortDict{typeDict: make(map[string]Object)}
+
+type _sortDict struct {
+	typeDict map[string]Object
+}
+
+func (d *_sortDict) Iter(yield func(name string, dtype Object) bool) {
+	for name, obj := range d.typeDict {
 		if ok := yield(name, obj); !ok {
 			return
 		}
 	}
 }
 
-func (d *_objectDict) MakeType(name string) Object {
+func (d *_sortDict) MakeType(name string) Object {
 	const typeLevel = 1
 	o := _object{
 		data:   nil,
 		sort:   sorts.MustAtom(typeLevel, name, nil),
 		parent: nil, // default parent
 	}
-	d.data[name] = o
+	d.typeDict[name] = o
 	return o
 }
 
-func (d *_objectDict) MakeData(data Data, parent Object) Object {
+func (d *_sortDict) MakeData(data Data, parent Object) Object {
 	const dataLevel = 0
 	return _object{
 		data:   data,

@@ -22,4 +22,4 @@ func (Nil) String() string {
 	return "nil"
 }
 
-var NilType Object = objectDict.MakeType("nil")
+var NilType Object = Pool.MakeType("nil")
