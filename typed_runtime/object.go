@@ -22,4 +22,6 @@ func (Nil) String() string {
 	return "nil"
 }
 
-var NilType Object = makeType("nil_type")
+var NilType = makeType("nil_type")
+
+var BuiltinType = makeType("builtin_type")

@@ -50,6 +50,7 @@ func init() {
 	builtinObject := map[Name]Object{
 		"nil":      makeData(Nil{}, NilType),
 		"nil_type": NilType,
+		"let":      makeData(),
 	}
 	frame := Frame{}
 	for name, object := range builtinObject {
