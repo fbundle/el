@@ -9,7 +9,7 @@ import (
 
 var printExtension = Extension{
 	Name: "print",
-	Man:  "[builtin: (print 1 2 (lambda x (add x 1))) - print]",
+	Man:  "{builtin: (print 1 2 (lambda x (add x 1))) - print}",
 	Exec: func(ctx context.Context, values ...Object) adt.Result[Object] {
 		for i, v := range values {
 			fmt.Print(v)
@@ -19,5 +19,13 @@ var printExtension = Extension{
 		}
 		fmt.Println()
 		return value(nil)
+	},
+}
+
+var typeExtension = Extension{
+	Name: "type",
+	Man:  "{builtin: (print 1 2 (lambda x (add x 1))) - get type in list of strings}",
+	Exec: func(ctx context.Context, values ...Object) adt.Result[Object] {
+
 	},
 }

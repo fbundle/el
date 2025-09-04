@@ -38,7 +38,7 @@ func NewBasicRuntime() (Runtime, Frame) {
 			Load("true", True).Load("false", False).
 			LoadExtension(eqExtension, neExtension, ltExtension, leExtension, gtExtension, geExtension).
 			LoadExtension(addExtension, subExtension, mulExtension, divExtension, modExtension).
-			LoadExtension(printExtension)
+			LoadExtension(printExtension, typeExtension)
 
 	return r, f.frame
 }
