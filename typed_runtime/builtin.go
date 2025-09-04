@@ -3,12 +3,10 @@ package runtime
 import (
 	"context"
 	"el/ast"
-	"el/sorts"
 	"errors"
 	"fmt"
 	"reflect"
 	"strings"
-	"testing/quick"
 
 	"github.com/fbundle/lab_public/lab/go_util/pkg/adt"
 )
@@ -182,10 +180,9 @@ func makeLambdaExec(paramList []Name, body ast.Expr, closure Frame) Exec {
 			return resultErr(err)
 		}
 		// 2. add params to closure
-		zip(paramList, argList, func(param Name, arg Object) bool {
+		for param, arg := range zip(paramList, argList) {
 			closure = closure.Set(param, arg)
-			return true
-		})
+		}
 
 		if len(argList) > len(paramList) {
 			// 3. too many arguments
@@ -201,10 +198,10 @@ func makeLambdaExec(paramList []Name, body ast.Expr, closure Frame) Exec {
 			if err := r.Step(ctx, closure, body).Unwrap(&o); err != nil {
 				return resultErr(err)
 			}
-			return value(o)
+			return resultObj(o)
 		} else {
 			// 3. currying
-			return value(makeFunction(paramList[len(argList):], body, closure))
+			return resultObj(makeFunction(paramList[len(argList):], body, closure))
 		}
 	}
 }

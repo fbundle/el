@@ -28,13 +28,13 @@ func makeData(data Data, parent Object) Object {
 	}
 }
 
-func makeWeakestType(length int) Object {
+func makeWeakestType(numParams int) Object {
 	// every type of this length can be cast into this type
-	if length < 1 {
+	if numParams < 0 {
 		panic("type_error")
 	}
 	var ss []sorts.Sort
-	for i := 0; i < length-1; i++ {
+	for i := 0; i < numParams; i++ {
 		ss = append(ss, sorts.MustAtom(_typeLevel, sorts.Terminal, nil))
 	}
 	ss = append(ss, sorts.MustAtom(_typeLevel, sorts.Initial, nil))
