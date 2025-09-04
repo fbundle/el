@@ -55,12 +55,12 @@ func (s chain) Parent() Sort {
 	}
 }
 
-func (s chain) Len() int {
+func (s chain) Length() int {
 	return len(s.params.Repr()) + 1
 }
 
 func (s chain) LE(dst Sort) bool {
-	if s.Len() != dst.Len() || s.Level() != dst.Level() {
+	if s.Length() != dst.Length() || s.Level() != dst.Level() {
 		return false
 	}
 	var d chain

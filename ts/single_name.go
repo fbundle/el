@@ -33,12 +33,12 @@ func (s singleName) Parent() Sort {
 	}
 }
 
-func (s singleName) Len() int {
+func (s singleName) Length() int {
 	return 1
 }
 
 func (s singleName) LE(dst Sort) bool {
-	if s.Len() != dst.Len() || s.Level() != dst.Level() {
+	if s.Length() != dst.Length() || s.Level() != dst.Level() {
 		return false
 	}
 	return le(s.String(), dst.String())
