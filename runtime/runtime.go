@@ -75,7 +75,7 @@ func (r Runtime) Step(ctx context.Context, frame Frame, e ast.Expr) adt.Result[O
 		if ok := adt.Cast[Function](cmdObject).Unwrap(&funcObject); !ok {
 			return errValue(ErrorCannotExecuteExpression(e))
 		}
-		return funcObject.exec(r, ctx, frame, cmd.argList)
+		return funcObject.exec(r, ctx, frame, cmd.argExprList)
 
 	default:
 		return errValue(ErrorUnknownExpression(e))
@@ -83,9 +83,9 @@ func (r Runtime) Step(ctx context.Context, frame Frame, e ast.Expr) adt.Result[O
 }
 
 // stepAndUnwrapArgs executes the argument expressions and unwraps the results
-func (r Runtime) stepAndUnwrapArgs(ctx context.Context, frame Frame, argList []ast.Expr) adt.Result[[]Object] {
-	args := make([]Object, len(argList))
-	for i, e := range argList {
+func (r Runtime) stepAndUnwrapArgs(ctx context.Context, frame Frame, argExprList []ast.Expr) adt.Result[[]Object] {
+	args := make([]Object, len(argExprList))
+	for i, e := range argExprList {
 		if err := r.Step(ctx, frame, e).Unwrap(&args[i]); err != nil {
 			return adt.Err[[]Object](err)
 		}

@@ -7,7 +7,7 @@ import (
 	"github.com/fbundle/lab_public/lab/go_util/pkg/adt"
 )
 
-type Exec = func(r Runtime, ctx context.Context, frame Frame, argList []ast.Expr) adt.Result[Object]
+type Exec = func(r Runtime, ctx context.Context, frame Frame, argExprList []ast.Expr) adt.Result[Object]
 
 type Object interface {
 	String() string

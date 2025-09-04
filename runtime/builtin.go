@@ -32,15 +32,15 @@ var builtinObject = map[Name]Object{
 
 var letFunc = Function{
 	repr: "{builtin: (let x 3) - assign value 3 to local variable x}",
-	exec: func(r Runtime, ctx context.Context, frame Frame, argList []ast.Expr) adt.Result[Object] {
-		if len(argList) < 1 || len(argList)%2 != 1 {
+	exec: func(r Runtime, ctx context.Context, frame Frame, argExprList []ast.Expr) adt.Result[Object] {
+		if len(argExprList) < 1 || len(argExprList)%2 != 1 {
 			return errValueString("let requires at least 1 arguments and odd number of arguments")
 		}
 
 		var lvalue ast.Name
 		var rvalue Object
-		for i := 0; i < len(argList)-1; i += 2 {
-			lexpr, rexpr := argList[i], argList[i+1]
+		for i := 0; i < len(argExprList)-1; i += 2 {
+			lexpr, rexpr := argExprList[i], argExprList[i+1]
 			if ok := adt.Cast[ast.Name](lexpr).Unwrap(&lvalue); !ok {
 				return errValueString(fmt.Sprintf("lvalue must be a Name: %s", lexpr.String()))
 			}
@@ -49,24 +49,24 @@ var letFunc = Function{
 			}
 			frame = frame.Set(Name(lvalue), rvalue)
 		}
-		return r.Step(ctx, frame, argList[len(argList)-1])
+		return r.Step(ctx, frame, argExprList[len(argExprList)-1])
 	},
 }
 
 var matchFunc = Function{
 	repr: "{builtin: (match x 1 2 3 4 5) - match, if x=1 then return 2, if x=3 the return 4, otherwise return 5",
-	exec: func(r Runtime, ctx context.Context, frame Frame, argList []ast.Expr) adt.Result[Object] {
-		if len(argList) < 2 || len(argList)%2 != 0 {
+	exec: func(r Runtime, ctx context.Context, frame Frame, argExprList []ast.Expr) adt.Result[Object] {
+		if len(argExprList) < 2 || len(argExprList)%2 != 0 {
 			return errValueString("match requires at least 2 arguments and even number of arguments")
 		}
 		var cond Object
-		if err := r.Step(ctx, frame, argList[0]).Unwrap(&cond); err != nil {
+		if err := r.Step(ctx, frame, argExprList[0]).Unwrap(&cond); err != nil {
 			return errValue(err)
 		}
 
-		var finalRexpr = argList[len(argList)-1]
-		for i := 1; i < len(argList)-1; i += 2 {
-			lexpr, rexpr := argList[i], argList[i+1]
+		var finalRexpr = argExprList[len(argExprList)-1]
+		for i := 1; i < len(argExprList)-1; i += 2 {
+			lexpr, rexpr := argExprList[i], argExprList[i+1]
 			var comp Object
 			if err := r.Step(ctx, frame, lexpr).Unwrap(&comp); err != nil {
 				return errValue(err)
@@ -86,22 +86,22 @@ var matchFunc = Function{
 
 var lambdaFunc = Function{
 	repr: "{builtin: (lambda x y (add x y) - declare a function}",
-	exec: func(r Runtime, ctx context.Context, frame Frame, argList []ast.Expr) adt.Result[Object] {
-		if len(argList) < 1 {
+	exec: func(r Runtime, ctx context.Context, frame Frame, argExprList []ast.Expr) adt.Result[Object] {
+		if len(argExprList) < 1 {
 			return errValueString("lambda requires at least 1 arguments")
 		}
 
-		paramList := make([]Name, 0, len(argList)-1)
+		paramList := make([]Name, 0, len(argExprList)-1)
 		var lvalue ast.Name
-		for i := 0; i < len(argList)-1; i++ {
-			lexpr := argList[i]
+		for i := 0; i < len(argExprList)-1; i++ {
+			lexpr := argExprList[i]
 			if ok := adt.Cast[ast.Name](lexpr).Unwrap(&lvalue); !ok {
 				return errValueString(fmt.Sprintf("lvalue must be a Name: %s", lexpr.String()))
 			}
 			paramList = append(paramList, Name(lvalue))
 		}
 
-		body := argList[len(argList)-1]
+		body := argExprList[len(argExprList)-1]
 		closure := frame
 		for _, name := range paramList {
 			closure = closure.Del(name) // remove all the parameters from the local
@@ -127,26 +127,25 @@ func makeLambdaRepr(paramList []Name, body ast.Expr, closure Frame) string {
 }
 
 func makeLambdaExec(paramList []Name, body ast.Expr, closure Frame) Exec {
-	return func(r Runtime, ctx context.Context, frame Frame, argList []ast.Expr) adt.Result[Object] {
+	return func(r Runtime, ctx context.Context, frame Frame, argExprList []ast.Expr) adt.Result[Object] {
 		/*
 			for recursive function, the name of that function is in `frame`
 		*/
 
 		// 1. evaluate arguments
-		var args []Object
-		if err := r.stepAndUnwrapArgs(ctx, frame, argList).Unwrap(&args); err != nil {
+		var argList []Object
+		if err := r.stepAndUnwrapArgs(ctx, frame, argExprList).Unwrap(&argList); err != nil {
 			return errValue(err)
 		}
 		// 2. add params to closure
-		if len(args) > len(paramList) {
-			return errValue(ErrorTooManyArguments)
-		}
-		for i, arg := range args {
-			param := paramList[i]
+		zip(paramList, argList, func(param Name, arg Object) bool {
 			closure = closure.Set(param, arg)
-		}
+			return true
+		})
 
-		if len(args) >= len(paramList) {
+		if len(argList) > len(paramList) {
+			return errValue(ErrorTooManyArguments)
+		} else if len(argList) == len(paramList) {
 			// 3. add environment frame into closure and make call
 			for k, v := range frame.Iter {
 				if _, ok := closure.Get(k); !ok {
@@ -160,7 +159,16 @@ func makeLambdaExec(paramList []Name, body ast.Expr, closure Frame) Exec {
 			return value(o)
 		} else {
 			// 3. currying
-			return value(makeFunction(paramList[len(args):], body, closure))
+			return value(makeFunction(paramList[len(argList):], body, closure))
+		}
+	}
+}
+
+func zip[T1 any, T2 any](l1 []T1, l2 []T2, yield func(T1, T2) bool) {
+	length := min(len(l1), len(l2))
+	for i := 0; i < length; i++ {
+		if ok := yield(l1[i], l2[i]); !ok {
+			return
 		}
 	}
 }

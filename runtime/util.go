@@ -20,8 +20,8 @@ func errValueString(msg string) adt.Result[Object] {
 }
 
 type cmd struct {
-	cmdExpr ast.Expr
-	argList []ast.Expr
+	cmdExpr     ast.Expr
+	argExprList []ast.Expr
 }
 
 func getCmd(e ast.Lambda) adt.Option[cmd] {
@@ -29,7 +29,7 @@ func getCmd(e ast.Lambda) adt.Option[cmd] {
 		return adt.None[cmd]()
 	}
 	return adt.Some(cmd{
-		cmdExpr: e[0],
-		argList: e[1:],
+		cmdExpr:     e[0],
+		argExprList: e[1:],
 	})
 }
