@@ -2,8 +2,6 @@ package ts
 
 import "github.com/fbundle/lab_public/lab/go_util/pkg/adt"
 
-const TypeName = "type"
-
 func MustSingleName(level int, name string) Sort {
 	var sort Sort
 	if ok := SingleName(level, name).Unwrap(&sort); !ok {
@@ -43,7 +41,7 @@ func (s singleName) String() string {
 func (s singleName) Type() Sort {
 	return singleName{
 		level: s.level + 1,
-		name:  TypeName,
+		name:  DefaultSortName,
 	}
 }
 

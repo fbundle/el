@@ -55,7 +55,7 @@ func (s chain) String() string {
 func (s chain) Type() Sort {
 	return singleName{
 		level: s.Level() + 1,
-		name:  TypeName,
+		name:  DefaultSortName,
 	}
 }
 

@@ -87,6 +87,9 @@ func main() {
 	weak3 := weakestType(3)
 	strong3 := strongestType(3)
 
+	weak3Sort := makeData(newData(nil), weak3)
+	strong3Sort := makeData(newData(nil), strong3)
+
 	ts.AddRule("bool", "int") // cast bool -> int
 	fmt.Println("[bool] can be cast into [int]")
 
@@ -106,6 +109,6 @@ func main() {
 
 	printCast(trueSort, intType)
 	printCast(oneSort, boolType)
-	printCast(add, weak3)
-	printCast(add, strong3)
+	printCast(weak3Sort, add.Type())
+	printCast(strong3Sort, add.Type())
 }
