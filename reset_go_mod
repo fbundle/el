@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+path=$(realpath .)
+proj=$(basename $path)
+
+echo $proj
+
+rm -rf go.mod
+export GOPROXY=direct
+go mod init $proj
+go mod tidy
+go mod vendor
+
