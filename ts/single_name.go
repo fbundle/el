@@ -3,31 +3,19 @@ package ts
 import "github.com/fbundle/lab_public/lab/go_util/pkg/adt"
 
 func MustSingleName(level int, name string) Sort {
-	var sort Sort
-	if ok := SingleName(level, name).Unwrap(&sort); !ok {
-		panic("type_error")
-	}
-	return sort
-}
-
-func SingleName(level int, name string) adt.Option[Sort] {
-	return adt.Some[Sort](singleName{
+	return singleName{
 		level: level,
 		name:  name,
-	})
+	}
 }
 
-// singleName - representing all single sorts with level >= 1
+// singleName - representing all single sorts
 // this is a helper since with only singleData, one needs infinitely many objects to construct
 // level 1: Int, Bool
 // level 2: Type
 type singleName struct {
 	level int
 	name  string
-}
-
-func (s singleName) Data() adt.Option[Data] {
-	return adt.None[Data]()
 }
 
 func (s singleName) Level() int {
@@ -38,23 +26,18 @@ func (s singleName) String() string {
 	return s.name
 }
 
-func (s singleName) Type() Sort {
+func (s singleName) Parent() Sort {
 	return singleName{
 		level: s.level + 1,
 		name:  DefaultSortName,
 	}
 }
 
-func (s singleName) Cast(parent Sort) adt.Option[Sort] {
-	// cannot cast sort of name
-	return adt.None[Sort]()
-}
-
 func (s singleName) Len() int {
 	return 1
 }
 
-func (s singleName) le(dst Sort) bool {
+func (s singleName) LE(dst Sort) bool {
 	if s.Len() != dst.Len() || s.Level() != dst.Level() {
 		return false
 	}

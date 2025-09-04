@@ -31,10 +31,6 @@ type chain struct {
 	body   Sort
 }
 
-func (s chain) Data() adt.Option[Data] {
-	return adt.None[Data]()
-}
-
 func (s chain) Level() int {
 	level := s.body.Level()
 	for _, param := range s.params.Repr() {
@@ -52,23 +48,18 @@ func (s chain) String() string {
 	return "{" + strings.Join(strList, " -> ") + "}"
 }
 
-func (s chain) Type() Sort {
+func (s chain) Parent() Sort {
 	return singleName{
 		level: s.Level() + 1,
 		name:  DefaultSortName,
 	}
 }
 
-func (s chain) Cast(parent Sort) adt.Option[Sort] {
-	// cannot cast sort of chain
-	return adt.None[Sort]()
-}
-
 func (s chain) Len() int {
 	return len(s.params.Repr()) + 1
 }
 
-func (s chain) le(dst Sort) bool {
+func (s chain) LE(dst Sort) bool {
 	if s.Len() != dst.Len() || s.Level() != dst.Level() {
 		return false
 	}
@@ -80,14 +71,14 @@ func (s chain) le(dst Sort) bool {
 	for i := 0; i < length; i++ {
 		sParam := s.params.Repr()[i]
 		dParam := d.params.Repr()[i]
-		if !dParam.le(sParam) {
+		if !dParam.LE(sParam) {
 			// reverse cast - similar to contravariant functor
 			// {int} can be cast into {any}
 			// {any -> int} can be cast into {int -> int}
 			return false
 		}
 	}
-	return s.body.le(d.body)
+	return s.body.LE(d.body)
 }
 
 func (s chain) prepend(param Sort) Sort {

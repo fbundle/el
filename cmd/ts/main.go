@@ -32,16 +32,16 @@ func makeData(data ts.Data, dtype ts.Sort) ts.Sort {
 
 func printSorts(sorts ...ts.Sort) {
 	for _, sort := range sorts {
-		fmt.Printf("[%s] is of type [%s]\n", sort.String(), sort.Type().String())
+		fmt.Printf("[%s] is of type [%s]\n", sort.String(), sort.Parent().String())
 	}
 }
 func printCast(value1 ts.Sort, type2 ts.Sort) {
 	ok := value1.Cast(type2).Ok
 
 	if ok {
-		fmt.Printf("value [%s] of type [%s] CAN be cast into [%s]\n", value1, value1.Type(), type2)
+		fmt.Printf("value [%s] of type [%s] CAN be cast into [%s]\n", value1, value1.Parent(), type2)
 	} else {
-		fmt.Printf("value [%s] of type [%s] CANNOT be cast into [%s]\n", value1, value1.Type(), type2)
+		fmt.Printf("value [%s] of type [%s] CANNOT be cast into [%s]\n", value1, value1.Parent(), type2)
 	}
 }
 
@@ -109,6 +109,6 @@ func main() {
 
 	printCast(trueSort, intType)
 	printCast(oneSort, boolType)
-	printCast(weak3Sort, add.Type())
-	printCast(strong3Sort, add.Type())
+	printCast(weak3Sort, add.Parent())
+	printCast(strong3Sort, add.Parent())
 }
