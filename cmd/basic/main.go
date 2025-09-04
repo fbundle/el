@@ -48,21 +48,6 @@ var program = `
 	))
 	_ (print "evens and odds:" [(odd 10) (even 10) (odd 11) (even 11) (odd 12) (even 12)])
 
-	# type system
-	_ (print "some types" (let
-		x 1
-		y (list 1 2 3)
-		z (lambda x {x+y})
-		x1 (type x)
-		y1 (type y)
-		z1 (type z)
-		x2 (type (type x))
-		x3 (type (type (type x)))
-		t (type type)
-
-		[x y z x1 y1 z1 x2 x3 t]
-	))
-
 	# weird implementation
 	_ (print (let
 			f (lambda x (add x y))
@@ -72,7 +57,6 @@ var program = `
 
 	# nil
 	_ (print (list () nil))
-	_ (print "type(nil)=" (type nil))
 	_ (print "empty()=" ())
 
 	# simple match sanity
@@ -82,21 +66,6 @@ var program = `
 	# arrow function 
 	_ (print "arrow function:" {x y => {x + y}})
 
-	# type check
-	function (type (lambda 1))
-	nil_type (type nil)
-	is_func (lambda x (match (type x)
-		function	true
-					false
-	))
-	is_nil_type (lambda x (match (type x)
-		nil_type	true
-					false
-	))
-
-	_ (print (is_func (lambda x x)) (is_func 1))
-	_ (print (is_nil_type nil) (is_func 1))
-	
 	nil
 )`
 

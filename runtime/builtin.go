@@ -22,25 +22,10 @@ func init() {
 }
 
 var builtinObject = map[Name]Object{
-	"type":   typeFunc,
 	"let":    letFunc,
 	"match":  matchFunc,
 	"lambda": lambdaFunc,
 	"nil":    Nil{},
-}
-
-var typeFunc = Function{
-	repr: "{builtin: (type (list 1 2 3)) - get the type of an arbitrary object}",
-	exec: func(r Runtime, ctx context.Context, frame Frame, argList []ast.Expr) adt.Result[Object] {
-		if len(argList) != 1 {
-			return errValueString("type requires 1 argument")
-		}
-		var v Object
-		if err := r.Step(ctx, frame, argList[0]).Unwrap(&v); err != nil {
-			return errValue(err)
-		}
-		return value(v.Type())
-	},
 }
 
 var letFunc = Function{
