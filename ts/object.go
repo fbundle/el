@@ -2,67 +2,67 @@ package ts
 
 import "github.com/fbundle/lab_public/lab/go_util/pkg/adt"
 
-func MustSingle(level int, name string, parent Sort) Sort {
+func MustObject(level int, name string, parent Sort) Sort {
 	var sort Sort
-	if ok := Single(level, name, parent).Unwrap(&sort); !ok {
+	if ok := Object(level, name, parent).Unwrap(&sort); !ok {
 		panic("type_error")
 	}
 	return sort
 }
 
-func Single(level int, name string, parent Sort) adt.Option[Sort] {
+func Object(level int, name string, parent Sort) adt.Option[Sort] {
 	if parent != nil && level+1 != parent.Level() {
 		// if parent is specified, then its level must be valid
 		return adt.None[Sort]()
 	}
-	return adt.Some[Sort](single{
+	return adt.Some[Sort](object{
 		level:  level,
 		name:   name,
 		parent: parent,
 	})
 }
 
-// single - representing all single sorts
+// object - representing all primitive sorts
 // level 1: Int, Bool
 // level 2: Type
-type single struct {
+type object struct {
 	level  int
 	name   string
 	parent Sort
 }
 
-func (s single) Level() int {
+func (s object) Level() int {
 	return s.level
 }
 
-func (s single) String() string {
+func (s object) String() string {
 	return s.name
 }
 
-func (s single) Parent() Sort {
+func (s object) Parent() Sort {
 	if s.parent != nil {
 		return s.parent
 	}
 	// default parent - must have this to avoid infinity
-	return single{
+	return object{
 		level: s.level + 1,
 		name:  DefaultSortName,
 	}
 }
 
-func (s single) Length() int {
+func (s object) Length() int {
 	return 1
 }
 
-func (s single) LessEqual(dst Sort) bool {
+func (s object) LessEqual(dst Sort) bool {
 	if s.Length() != dst.Length() || s.Level() != dst.Level() {
 		return false
 	}
 	return le(s.String(), dst.String())
 }
 
-func (s single) prepend(param Sort) Sort {
-	return chain{
+func (s object) prepend(param Sort) Sort {
+	return morphism{
 		params: adt.MustNonEmpty([]Sort{param}),
 		body:   s,
 	}

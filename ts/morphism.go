@@ -6,15 +6,15 @@ import (
 	"github.com/fbundle/lab_public/lab/go_util/pkg/adt"
 )
 
-func MustChain(sorts ...Sort) Sort {
+func MustMorphism(sorts ...Sort) Sort {
 	var sort Sort
-	if ok := Chain(sorts...).Unwrap(&sort); !ok {
+	if ok := Morphism(sorts...).Unwrap(&sort); !ok {
 		panic("type_error")
 	}
 	return sort
 }
 
-func Chain(sorts ...Sort) adt.Option[Sort] {
+func Morphism(sorts ...Sort) adt.Option[Sort] {
 	if len(sorts) == 0 {
 		return adt.None[Sort]()
 	}
@@ -25,13 +25,13 @@ func Chain(sorts ...Sort) adt.Option[Sort] {
 	return adt.Some[Sort](sort)
 }
 
-// chain - represent arrow type A -> B -> C
-type chain struct {
+// morphism - represent arrow type A -> B -> C
+type morphism struct {
 	params adt.NonEmptySlice[Sort]
 	body   Sort
 }
 
-func (s chain) Level() int {
+func (s morphism) Level() int {
 	level := s.body.Level()
 	for _, param := range s.params.Repr() {
 		level = max(level, param.Level())
@@ -39,7 +39,7 @@ func (s chain) Level() int {
 	return level
 }
 
-func (s chain) String() string {
+func (s morphism) String() string {
 	strList := make([]string, 0, len(s.params.Repr())+1)
 	for _, param := range s.params.Repr() {
 		strList = append(strList, param.String())
@@ -48,23 +48,23 @@ func (s chain) String() string {
 	return "{" + strings.Join(strList, " -> ") + "}"
 }
 
-func (s chain) Parent() Sort {
-	return single{
+func (s morphism) Parent() Sort {
+	return object{
 		level: s.Level() + 1,
 		name:  DefaultSortName,
 	}
 }
 
-func (s chain) Length() int {
+func (s morphism) Length() int {
 	return len(s.params.Repr()) + 1
 }
 
-func (s chain) LessEqual(dst Sort) bool {
+func (s morphism) LessEqual(dst Sort) bool {
 	if s.Length() != dst.Length() || s.Level() != dst.Level() {
 		return false
 	}
-	var d chain
-	if ok := adt.Cast[chain](dst).Unwrap(&d); !ok {
+	var d morphism
+	if ok := adt.Cast[morphism](dst).Unwrap(&d); !ok {
 		return false
 	}
 	length := len(s.params.Repr())
@@ -81,8 +81,8 @@ func (s chain) LessEqual(dst Sort) bool {
 	return s.body.LessEqual(d.body)
 }
 
-func (s chain) prepend(param Sort) Sort {
-	return chain{
+func (s morphism) prepend(param Sort) Sort {
+	return morphism{
 		params: adt.MustNonEmpty[Sort](append([]Sort{param}, s.params.Repr()...)),
 		body:   s.body,
 	}

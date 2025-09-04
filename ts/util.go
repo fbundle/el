@@ -1,10 +1,10 @@
 package ts
 
 const (
-	// Initial - Initial can be cast into any type, it has a no value or a single zero value depends on the category
+	// Initial - Initial can be cast into any type, it has a no value or a object zero value depends on the category
 	Initial = "unit"
-	// Final - every type can be cast into Final, it is like Any
-	Final = "any"
+	// Terminal - every type can be cast into Terminal, it is like Any
+	Terminal = "any"
 )
 
 type rule struct {
@@ -19,7 +19,7 @@ func AddRule(src string, dst string) {
 }
 
 func le(src string, dst string) bool {
-	if src == Initial || dst == Final {
+	if src == Initial || dst == Terminal {
 		return true
 	}
 	if src == dst {

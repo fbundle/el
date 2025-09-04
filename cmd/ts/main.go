@@ -10,7 +10,7 @@ const (
 )
 
 func makeNameType(typeName string) ts.Sort {
-	return ts.MustSingle(typeLevel, typeName, nil)
+	return ts.MustObject(typeLevel, typeName, nil)
 }
 
 func printSorts(sorts ...ts.Sort) {
@@ -35,11 +35,11 @@ func strongestType(length int) ts.Sort {
 	}
 	var sorts []ts.Sort
 	for i := 0; i < length-1; i++ {
-		sorts = append(sorts, ts.MustSingle(typeLevel, ts.Initial, nil))
+		sorts = append(sorts, ts.MustObject(typeLevel, ts.Initial, nil))
 	}
-	sorts = append(sorts, ts.MustSingle(typeLevel, ts.Final, nil))
+	sorts = append(sorts, ts.MustObject(typeLevel, ts.Terminal, nil))
 
-	return ts.MustChain(sorts...)
+	return ts.MustMorphism(sorts...)
 }
 
 func weakestType(length int) ts.Sort {
@@ -49,22 +49,22 @@ func weakestType(length int) ts.Sort {
 	}
 	var sorts []ts.Sort
 	for i := 0; i < length-1; i++ {
-		sorts = append(sorts, ts.MustSingle(typeLevel, ts.Final, nil))
+		sorts = append(sorts, ts.MustObject(typeLevel, ts.Terminal, nil))
 	}
-	sorts = append(sorts, ts.MustSingle(typeLevel, ts.Initial, nil))
+	sorts = append(sorts, ts.MustObject(typeLevel, ts.Initial, nil))
 
-	return ts.MustChain(sorts...)
+	return ts.MustMorphism(sorts...)
 }
 
 func main() {
-	fmt.Printf("anything can be cast into [%s]\n", ts.Final)
+	fmt.Printf("anything can be cast into [%s]\n", ts.Terminal)
 	fmt.Printf("[%s] can be cast into anything\n", ts.Initial)
 
 	intType := makeNameType("int")
 	boolType := makeNameType("bool")
 	stringType := makeNameType("string")
-	intIntType := ts.MustChain(intType, intType)
-	intIntIntType := ts.MustChain(intType, intType, intType)
+	intIntType := ts.MustMorphism(intType, intType)
+	intIntIntType := ts.MustMorphism(intType, intType, intType)
 	weak1 := weakestType(1)
 	strong1 := strongestType(1)
 	weak3 := weakestType(3)
