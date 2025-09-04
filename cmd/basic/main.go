@@ -88,7 +88,8 @@ func testRuntime() {
 		}
 		fmt.Println("expr\t", e)
 		if err := r.Step(ctx, s, e).Unwrap(&o); err != nil {
-			panic(err)
+			fmt.Println("error\t", err)
+			return
 		}
 		fmt.Println("output\t", o)
 		fmt.Println()

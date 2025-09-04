@@ -11,6 +11,8 @@ import (
 	"github.com/fbundle/lab_public/lab/go_util/pkg/adt"
 )
 
+var ErrorTooManyArguments = errors.New("too many arguments")
+
 var BuiltinFrame Frame
 
 func init() {
@@ -105,11 +107,15 @@ var lambdaFunc = Function{
 			closure = closure.Del(name) // remove all the parameters from the local
 		}
 
-		return value(Function{
-			repr: makeLambdaRepr(paramList, body, closure),
-			exec: makeLambdaExec(paramList, body, closure),
-		})
+		return value(makeFunction(paramList, body, closure))
 	},
+}
+
+func makeFunction(paramList []Name, body ast.Expr, closure Frame) Function {
+	return Function{
+		repr: makeLambdaRepr(paramList, body, closure),
+		exec: makeLambdaExec(paramList, body, closure),
+	}
 }
 
 func makeLambdaRepr(paramList []Name, body ast.Expr, closure Frame) string {
@@ -125,34 +131,37 @@ func makeLambdaExec(paramList []Name, body ast.Expr, closure Frame) Exec {
 		/*
 			for recursive function, the name of that function is in `frame`
 		*/
-		// 0. sanity check
-		if len(argList) < len(paramList) {
-			return errValue(ErrorNotEnoughArguments)
-		}
+
 		// 1. evaluate arguments
 		var args []Object
 		if err := r.stepAndUnwrapArgs(ctx, frame, argList).Unwrap(&args); err != nil {
 			return errValue(err)
 		}
-		// 2. make the call frame
-		// for non-recursive function, callFrame = closure + params
-		// for recursive function, callFrame = frame + closure + params
-		callFrame := closure
-		for k, v := range frame.Iter {
-			if _, ok := callFrame.Get(k); !ok {
-				callFrame = callFrame.Set(k, v)
+		// 2. add params to closure
+		if len(args) > len(paramList) {
+			return errValue(ErrorTooManyArguments)
+		}
+		for i, arg := range args {
+			param := paramList[i]
+			closure = closure.Set(param, arg)
+		}
+
+		if len(args) >= len(paramList) {
+			// 3. add environment frame into closure and make call
+			for k, v := range frame.Iter {
+				if _, ok := closure.Get(k); !ok {
+					closure = closure.Set(k, v)
+				}
 			}
+			var o Object
+			if err := r.Step(ctx, closure, body).Unwrap(&o); err != nil {
+				return errValue(err)
+			}
+			return value(o)
+		} else {
+			// 3. currying
+			return value(makeFunction(paramList[len(args):], body, closure))
 		}
-		for i := 0; i < len(paramList); i++ {
-			param, arg := paramList[i], args[i]
-			callFrame = callFrame.Set(param, arg)
-		}
-		// 3. make call with new stack - signal tailcall to children
-		var o Object
-		if err := r.Step(ctx, callFrame, body).Unwrap(&o); err != nil {
-			return errValue(err)
-		}
-		return value(o)
 	}
 }
 

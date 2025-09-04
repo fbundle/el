@@ -22,7 +22,6 @@ var ErrorUnknownExpression = func(e ast.Expr) error {
 var ErrorCannotExecuteExpression = func(e ast.Expr) error {
 	return fmt.Errorf("expression cannot be executed: %s", e.String())
 }
-var ErrorNotEnoughArguments = errors.New("not enough arguments")
 
 type Runtime struct {
 	ParseLiteral func(lit string) adt.Result[Object]
