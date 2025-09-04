@@ -85,17 +85,6 @@
     _ (print "Grade for 95:" (grade 95))
     _ (print "Grade for 75:" (grade 75))
 
-    # 8. Type System
-    _ (print "\n8. Type System:")
-    _ (print "Type of nil:" (type nil))
-    _ (print "Type of 42:" (type 42))
-    _ (print "Type of 'hello':" (type "hello"))
-    _ (print "Type of [1 2 3]:" (type [1 2 3]))
-    _ (print "Type of true:" (type true))
-    _ (print "Type of lambda:" (type (lambda x x)))
-    _ (print "Type of type:" (type (type nil)))
-    _ (print "Type of type of type:" (type (type (type nil))))
-
     # 9. Advanced List Operations
     # _ (print "\n9. Advanced List Operations:")
     # Zip two lists
