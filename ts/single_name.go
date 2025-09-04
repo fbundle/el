@@ -62,7 +62,7 @@ func (s singleName) Len() int {
 }
 
 func (s singleName) le(dst Sort) bool {
-	if s.Len() != s.Len() || s.Level() != dst.Level() {
+	if s.Len() != dst.Len() || s.Level() != dst.Level() {
 		return false
 	}
 	return le(s.String(), dst.String())
