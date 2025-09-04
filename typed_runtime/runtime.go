@@ -36,11 +36,11 @@ var ErrorCannotExecuteExpression = func(e ast.Expr) error {
 func (r Runtime) Step(ctx context.Context, frame Frame, e ast.Expr) adt.Result[Object] {
 	deadline, ok := ctx.Deadline()
 	if ok && time.Now().After(deadline) {
-		return errValue(ErrorTimeout)
+		return resultErr(ErrorTimeout)
 	}
 	select {
 	case <-ctx.Done():
-		return errValue(ErrorInterrupt)
+		return resultErr(ErrorInterrupt)
 	default:
 	}
 
@@ -64,26 +64,26 @@ func (r Runtime) Step(ctx context.Context, frame Frame, e ast.Expr) adt.Result[O
 		name := Name(e)
 		var o Object
 		if ok := r.resolveName(frame, name).Unwrap(&o); !ok {
-			return errValue(ErrorNameNotFound(name))
+			return resultErr(ErrorNameNotFound(name))
 		}
-		return objValue(o)
+		return resultObj(o)
 	case ast.Lambda:
 		var cmd cmd
 		if ok := getCmd(e).Unwrap(&cmd); !ok {
-			return dataValue(Nil{}, NilType) // empty expression
+			return resultData(Nil{}, NilType) // empty expression
 		}
 		var cmdObject Object
 		if err := r.Step(ctx, frame, cmd.cmdExpr).Unwrap(&cmdObject); err != nil {
-			return errValue(err)
+			return resultErr(err)
 		}
 		funcData, ok := cmdObject.Data().(FuncData)
 		if !ok {
-			return errValue(ErrorCannotExecuteExpression(e))
+			return resultErr(ErrorCannotExecuteExpression(e))
 		}
 		return funcData.exec(r, ctx, frame, cmd.argExprList)
 
 	default:
-		return errValue(ErrorUnknownExpression(e))
+		return resultErr(ErrorUnknownExpression(e))
 	}
 }
 
@@ -111,15 +111,18 @@ func (r Runtime) resolveName(frame Frame, name Name) adt.Option[Object] {
 	return adt.None[Object]()
 }
 
-func objValue(o Object) adt.Result[Object] {
+func resultObj(o Object) adt.Result[Object] {
 	return adt.Ok(o)
 }
-func dataValue(data Data, parent Object) adt.Result[Object] {
-	return adt.Ok(MakeData(data, parent))
+func resultData(data Data, parent Object) adt.Result[Object] {
+	return adt.Ok(makeData(data, parent))
 }
 
-func errValue(err error) adt.Result[Object] {
+func resultErr(err error) adt.Result[Object] {
 	return adt.Err[Object](err)
+}
+func resultErrStr(msg string) adt.Result[Object] {
+	return adt.Err[Object](errors.New(msg))
 }
 
 type cmd struct {

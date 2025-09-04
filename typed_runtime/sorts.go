@@ -6,26 +6,47 @@ import (
 	"github.com/fbundle/lab_public/lab/go_util/pkg/adt"
 )
 
+const _typeLevel = 1
+const _dataLevel = 0
+
 type Sort = sorts.Sort
 
-func MakeType(name string) Object {
-	const typeLevel = 1
+func makeType(name string) Object {
 	o := _object{
 		data:   nil,
-		sort:   sorts.MustAtom(typeLevel, name, nil),
+		sort:   sorts.MustAtom(_typeLevel, name, nil),
 		parent: nil, // default parent
 	}
 	return o
 }
 
-func MakeData(data Data, parent Object) Object {
-	const dataLevel = 0
-	o := _object{
+func makeData(data Data, parent Object) Object {
+	return _object{
 		data:   data,
-		sort:   sorts.MustAtom(dataLevel, data.String(), parent.Sort()),
+		sort:   sorts.MustAtom(_dataLevel, data.String(), parent.Sort()),
 		parent: parent.Sort(),
 	}
-	return o
+}
+
+func makeWeakestType(length int) Object {
+	// every type of this length can be cast into this type
+	if length < 1 {
+		panic("type_error")
+	}
+	var ss []sorts.Sort
+	for i := 0; i < length-1; i++ {
+		ss = append(ss, sorts.MustAtom(_typeLevel, sorts.Terminal, nil))
+	}
+	ss = append(ss, sorts.MustAtom(_typeLevel, sorts.Initial, nil))
+	s := sorts.MustArrow(ss...)
+
+	// convert sort to object
+	return _object{
+		data:   nil,
+		sort:   s,
+		parent: nil,
+	}
+
 }
 
 // _object - unorder-score means private, even in the same package
