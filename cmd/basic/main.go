@@ -66,6 +66,10 @@ var program = `
 	# arrow function 
 	_ (print "arrow function:" {x y => {x + y}})
 
+	# function unwrapping
+	f {x y => {x + y}}
+	_ (print "f 1" (f 1))
+
 	nil
 )`
 
