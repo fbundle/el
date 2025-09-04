@@ -66,9 +66,15 @@ var program = `
 	# arrow function 
 	_ (print "arrow function:" {x y => {x + y}})
 
-	# function currying
+	# builtin function currying
 	f {x y => {x + y}}
-	_ (print "f 1" (f 1))
+	_ (print "f 1 = " (f 1))
+	_ (print "(f 1) 2 = " ((f 1) 2))
+
+	# user-defined function currying
+	f {x y => {x + y}}
+	_ (print "f 1 = " (curry2 f 1))
+	_ (print "(f 1) 2 = " ((curry2 f 1) 2))
 
 	nil
 )`
@@ -128,6 +134,10 @@ map (lambda l f (match (len l)
 		(list first_elem2 $rest_elems2)
 	)
 ))
+
+# curry
+curry2  {f x => {y => (f x y)}}
+
 
 %s
 
