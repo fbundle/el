@@ -2,26 +2,30 @@ package runtime
 
 import (
 	"el/sorts"
+	"sync"
 
 	"github.com/fbundle/lab_public/lab/go_util/pkg/adt"
 )
 
 type Sort = sorts.Sort
 
-type TypePool interface {
+type ObjectPool interface {
 	Iter(yield func(name string, dtype Object) bool)
 	MakeType(name string) Object
 	MakeData(data Data, parent Object) Object
 }
 
-var Pool TypePool = &_sortDict{typeDict: make(map[string]Object)}
+var Pool ObjectPool = &_sortDict{objectDict: make(map[string]Object)}
 
 type _sortDict struct {
-	typeDict map[string]Object
+	mu         sync.RWMutex
+	objectDict map[string]Object
 }
 
 func (d *_sortDict) Iter(yield func(name string, dtype Object) bool) {
-	for name, obj := range d.typeDict {
+	d.mu.RLock()
+	defer d.mu.RUnlock()
+	for name, obj := range d.objectDict {
 		if ok := yield(name, obj); !ok {
 			return
 		}
@@ -35,17 +39,23 @@ func (d *_sortDict) MakeType(name string) Object {
 		sort:   sorts.MustAtom(typeLevel, name, nil),
 		parent: nil, // default parent
 	}
-	d.typeDict[name] = o
+	d.mu.Lock()
+	defer d.mu.Unlock()
+	d.objectDict[o.String()] = o
 	return o
 }
 
 func (d *_sortDict) MakeData(data Data, parent Object) Object {
 	const dataLevel = 0
-	return _object{
+	o := _object{
 		data:   data,
 		sort:   sorts.MustAtom(dataLevel, data.String(), parent.Sort()),
 		parent: parent.Sort(),
 	}
+	d.mu.Lock()
+	defer d.mu.Unlock()
+	d.objectDict[o.String()] = o
+	return o
 }
 
 // _object - unorder-score means private, even in the same package
