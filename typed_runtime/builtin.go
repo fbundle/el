@@ -48,9 +48,12 @@ var BuiltinFrame Frame
 
 func init() {
 	builtinObject := map[Name]Object{
-		"nil":      makeData(Nil{}, NilType),
-		"nil_type": NilType,
-		"let":      makeData(),
+		"nil_type":     NilType,
+		"builtin_type": BuiltinType,
+		"nil":          makeData(Nil{}, NilType),
+		"let":          makeData(letFunc, BuiltinType),
+		"match":        makeData(matchFunc, BuiltinType),
+		"lambda":       makeData(lambdaFunc, BuiltinType),
 	}
 	frame := Frame{}
 	for name, object := range builtinObject {
