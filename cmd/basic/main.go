@@ -4,8 +4,8 @@ import (
 	"context"
 	"el/ast"
 	"el/parser"
-	"el/runtime"
-	"el/runtime_ext"
+	runtime "el/typed_runtime"
+	runtime_ext "el/typed_runtime_ext"
 	"fmt"
 )
 
