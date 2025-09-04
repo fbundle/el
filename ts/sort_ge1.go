@@ -48,8 +48,8 @@ func (s sortGE1) Type() Sort {
 }
 
 func (s sortGE1) Cast(sort Sort) adt.Option[Sort] {
-	//TODO implement me
-	panic("implement me")
+	// cannot cast sort_1 or higher
+	return adt.None[Sort]()
 }
 
 func (s sortGE1) Chain() adt.NonEmptySlice[Sort] {
