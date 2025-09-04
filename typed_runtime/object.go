@@ -1,6 +1,8 @@
 package runtime
 
 import (
+	"el/sorts"
+
 	"github.com/fbundle/lab_public/lab/go_util/pkg/adt"
 )
 
@@ -16,12 +18,7 @@ type Object interface {
 	Cast(dtype Object) adt.Option[Object]
 }
 
-type Nil struct{}
-
-func (Nil) String() string {
-	return "nil"
-}
-
-var NilType = makeType("nil_type")
-
 var BuiltinType = makeType("builtin_type")
+
+var NilType = makeType(sorts.Initial)
+var AnyType = makeType(sorts.Terminal)

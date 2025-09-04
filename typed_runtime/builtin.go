@@ -3,6 +3,7 @@ package runtime
 import (
 	"context"
 	"el/ast"
+	"el/sorts"
 	"errors"
 	"fmt"
 	"reflect"
@@ -48,9 +49,9 @@ var BuiltinFrame Frame
 
 func init() {
 	builtinObject := map[Name]Object{
-		"nil_type":     NilType,
+		sorts.Initial:  NilType,
+		sorts.Terminal: AnyType,
 		"builtin_type": BuiltinType,
-		"nil":          makeData(Nil{}, NilType),
 		"let":          makeData(letFunc, BuiltinType),
 		"match":        makeData(matchFunc, BuiltinType),
 		"lambda":       makeData(lambdaFunc, BuiltinType),

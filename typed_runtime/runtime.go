@@ -70,7 +70,7 @@ func (r Runtime) Step(ctx context.Context, frame Frame, e ast.Expr) adt.Result[O
 	case ast.Lambda:
 		var cmd cmd
 		if ok := getCmd(e).Unwrap(&cmd); !ok {
-			return resultData(Nil{}, NilType) // empty expression
+			return resultData(nil, NilType) // empty expression
 		}
 		var cmdObject Object
 		if err := r.Step(ctx, frame, cmd.cmdExpr).Unwrap(&cmdObject); err != nil {
