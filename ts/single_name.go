@@ -23,7 +23,6 @@ func SingleName(level int, name string, parent Sort) adt.Option[Sort] {
 }
 
 // singleName - representing all single sorts
-// this is a helper since with only singleData, one needs infinitely many objects to construct
 // level 1: Int, Bool
 // level 2: Type
 type singleName struct {
@@ -44,6 +43,7 @@ func (s singleName) Parent() Sort {
 	if s.parent != nil {
 		return s.parent
 	}
+	// default parent - must have this to avoid infinity
 	return singleName{
 		level: s.level + 1,
 		name:  DefaultSortName,
