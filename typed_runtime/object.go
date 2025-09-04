@@ -23,7 +23,7 @@ func makeDataObject(data Data, parent Sort) object {
 	const dataLevel = 0
 	return object{
 		data:   data,
-		sort:   ts.MustSingleName(dataLevel, data.String()),
+		sort:   ts.MustSingle(dataLevel, data.String()),
 		parent: parent,
 	}
 }

@@ -10,7 +10,7 @@ const (
 )
 
 func makeNameType(typeName string) ts.Sort {
-	return ts.MustSingleName(typeLevel, typeName)
+	return ts.MustSingle(typeLevel, typeName)
 }
 
 func printSorts(sorts ...ts.Sort) {
@@ -35,9 +35,9 @@ func strongestType(length int) ts.Sort {
 	}
 	var sorts []ts.Sort
 	for i := 0; i < length-1; i++ {
-		sorts = append(sorts, ts.MustSingleName(typeLevel, ts.Initial))
+		sorts = append(sorts, ts.MustSingle(typeLevel, ts.Initial))
 	}
-	sorts = append(sorts, ts.MustSingleName(typeLevel, ts.Final))
+	sorts = append(sorts, ts.MustSingle(typeLevel, ts.Final))
 
 	return ts.MustChain(sorts...)
 }
@@ -49,9 +49,9 @@ func weakestType(length int) ts.Sort {
 	}
 	var sorts []ts.Sort
 	for i := 0; i < length-1; i++ {
-		sorts = append(sorts, ts.MustSingleName(typeLevel, ts.Final))
+		sorts = append(sorts, ts.MustSingle(typeLevel, ts.Final))
 	}
-	sorts = append(sorts, ts.MustSingleName(typeLevel, ts.Initial))
+	sorts = append(sorts, ts.MustSingle(typeLevel, ts.Initial))
 
 	return ts.MustChain(sorts...)
 }

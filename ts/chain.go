@@ -49,7 +49,7 @@ func (s chain) String() string {
 }
 
 func (s chain) Parent() Sort {
-	return singleName{
+	return single{
 		level: s.Level() + 1,
 		name:  DefaultSortName,
 	}
