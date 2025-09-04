@@ -36,6 +36,7 @@ var typeExtension = Extension{
 				f {(lambda x y {x + y}) : {int -> int -> int} }		# decorate anything with type
 				(typeof f)											# {int -> int -> int}
 			)
+			(f 1 2)													# type check before execution
 
 		*/
 	},
