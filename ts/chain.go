@@ -6,8 +6,13 @@ var _ Sort = chain{}
 
 // chain - represent arrow type A -> B -> C
 type chain struct {
-	par adt.NonEmptySlice[Sort]
-	ret Sort
+	parm adt.NonEmptySlice[Sort]
+	ret  Sort
+}
+
+func (c chain) Data() adt.Option[Data] {
+	//TODO implement me
+	panic("implement me")
 }
 
 func (c chain) Level() int {
@@ -25,14 +30,13 @@ func (c chain) Type() Sort {
 	panic("implement me")
 }
 
-func (c chain) Cast(sort Sort) adt.Option[Sort] {
+func (c chain) Cast(parent Sort) adt.Option[Sort] {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (c chain) Chain() adt.NonEmptySlice[Sort] {
-	//TODO implement me
-	panic("implement me")
+func (c chain) Len() int {
+	return len(c.parm.Repr()) + 1
 }
 
 func (c chain) le(dst Sort) bool {

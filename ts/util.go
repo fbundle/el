@@ -8,31 +8,25 @@ const (
 )
 
 type rule struct {
-	srcName string
-	dstName string
+	src string
+	dst string
 }
 
 var leMap = make(map[rule]struct{})
 
-func AddRule(srcName string, dstName string) {
-	leMap[rule{srcName, dstName}] = struct{}{}
+func AddRule(src string, dst string) {
+	leMap[rule{src, dst}] = struct{}{}
 }
 
-func leName(srcName string, dstName string) bool {
-	if srcName == Initial || dstName == Final {
+func le(src string, dst string) bool {
+	if src == Initial || dst == Final {
 		return true
 	}
-	if srcName == dstName {
+	if src == dst {
 		return true
 	}
-	if _, ok := leMap[rule{srcName, dstName}]; ok {
+	if _, ok := leMap[rule{src, dst}]; ok {
 		return true
 	}
 	return false
-}
-
-type Name string
-
-func (n Name) String() string {
-	return string(n)
 }

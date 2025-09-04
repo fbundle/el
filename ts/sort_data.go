@@ -4,49 +4,64 @@ import (
 	"github.com/fbundle/lab_public/lab/go_util/pkg/adt"
 )
 
-type Data interface {
-	String() string
-}
-
-func SortData(data Data, sort string) Sort {
-	return sortData{
-		data:   data,
-		parent: MustSortGE1(1, sort),
+func SortData(level int, data Data, parent Sort) adt.Option[Sort] {
+	if parent.Level() != level+1 {
+		return adt.None[Sort]()
 	}
+	return adt.Some[Sort](singleData{
+		level:  level,
+		data:   data,
+		parent: parent,
+	})
 }
 
-type sortData struct {
+type singleData struct {
+	level  int
 	data   Data
 	parent Sort
 }
 
-func (s sortData) Level() int {
-	return 0
+func (s singleData) Data() adt.Option[Data] {
+	return adt.Some(s.data)
 }
 
-func (s sortData) String() string {
+func (s singleData) Level() int {
+	return s.level
+}
+
+func (s singleData) String() string {
 	return s.data.String()
 }
 
-func (s sortData) Type() Sort {
+func (s singleData) Type() Sort {
 	return s.parent
 }
 
-func (s sortData) Cast(sort Sort) adt.Option[Sort] {
-	//TODO implement me
-	panic("implement me")
+func (s singleData) Cast(parent Sort) adt.Option[Sort] {
+	if ok := s.Type().le(parent); !ok {
+		return adt.None[Sort]()
+	}
+	return adt.Some[Sort](singleData{
+		level:  s.level,
+		data:   s.data,
+		parent: parent,
+	})
 }
 
-func (s sortData) Chain() adt.NonEmptySlice[Sort] {
-	return adt.MustNonEmpty([]Sort{s})
+func (s singleData) Len() int {
+	return 1
 }
 
-func (s sortData) le(dst Sort) bool {
-	//TODO implement me
-	panic("implement me")
+func (s singleData) le(dst Sort) bool {
+	if s.Len() != s.Len() || s.Level() != dst.Level() {
+		return false
+	}
+	return le(s.String(), dst.String())
 }
 
-func (s sortData) prepend(param Sort) Sort {
-	//TODO implement me
-	panic("implement me")
+func (s singleData) prepend(param Sort) Sort {
+	return chain{
+		parm: adt.MustNonEmpty([]Sort{param}),
+		ret:  s,
+	}
 }

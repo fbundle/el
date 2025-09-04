@@ -15,12 +15,17 @@ func Unmarshal(typeMake string, e ast.Expr) adt.Result[Sort] {
 	panic("not implemented")
 }
 
+type Data interface {
+	String() string
+}
+
 type Sort interface {
+	Data() adt.Option[Data]
 	Level() int
 	String() string
 	Type() Sort
-	Cast(sort Sort) adt.Option[Sort]
-	Chain() adt.NonEmptySlice[Sort]
+	Cast(parent Sort) adt.Option[Sort]
+	Len() int
 
 	le(dst Sort) bool
 	prepend(param Sort) Sort
