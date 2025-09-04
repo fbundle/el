@@ -66,7 +66,7 @@ var program = `
 	# arrow function 
 	_ (print "arrow function:" {x y => {x + y}})
 
-	# function unwrapping
+	# function currying
 	f {x y => {x + y}}
 	_ (print "f 1" (f 1))
 
