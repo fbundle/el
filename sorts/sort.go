@@ -1,4 +1,4 @@
-package ts
+package sorts
 
 const (
 	DefaultSortName = "type"

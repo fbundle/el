@@ -1,7 +1,7 @@
-package ts
+package sorts
 
 const (
-	// Initial - Initial can be cast into any type, it has a no value or a object zero value depends on the category
+	// Initial - Initial can be cast into any type, it has a no value or a atom zero value depends on the category
 	Initial = "unit"
 	// Terminal - every type can be cast into Terminal, it is like Any
 	Terminal = "any"

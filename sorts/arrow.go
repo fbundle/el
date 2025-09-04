@@ -1,4 +1,4 @@
-package ts
+package sorts
 
 import (
 	"strings"
@@ -6,15 +6,15 @@ import (
 	"github.com/fbundle/lab_public/lab/go_util/pkg/adt"
 )
 
-func MustMorphism(sorts ...Sort) Sort {
+func MustArrow(sorts ...Sort) Sort {
 	var sort Sort
-	if ok := Morphism(sorts...).Unwrap(&sort); !ok {
+	if ok := Arrow(sorts...).Unwrap(&sort); !ok {
 		panic("type_error")
 	}
 	return sort
 }
 
-func Morphism(sorts ...Sort) adt.Option[Sort] {
+func Arrow(sorts ...Sort) adt.Option[Sort] {
 	if len(sorts) == 0 {
 		return adt.None[Sort]()
 	}
@@ -25,13 +25,13 @@ func Morphism(sorts ...Sort) adt.Option[Sort] {
 	return adt.Some[Sort](sort)
 }
 
-// morphism - represent arrow type A -> B -> C
-type morphism struct {
+// arrow - represent arrow type A -> B -> C
+type arrow struct {
 	params adt.NonEmptySlice[Sort]
 	body   Sort
 }
 
-func (s morphism) Level() int {
+func (s arrow) Level() int {
 	level := s.body.Level()
 	for _, param := range s.params.Repr() {
 		level = max(level, param.Level())
@@ -39,7 +39,7 @@ func (s morphism) Level() int {
 	return level
 }
 
-func (s morphism) String() string {
+func (s arrow) String() string {
 	strList := make([]string, 0, len(s.params.Repr())+1)
 	for _, param := range s.params.Repr() {
 		strList = append(strList, param.String())
@@ -48,23 +48,23 @@ func (s morphism) String() string {
 	return "{" + strings.Join(strList, " -> ") + "}"
 }
 
-func (s morphism) Parent() Sort {
-	return object{
+func (s arrow) Parent() Sort {
+	return atom{
 		level: s.Level() + 1,
 		name:  DefaultSortName,
 	}
 }
 
-func (s morphism) Length() int {
+func (s arrow) Length() int {
 	return len(s.params.Repr()) + 1
 }
 
-func (s morphism) LessEqual(dst Sort) bool {
+func (s arrow) LessEqual(dst Sort) bool {
 	if s.Length() != dst.Length() || s.Level() != dst.Level() {
 		return false
 	}
-	var d morphism
-	if ok := adt.Cast[morphism](dst).Unwrap(&d); !ok {
+	var d arrow
+	if ok := adt.Cast[arrow](dst).Unwrap(&d); !ok {
 		return false
 	}
 	length := len(s.params.Repr())
@@ -81,8 +81,8 @@ func (s morphism) LessEqual(dst Sort) bool {
 	return s.body.LessEqual(d.body)
 }
 
-func (s morphism) prepend(param Sort) Sort {
-	return morphism{
+func (s arrow) prepend(param Sort) Sort {
+	return arrow{
 		params: adt.MustNonEmpty[Sort](append([]Sort{param}, s.params.Repr()...)),
 		body:   s.body,
 	}
