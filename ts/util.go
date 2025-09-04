@@ -30,3 +30,9 @@ func leName(srcName string, dstName string) bool {
 	}
 	return false
 }
+
+type Name string
+
+func (n Name) String() string {
+	return string(n)
+}

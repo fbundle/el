@@ -1,20 +1,18 @@
 package ts
 
-import (
-	"strconv"
-
-	"github.com/fbundle/lab_public/lab/go_util/pkg/adt"
-)
+import "github.com/fbundle/lab_public/lab/go_util/pkg/adt"
 
 func MustSortGE1(level int, name string) Sort {
-	var sort Sort
-	if ok := SortGE(level, name).Unwrap(&sort); !ok {
+	if level < 1 {
 		panic("type_error")
 	}
-	return sort
+	return sortGE1{
+		level: level,
+		name:  name,
+	}
 }
 
-func SortGE(level int, name string) adt.Option[Sort] {
+func SortGE1(level int, name string) adt.Option[Sort] {
 	if level < 1 {
 		return adt.None[Sort]()
 	}
@@ -24,9 +22,9 @@ func SortGE(level int, name string) adt.Option[Sort] {
 	})
 }
 
-// sortGE1 - representing a single sort with level >= 1
-// level 1: Int, Bool, etc.
-// level 2: TypeName, etc.
+// sortGE1 - representing all single sort with level >= 1
+// level 1: Int, Bool
+// level 2: Type
 type sortGE1 struct {
 	level int
 	name  string
@@ -37,19 +35,19 @@ func (s sortGE1) Level() int {
 }
 
 func (s sortGE1) String() string {
-	return s.name + "_" + strconv.Itoa(s.level)
+	return s.name
 }
 
 func (s sortGE1) Type() Sort {
 	return sortGE1{
 		level: s.level + 1,
-		name:  TypeName, // everything from level 2 is just TypeName
+		name:  TypeName,
 	}
 }
 
 func (s sortGE1) Cast(sort Sort) adt.Option[Sort] {
-	// cannot cast sort_1 or higher
-	return adt.None[Sort]()
+	//TODO implement me
+	panic("implement me")
 }
 
 func (s sortGE1) Chain() adt.NonEmptySlice[Sort] {
@@ -57,21 +55,11 @@ func (s sortGE1) Chain() adt.NonEmptySlice[Sort] {
 }
 
 func (s sortGE1) le(dst Sort) bool {
-	var d sortGE1
-	if ok := adt.Cast[sortGE1](dst).Unwrap(&d); !ok {
-		return false
-	}
-	if s.level != d.level {
-		return false
-	}
-	return leName(s.name, d.name)
+	//TODO implement me
+	panic("implement me")
 }
 
 func (s sortGE1) prepend(param Sort) Sort {
-	return chain{
-		par: adt.MustNonEmpty([]Sort{param}),
-		ret: s,
-	}
+	//TODO implement me
+	panic("implement me")
 }
-
-var _ Sort = sortGE1{}

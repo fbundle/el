@@ -4,6 +4,7 @@ import "github.com/fbundle/lab_public/lab/go_util/pkg/adt"
 
 var _ Sort = chain{}
 
+// chain - represent arrow type A -> B -> C
 type chain struct {
 	par adt.NonEmptySlice[Sort]
 	ret Sort
