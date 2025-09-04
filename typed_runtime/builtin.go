@@ -3,6 +3,7 @@ package runtime
 import (
 	"context"
 	"el/ast"
+	"errors"
 
 	"github.com/fbundle/lab_public/lab/go_util/pkg/adt"
 )
@@ -37,3 +38,5 @@ func (ext Extension) Module() FuncData {
 		},
 	}
 }
+
+var ErrorTooManyArguments = errors.New("too many arguments")
