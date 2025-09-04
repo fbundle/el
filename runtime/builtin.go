@@ -152,9 +152,11 @@ func makeLambdaExec(paramList []Name, body ast.Expr, closure Frame) Exec {
 		// 2. make the call frame
 		// for non-recursive function, callFrame = closure + params
 		// for recursive function, callFrame = frame + closure + params
-		callFrame := frame
-		for k, v := range closure.Iter {
-			callFrame = callFrame.Set(k, v)
+		callFrame := closure
+		for k, v := range frame.Iter {
+			if _, ok := callFrame.Get(k); !ok {
+				callFrame = callFrame.Set(k, v)
+			}
 		}
 		for i := 0; i < len(paramList); i++ {
 			param, arg := paramList[i], args[i]
