@@ -144,6 +144,7 @@ func makeLambdaExec(paramList []Name, body ast.Expr, closure Frame) Exec {
 		})
 
 		if len(argList) > len(paramList) {
+			// 3. too many arguments
 			return errValue(ErrorTooManyArguments)
 		} else if len(argList) == len(paramList) {
 			// 3. add environment frame into closure and make call
