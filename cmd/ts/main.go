@@ -5,20 +5,7 @@ import (
 	"fmt"
 )
 
-func newData(v any) ts.Data {
-	return data{value: v}
-}
-
-type data struct {
-	value any
-}
-
-func (d data) String() string {
-	return fmt.Sprint(d.value)
-}
-
 const (
-	dataLevel = 0
 	typeLevel = 1
 )
 
@@ -26,22 +13,18 @@ func makeNameType(typeName string) ts.Sort {
 	return ts.MustSingleName(typeLevel, typeName)
 }
 
-func makeData(data ts.Data, dtype ts.Sort) ts.Sort {
-	return ts.MustSingleData(dataLevel, data, dtype)
-}
-
 func printSorts(sorts ...ts.Sort) {
 	for _, sort := range sorts {
 		fmt.Printf("[%s] is of type [%s]\n", sort.String(), sort.Parent().String())
 	}
 }
-func printCast(value1 ts.Sort, type2 ts.Sort) {
-	ok := value1.Cast(type2).Ok
+func printCast(type1 ts.Sort, type2 ts.Sort) {
+	ok := type1.LessEqual(type2)
 
 	if ok {
-		fmt.Printf("value [%s] of type [%s] CAN be cast into [%s]\n", value1, value1.Parent(), type2)
+		fmt.Printf("type [%s] CAN be cast into [%s]\n", type1, type2)
 	} else {
-		fmt.Printf("value [%s] of type [%s] CANNOT be cast into [%s]\n", value1, value1.Parent(), type2)
+		fmt.Printf("type [%s] CANNOT be cast into [%s]\n", type1, type2)
 	}
 }
 
@@ -87,28 +70,13 @@ func main() {
 	weak3 := weakestType(3)
 	strong3 := strongestType(3)
 
-	weak3Sort := makeData(newData(nil), weak3)
-	strong3Sort := makeData(newData(nil), strong3)
-
 	ts.AddRule("bool", "int") // cast bool -> int
 	fmt.Println("[bool] can be cast into [int]")
 
-	oneSort := makeData(newData(1), intType)
-	trueSort := makeData(newData(true), boolType)
-	helloSort := makeData(newData("hello"), stringType)
-	add1 := makeData(newData(func(i int) int {
-		return i + 1
-	}), intIntType)
-	add := makeData(newData(func(i int) func(int) int {
-		return func(j int) int {
-			return i + j
-		}
-	}), intIntIntType)
+	printSorts(stringType, intIntType, intIntIntType, weak1, strong1, weak3, strong3)
 
-	printSorts(oneSort, trueSort, helloSort, add1, add, weak1, strong1, weak3, strong3)
-
-	printCast(trueSort, intType)
-	printCast(oneSort, boolType)
-	printCast(weak3Sort, add.Parent())
-	printCast(strong3Sort, add.Parent())
+	printCast(boolType, intType)
+	printCast(intType, boolType)
+	printCast(weak3, intIntType)
+	printCast(strong3, intIntType)
 }
