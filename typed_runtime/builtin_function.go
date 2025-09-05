@@ -26,7 +26,7 @@ var letFunc = FuncData{
 	repr: "{builtin: (let x 3 4) - assign value 3 to local variable x then return 4}",
 	exec: func(r Runtime, ctx context.Context, frame Frame, argExprList []ast.Expr) adt.Result[Object] {
 		if len(argExprList) == 0 || len(argExprList)%2 != 1 {
-			return resultErrStr("let requires at least 1 arguments and odd number of arguments")
+			return resultErrStrf("let requires at least 1 arguments and odd number of arguments")
 		}
 
 		lastExpr := argExprList[len(argExprList)-1]
@@ -39,7 +39,7 @@ var letFunc = FuncData{
 		for lexpr, rexpr := range zip(lExprList, rExprList) {
 			lvalue, ok := lexpr.(ast.Name)
 			if !ok {
-				return resultErrStr(fmt.Sprintf("lvalue must be a Name: %s", lexpr.String()))
+				return resultErrStrf("lvalue must be a Name: %s", lexpr.String())
 			}
 			var rvalue Object
 			if err := r.Step(ctx, frame, rexpr).Unwrap(&rvalue); err != nil {
@@ -55,7 +55,7 @@ var matchFunc = FuncData{
 	repr: "{builtin: (match x 1 2 3 4 5) - match, if x=1 then return 2, if x=3 the return 4, otherwise return 5",
 	exec: func(r Runtime, ctx context.Context, frame Frame, argExprList []ast.Expr) adt.Result[Object] {
 		if len(argExprList) < 2 || len(argExprList)%2 != 0 {
-			return resultErrStr("match requires at least 2 arguments and even number of arguments")
+			return resultErrStrf("match requires at least 2 arguments and even number of arguments")
 		}
 		condExpr := argExprList[0]
 		lastExpr := argExprList[len(argExprList)-1]
@@ -91,7 +91,7 @@ var lambdaFunc = FuncData{
 	repr: "{builtin: (lambda x y (add x y) - declare a function}",
 	exec: func(r Runtime, ctx context.Context, frame Frame, argExprList []ast.Expr) adt.Result[Object] {
 		if len(argExprList) < 1 {
-			return resultErrStr("lambda requires at least 1 arguments")
+			return resultErrStrf("lambda requires at least 1 arguments")
 		}
 
 		lastExpr := argExprList[len(argExprList)-1]
@@ -101,7 +101,7 @@ var lambdaFunc = FuncData{
 		for _, paramExpr := range paramExprList {
 			lvalue, ok := paramExpr.(ast.Name)
 			if !ok {
-				return resultErrStr(fmt.Sprintf("lvalue must be a Name: %s", paramExpr.String()))
+				return resultErrStrf("lvalue must be a Name: %s", paramExpr.String())
 			}
 			paramList = append(paramList, Name(lvalue))
 		}
@@ -148,7 +148,9 @@ func makeLambdaExec(paramList []Name, body ast.Expr, closure Frame) Exec {
 			closure = closure.Set(param, arg)
 		}
 
-		if len(argList) >= len(paramList) {
+		if len(argList) > len(paramList) {
+			return resultErrStrf("too many arguments to lambda")
+		} else if len(argList) == len(paramList) {
 			// 3. add environment frame into closure and make call
 			for k, v := range frame.Iter {
 				if _, ok := closure.Get(k); !ok {

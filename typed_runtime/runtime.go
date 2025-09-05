@@ -121,8 +121,8 @@ func resultData(data Data, parent Object) adt.Result[Object] {
 func resultErr(err error) adt.Result[Object] {
 	return adt.Err[Object](err)
 }
-func resultErrStr(msg string) adt.Result[Object] {
-	return adt.Err[Object](errors.New(msg))
+func resultErrStrf(format string, args ...any) adt.Result[Object] {
+	return adt.Err[Object](fmt.Errorf(format, args...))
 }
 
 type cmd struct {

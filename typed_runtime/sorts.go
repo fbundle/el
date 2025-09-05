@@ -28,6 +28,14 @@ func makeData(data Data, parent Object) Object {
 	}
 }
 
+func makeSort(sort Sort) Object {
+	return _object{
+		data:   nil, // no data
+		sort:   sort,
+		parent: nil, // default parent
+	}
+}
+
 func makeWeakestType(numParams int) Object {
 	// every type of this length can be cast into this type
 	if numParams < 0 {
