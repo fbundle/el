@@ -8,16 +8,10 @@ import (
 	"github.com/fbundle/lab_public/lab/go_util/pkg/adt"
 )
 
-var Builtin = map[Name]Object{
-	sorts.Unit:     NilType,
-	sorts.Any:      AnyType,
-	"builtin_type": BuiltinType,
-	"let":          makeData(letFunc, BuiltinType),
-	"match":        makeData(matchFunc, BuiltinType),
-	"lambda":       makeData(lambdaFunc, BuiltinType),
-	"type.of":      makeData(typeOfExtension.Module(), BuiltinType),
-	"type.cast":    makeData(typeCastExtension.Module(), BuiltinType),
-	"type.chain":   makeData(typeChainExtension.Module(), BuiltinType),
+func init() {
+	Builtin["type.of"] = makeData(typeOfExtension.Module(), BuiltinType)
+	Builtin["type.cast"] = makeData(typeCastExtension.Module(), BuiltinType)
+	Builtin["type.chain"] = makeData(typeChainExtension.Module(), BuiltinType)
 }
 
 type Extension struct {

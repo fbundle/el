@@ -3,6 +3,7 @@ package runtime
 import (
 	"context"
 	"el/ast"
+	"el/sorts"
 	"errors"
 	"fmt"
 	"reflect"
@@ -10,6 +11,15 @@ import (
 
 	"github.com/fbundle/lab_public/lab/go_util/pkg/adt"
 )
+
+var Builtin = map[Name]Object{
+	sorts.Unit:     NilType,
+	sorts.Any:      AnyType,
+	"builtin_type": BuiltinType,
+	"let":          makeData(letFunc, BuiltinType),
+	"match":        makeData(matchFunc, BuiltinType),
+	"lambda":       makeData(lambdaFunc, BuiltinType),
+}
 
 type Exec = func(r Runtime, ctx context.Context, frame Frame, argExprList []ast.Expr) adt.Result[Object]
 
