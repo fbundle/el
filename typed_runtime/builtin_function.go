@@ -22,8 +22,6 @@ func (f FuncData) String() string {
 	return f.repr
 }
 
-var ErrorTooManyArguments = errors.New("too many arguments")
-
 var letFunc = FuncData{
 	repr: "{builtin: (let x 3 4) - assign value 3 to local variable x then return 4}",
 	exec: func(r Runtime, ctx context.Context, frame Frame, argExprList []ast.Expr) adt.Result[Object] {
@@ -150,10 +148,7 @@ func makeLambdaExec(paramList []Name, body ast.Expr, closure Frame) Exec {
 			closure = closure.Set(param, arg)
 		}
 
-		if len(argList) > len(paramList) {
-			// 3. too many arguments
-			return resultErr(ErrorTooManyArguments)
-		} else if len(argList) == len(paramList) {
+		if len(argList) >= len(paramList) {
 			// 3. add environment frame into closure and make call
 			for k, v := range frame.Iter {
 				if _, ok := closure.Get(k); !ok {

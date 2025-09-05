@@ -36,3 +36,5 @@ func (ext Extension) Module() FuncData {
 		},
 	}
 }
+
+// extra types
