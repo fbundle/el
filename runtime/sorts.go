@@ -92,9 +92,6 @@ func (o _object) Cast(newParent Object) adt.Option[Object] {
 	if ok := o.parent.LessEqual(newParentObject.sort); !ok {
 		return adt.None[Object]()
 	}
-	return adt.Some[Object](_object{
-		data:   o.data,
-		sort:   o.sort,
-		parent: newParent.Sort(),
-	})
+
+	return adt.Some[Object](MakeData(o.data, newParentObject))
 }
