@@ -77,6 +77,7 @@ var program = `
 	_ (print "(f 1) 2 = " ((curry2 f 1) 2))
 
 	_ (inspect 1 (lambda x y {x + y}) add)
+
 	nil
 )`
 

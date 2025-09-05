@@ -9,9 +9,18 @@ import (
 
 type Token = ast.Token
 
+var SplitTokens = map[Token]struct{}{
+	ast.TokenBlockBegin: {},
+	ast.TokenBlockEnd:   {},
+	ast.TokenSugarBegin: {},
+	ast.TokenSugarEnd:   {},
+	ast.TokenUnwrap:     {},
+	ast.TokenTypeCast:   {},
+}
+
 func Tokenize(s string) []Token {
 	return tokenize(s,
-		ast.SplitTokens,
+		SplitTokens,
 		removeComment("#"),
 		mapping(map[string]string{
 			"[": " (list ",
