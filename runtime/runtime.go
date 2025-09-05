@@ -47,10 +47,10 @@ func (r Runtime) Step(ctx context.Context, frame Frame, e ast.Expr) adt.Result[O
 	/*
 		the whole language is every simple
 			1. parse literal or search on stack
-			2. function application: push a new frame, exec the function, pop
+			2. function application: push a new frame, Exec the function, pop
 			3. builtin module
 				a. lambda: capture the current frame and save the implementation
-				b. let: push a new frame, exec the function, pop
+				b. let: push a new frame, Exec the function, pop
 				c. match: eval and match
 
 		only let and function application push a new frame since
@@ -80,7 +80,7 @@ func (r Runtime) Step(ctx context.Context, frame Frame, e ast.Expr) adt.Result[O
 		if !ok {
 			return resultErr(ErrorCannotExecuteExpression(e))
 		}
-		return funcData.exec(r, ctx, frame, cmd.argExprList)
+		return funcData.Exec(r, ctx, frame, cmd.argExprList)
 
 	default:
 		return resultErr(ErrorUnknownExpression(e))

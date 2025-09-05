@@ -84,7 +84,9 @@ var program = `
 	new_type (type_chain int_type int_type int_type) # make type int -> int -> int # infix operator for this has issue
 	_ (print "casting f into ==> " new_type)
 	g (type_cast new_type f)
-	_ (inspect "g is {data:type} ==> " g) 									 # g is of type {int -> int -> int} 
+	_ (inspect "g is {data:type} ==> " g) 									 # g is of type {int -> int -> int}
+
+	_ (print (names)) # print all names in the current frame
 	nil
 )`
 

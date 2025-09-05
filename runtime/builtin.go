@@ -26,17 +26,17 @@ func init() {
 type Exec = func(r Runtime, ctx context.Context, frame Frame, argExprList []ast.Expr) adt.Result[Object]
 
 type FuncData struct {
-	exec Exec
-	repr string
+	Exec Exec
+	Repr string
 }
 
 func (f FuncData) String() string {
-	return f.repr
+	return f.Repr
 }
 
 var letFunc = FuncData{
-	repr: "{builtin: (let x 3 4) - assign value 3 to local variable x then return 4}",
-	exec: func(r Runtime, ctx context.Context, frame Frame, argExprList []ast.Expr) adt.Result[Object] {
+	Repr: "{builtin: (let x 3 4) - assign value 3 to local variable x then return 4}",
+	Exec: func(r Runtime, ctx context.Context, frame Frame, argExprList []ast.Expr) adt.Result[Object] {
 		if len(argExprList) == 0 || len(argExprList)%2 != 1 {
 			return resultErrStrf("let requires at least 1 arguments and odd number of arguments")
 		}
@@ -64,8 +64,8 @@ var letFunc = FuncData{
 }
 
 var matchFunc = FuncData{
-	repr: "{builtin: (match x 1 2 3 4 5) - match, if x=1 then return 2, if x=3 the return 4, otherwise return 5",
-	exec: func(r Runtime, ctx context.Context, frame Frame, argExprList []ast.Expr) adt.Result[Object] {
+	Repr: "{builtin: (match x 1 2 3 4 5) - match, if x=1 then return 2, if x=3 the return 4, otherwise return 5",
+	Exec: func(r Runtime, ctx context.Context, frame Frame, argExprList []ast.Expr) adt.Result[Object] {
 		if len(argExprList) < 2 || len(argExprList)%2 != 0 {
 			return resultErrStrf("match requires at least 2 arguments and even number of arguments")
 		}
@@ -100,8 +100,8 @@ var matchFunc = FuncData{
 }
 
 var lambdaFunc = FuncData{
-	repr: "{builtin: (lambda x y (add x y) - declare a function}",
-	exec: func(r Runtime, ctx context.Context, frame Frame, argExprList []ast.Expr) adt.Result[Object] {
+	Repr: "{builtin: (lambda x y (add x y) - declare a function}",
+	Exec: func(r Runtime, ctx context.Context, frame Frame, argExprList []ast.Expr) adt.Result[Object] {
 		if len(argExprList) < 1 {
 			return resultErrStrf("lambda requires at least 1 arguments")
 		}
@@ -129,8 +129,8 @@ var lambdaFunc = FuncData{
 
 func makeFunction(paramList []Name, body ast.Expr, closure Frame) Object {
 	funcData := FuncData{
-		repr: makeLambdaRepr(paramList, body, closure),
-		exec: makeLambdaExec(paramList, body, closure),
+		Repr: makeLambdaRepr(paramList, body, closure),
+		Exec: makeLambdaExec(paramList, body, closure),
 	}
 	funcType := makeWeakestType(len(paramList))
 	return MakeData(funcData, funcType)

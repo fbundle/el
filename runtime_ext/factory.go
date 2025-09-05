@@ -43,6 +43,7 @@ func NewBasicRuntime() (Runtime, Frame) {
 			Load("int_type", runtime.MakeType("int")).
 			Load("list_type", runtime.MakeType("list")).
 			Load("string_type", runtime.MakeType("string")).
+			Load("names", runtime.MakeData(namesFunc, runtime.BuiltinType)).
 			LoadExtension(eqExtension, neExtension, ltExtension, leExtension, gtExtension, geExtension).
 			LoadExtension(addExtension, subExtension, mulExtension, divExtension, modExtension).
 			LoadExtension(printExtension, inspectExtension)
