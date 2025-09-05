@@ -35,7 +35,7 @@ func (ext Extension) Module() FuncData {
 
 var typeOfExtension = Extension{
 	Name: "type.of",
-	Man:  "",
+	Man:  "{builtin: (type.of 1) - return the type of an object}",
 	Exec: func(ctx context.Context, values ...Object) adt.Result[Object] {
 		if len(values) != 1 {
 			return resultErrStrf("type.of expected 1 argument")
@@ -46,7 +46,7 @@ var typeOfExtension = Extension{
 
 var typeCastExtension = Extension{
 	Name: "type.cast",
-	Man:  "",
+	Man:  "{builtin: (type.of int true) - cast an object into another type}",
 	Exec: func(ctx context.Context, values ...Object) adt.Result[Object] {
 		if len(values) != 2 {
 			return resultErrStrf("type.cast expected 2 arguments")
