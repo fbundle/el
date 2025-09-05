@@ -3,7 +3,6 @@ package runtime
 import (
 	"context"
 	"el/ast"
-	"el/sorts"
 
 	"github.com/fbundle/lab_public/lab/go_util/pkg/adt"
 )
@@ -67,12 +66,12 @@ var typeChainExtension = Extension{
 		if len(values) == 0 {
 			return resultErrStrf("type.chain expected at least 1 argument")
 		}
-		sortList := make([]sorts.Sort, 0, len(values))
+		sortList := make([]Sort, 0, len(values))
 		for _, value := range values {
 			sortList = append(sortList, value.Sort())
 		}
-		var newSort sorts.Sort
-		if ok := sorts.Arrow(sortList...).Unwrap(&newSort); !ok {
+		var newSort Sort
+		if ok := Arrow(sortList...).Unwrap(&newSort); !ok {
 			return resultErrStrf("cannot make sort from %s", sortList)
 		}
 		return resultObj(MakeSort(newSort))

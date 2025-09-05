@@ -2,6 +2,7 @@ package sorts
 
 const (
 	// Unit - Unit can be cast into any type (initial object), it has a unique zero value
+	// in some category, the initial object does not have any element - maybe I will resolve it later
 	Unit = "unit"
 	// Any - every type can be cast into Any (terminal object)
 	Any = "any"

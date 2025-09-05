@@ -1,8 +1,6 @@
 package runtime
 
 import (
-	"el/sorts"
-
 	"github.com/fbundle/lab_public/lab/go_util/pkg/adt"
 )
 
@@ -20,8 +18,8 @@ type Object interface {
 
 var BuiltinType = MakeType("builtin_type")
 
-var NilType = MakeType(sorts.Unit)
-var AnyType = MakeType(sorts.Any)
+var NilType = MakeType(Unit)
+var AnyType = MakeType(Any)
 
 type Nil struct{}
 

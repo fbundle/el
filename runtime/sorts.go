@@ -1,15 +1,21 @@
 package runtime
 
 import (
-	"el/sorts"
-
 	"github.com/fbundle/lab_public/lab/go_util/pkg/adt"
+	"github.com/fbundle/sorts/sorts/v1"
 )
 
 const _typeLevel = 1
 const _dataLevel = 0
 
 type Sort = sorts.Sort
+
+const (
+	Unit = sorts.Unit
+	Any  = sorts.Any
+)
+
+var Arrow = sorts.Arrow
 
 func MakeType(name string) Object {
 	o := _object{
