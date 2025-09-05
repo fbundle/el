@@ -62,7 +62,7 @@ var typeCastExtension = Extension{
 
 var typeChainExtension = Extension{
 	Name: "type.chain",
-	Man:  "",
+	Man:  "{builtin: (type.chain int bool any) - make arrow type}",
 	Exec: func(ctx context.Context, values ...Object) adt.Result[Object] {
 		if len(values) == 0 {
 			return resultErrStrf("type.chain expected at least 1 argument")
