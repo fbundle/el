@@ -61,7 +61,7 @@ func makeWeakestType(numParams int) Object {
 
 // _object - unorder-score means private, even in the same package
 type _object struct {
-	data Data // nullable
+	data Data // nullable - hold the data
 	sort Sort // hold the sort of object
 }
 
