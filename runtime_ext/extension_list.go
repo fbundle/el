@@ -14,7 +14,7 @@ var listExtension = Extension{
 		for _, v := range values {
 			l = List{l.Ins(l.Len(), v)}
 		}
-		return resultObj(l)
+		return resultTypedData(l)
 	},
 }
 
@@ -29,7 +29,7 @@ var lenExtension = Extension{
 		if ok := adt.Cast[List](values[0]).Unwrap(&l); !ok {
 			return resultErrStrf("len argument must be a list")
 		}
-		return resultObj(Int{l.Len()})
+		return resultTypedData(Int{l.Len()})
 	},
 }
 
@@ -57,7 +57,7 @@ var sliceExtension = Extension{
 			v := l.Get(index.Val)
 			output = List{output.Ins(output.Len(), v)}
 		}
-		return resultObj(output)
+		return resultTypedData(output)
 	},
 }
 
@@ -77,8 +77,8 @@ var rangeExtension = Extension{
 		}
 		output := List{}
 		for k := i.Val; k < j.Val; k++ {
-			output = List{output.Ins(output.Len(), Int{k})}
+			output = List{output.Ins(output.Len(), makeTypedData(Int{k}))}
 		}
-		return resultObj(output)
+		return resultTypedData(output)
 	},
 }

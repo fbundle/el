@@ -24,7 +24,7 @@ func Atom(level int, name string, parent Sort) adt.Option[Sort] {
 
 // atom - representing all primitive sorts
 // level 1: Int, Bool
-// level 2: Type
+// level 2: TypeName
 type atom struct {
 	level  int
 	name   string

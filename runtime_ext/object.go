@@ -10,10 +10,19 @@ import (
 
 type Object = runtime.Object
 type Data = runtime.Data
+
+type TypedData interface {
+	Data
+	TypeName() string
+}
+
 type Unwrap struct{}
 
 func (u Unwrap) String() string {
 	return "*"
+}
+func (u Unwrap) TypeName() string {
+	return "unwrap"
 }
 
 type Int struct {
@@ -22,6 +31,9 @@ type Int struct {
 
 func (i Int) String() string {
 	return fmt.Sprintf("%d", i.Val)
+}
+func (i Int) TypeName() string {
+	return "int"
 }
 
 type List struct {
@@ -37,6 +49,9 @@ func (l List) String() string {
 	s = fmt.Sprintf("[%s]", s)
 	return s
 }
+func (l List) TypeName() string {
+	return "list"
+}
 
 type String struct {
 	Val string
@@ -44,4 +59,8 @@ type String struct {
 
 func (s String) String() string {
 	return s.Val
+}
+
+func (s String) TypeName() string {
+	return "string"
 }
