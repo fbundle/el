@@ -8,7 +8,17 @@ import (
 	"time"
 
 	"github.com/fbundle/lab_public/lab/go_util/pkg/adt"
+	"github.com/fbundle/lab_public/lab/go_util/pkg/persistent/ordered_map"
 )
+
+type Name string
+
+type Frame = ordered_map.OrderedMap[Name, Object]
+
+type Runtime struct {
+	ParseLiteral func(lit string) adt.Result[Object]
+	UnwrapArgs   func(argsOpt adt.Result[[]Object]) adt.Result[[]Object]
+}
 
 var ErrorNameNotFound = func(name Name) error {
 	return fmt.Errorf("object not found %s", name)
@@ -23,19 +33,14 @@ var ErrorCannotExecuteExpression = func(e ast.Expr) error {
 	return fmt.Errorf("expression cannot be executed: %s", e.String())
 }
 
-type Runtime struct {
-	ParseLiteral func(lit string) adt.Result[Object]
-	UnwrapArgs   func(argsOpt adt.Result[[]Object]) adt.Result[[]Object]
-}
-
 func (r Runtime) Step(ctx context.Context, frame Frame, e ast.Expr) adt.Result[Object] {
 	deadline, ok := ctx.Deadline()
 	if ok && time.Now().After(deadline) {
-		return errValue(ErrorTimeout)
+		return resultErr(ErrorTimeout)
 	}
 	select {
 	case <-ctx.Done():
-		return errValue(ErrorInterrupt)
+		return resultErr(ErrorInterrupt)
 	default:
 	}
 
@@ -59,26 +64,26 @@ func (r Runtime) Step(ctx context.Context, frame Frame, e ast.Expr) adt.Result[O
 		name := Name(e)
 		var o Object
 		if ok := r.resolveName(frame, name).Unwrap(&o); !ok {
-			return errValue(ErrorNameNotFound(name))
+			return resultErr(ErrorNameNotFound(name))
 		}
-		return value(o)
+		return resultObj(o)
 	case ast.Lambda:
 		var cmd cmd
 		if ok := getCmd(e).Unwrap(&cmd); !ok {
-			return value(Nil{}) // empty expression
+			return resultData(nil, NilType) // empty expression
 		}
 		var cmdObject Object
 		if err := r.Step(ctx, frame, cmd.cmdExpr).Unwrap(&cmdObject); err != nil {
-			return errValue(err)
+			return resultErr(err)
 		}
-		var funcObject Function
-		if ok := adt.Cast[Function](cmdObject).Unwrap(&funcObject); !ok {
-			return errValue(ErrorCannotExecuteExpression(e))
+		funcData, ok := cmdObject.Data().(FuncData)
+		if !ok {
+			return resultErr(ErrorCannotExecuteExpression(e))
 		}
-		return funcObject.exec(r, ctx, frame, cmd.argExprList)
+		return funcData.exec(r, ctx, frame, cmd.argExprList)
 
 	default:
-		return errValue(ErrorUnknownExpression(e))
+		return resultErr(ErrorUnknownExpression(e))
 	}
 }
 
@@ -104,4 +109,34 @@ func (r Runtime) resolveName(frame Frame, name Name) adt.Option[Object] {
 		return adt.Some(o)
 	}
 	return adt.None[Object]()
+}
+
+type cmd struct {
+	cmdExpr     ast.Expr
+	argExprList []ast.Expr
+}
+
+func getCmd(e ast.Lambda) adt.Option[cmd] {
+	if len(e) == 0 {
+		return adt.None[cmd]()
+	}
+	return adt.Some(cmd{
+		cmdExpr:     e[0],
+		argExprList: e[1:],
+	})
+}
+
+// result helpers
+func resultObj(o Object) adt.Result[Object] {
+	return adt.Ok(o)
+}
+func resultData(data Data, parent Object) adt.Result[Object] {
+	return adt.Ok(MakeData(data, parent))
+}
+
+func resultErr(err error) adt.Result[Object] {
+	return adt.Err[Object](err)
+}
+func resultErrStrf(format string, args ...any) adt.Result[Object] {
+	return adt.Err[Object](fmt.Errorf(format, args...))
 }

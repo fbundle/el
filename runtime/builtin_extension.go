@@ -9,9 +9,9 @@ import (
 )
 
 func init() {
-	Builtin = Builtin.Set("type.of", makeData(typeOfExtension.Module(), BuiltinType))
-	Builtin = Builtin.Set("type.cast", makeData(typeCastExtension.Module(), BuiltinType))
-	Builtin = Builtin.Set("type.chain", makeData(typeChainExtension.Module(), BuiltinType))
+	Builtin = Builtin.Set("type.of", MakeData(typeOfExtension.Module(), BuiltinType))
+	Builtin = Builtin.Set("type.cast", MakeData(typeCastExtension.Module(), BuiltinType))
+	Builtin = Builtin.Set("type.chain", MakeData(typeChainExtension.Module(), BuiltinType))
 }
 
 type Extension struct {
@@ -75,6 +75,6 @@ var typeChainExtension = Extension{
 		if ok := sorts.Arrow(sortList...).Unwrap(&newSort); !ok {
 			return resultErrStrf("cannot make sort from %s", sortList)
 		}
-		return resultObj(makeSort(newSort))
+		return resultObj(MakeSort(newSort))
 	},
 }

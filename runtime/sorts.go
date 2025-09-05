@@ -11,7 +11,7 @@ const _dataLevel = 0
 
 type Sort = sorts.Sort
 
-func makeType(name string) Object {
+func MakeType(name string) Object {
 	o := _object{
 		data:   nil,
 		sort:   sorts.MustAtom(_typeLevel, name, nil),
@@ -20,7 +20,7 @@ func makeType(name string) Object {
 	return o
 }
 
-func makeData(data Data, parent Object) Object {
+func MakeData(data Data, parent Object) Object {
 	return _object{
 		data:   data,
 		sort:   sorts.MustAtom(_dataLevel, data.String(), parent.Sort()),
@@ -28,7 +28,7 @@ func makeData(data Data, parent Object) Object {
 	}
 }
 
-func makeSort(sort Sort) Object {
+func MakeSort(sort Sort) Object {
 	return _object{
 		data:   nil, // no data
 		sort:   sort,

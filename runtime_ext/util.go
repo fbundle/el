@@ -4,22 +4,26 @@ import (
 	"el/ast"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"strconv"
 
 	"github.com/fbundle/lab_public/lab/go_util/pkg/adt"
 )
 
 // helpers
-func value(o Object) adt.Result[Object] {
-	return adt.Ok[Object](o)
+// result helpers
+func resultObj(o Object) adt.Result[Object] {
+	return adt.Ok(o)
+}
+func resultData(data Data, parent Object) adt.Result[Object] {
+	return adt.Ok(makeData(data, parent))
 }
 
-func errValue(err error) adt.Result[Object] {
+func resultErr(err error) adt.Result[Object] {
 	return adt.Err[Object](err)
 }
-
-func errValueString(msg string) adt.Result[Object] {
-	return errValue(errors.New(msg))
+func resultErrStrf(format string, args ...any) adt.Result[Object] {
+	return adt.Err[Object](fmt.Errorf(format, args...))
 }
 
 func unwrapArgs(args []Object) ([]Object, error) {

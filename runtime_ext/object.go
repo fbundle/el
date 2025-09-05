@@ -9,7 +9,7 @@ import (
 )
 
 type Object = runtime.Object
-
+type Data = runtime.Data
 type Unwrap struct{}
 
 func (u Unwrap) String() string {

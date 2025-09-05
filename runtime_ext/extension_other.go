@@ -19,7 +19,7 @@ var printExtension = Extension{
 			}
 		}
 		fmt.Println()
-		return value(nil)
+		return resultObj(nil)
 	},
 }
 
@@ -27,7 +27,7 @@ var typeExtension = Extension{
 	Name: "type",
 	Man:  "{builtin: (print 1 2 (lambda x (add x 1))) - get type in string}",
 	Exec: func(ctx context.Context, values ...Object) adt.Result[Object] {
-		return errValue(errors.New("not implemented"))
+		return resultErr(errors.New("not implemented"))
 		/*
 			(type int int bool) or {int -> int -> bool}  			# make type
 			(typeof 1) 												# int

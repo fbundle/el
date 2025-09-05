@@ -20,14 +20,14 @@ func makeArithExtension(name string, f func(...Int) (Int, error)) Extension {
 			vs := make([]Int, len(values))
 			for i, val := range values {
 				if ok := adt.Cast[Int](val).Unwrap(&vs[i]); !ok {
-					return errValueString(fmt.Sprintf("%s argument must be an integer", name))
+					return resultErrStrf(fmt.Sprintf("%s argument must be an integer", name))
 				}
 			}
 			output, err := f(vs...)
 			if err != nil {
-				return errValue(err)
+				return resultErr(err)
 			}
-			return value(output)
+			return resultObj(output)
 		},
 		Man: fmt.Sprintf("{arithmetic_extension: %s}", name),
 	}
