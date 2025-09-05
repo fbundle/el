@@ -12,13 +12,15 @@ import (
 	"github.com/fbundle/lab_public/lab/go_util/pkg/adt"
 )
 
-var Builtin = map[Name]Object{
-	sorts.Unit:     NilType,
-	sorts.Any:      AnyType,
-	"builtin_type": BuiltinType,
-	"let":          makeData(letFunc, BuiltinType),
-	"match":        makeData(matchFunc, BuiltinType),
-	"lambda":       makeData(lambdaFunc, BuiltinType),
+var Builtin = Frame{}
+
+func init() {
+	Builtin = Builtin.Set(sorts.Unit, NilType)
+	Builtin = Builtin.Set(sorts.Any, AnyType)
+	Builtin = Builtin.Set("builtin_type", BuiltinType)
+	Builtin = Builtin.Set("let", makeData(letFunc, BuiltinType))
+	Builtin = Builtin.Set("match", makeData(matchFunc, BuiltinType))
+	Builtin = Builtin.Set("lambda", makeData(lambdaFunc, BuiltinType))
 }
 
 type Exec = func(r Runtime, ctx context.Context, frame Frame, argExprList []ast.Expr) adt.Result[Object]

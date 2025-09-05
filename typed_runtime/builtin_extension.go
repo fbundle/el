@@ -9,9 +9,9 @@ import (
 )
 
 func init() {
-	Builtin["type.of"] = makeData(typeOfExtension.Module(), BuiltinType)
-	Builtin["type.cast"] = makeData(typeCastExtension.Module(), BuiltinType)
-	Builtin["type.chain"] = makeData(typeChainExtension.Module(), BuiltinType)
+	Builtin = Builtin.Set("type.of", makeData(typeOfExtension.Module(), BuiltinType))
+	Builtin = Builtin.Set("type.cast", makeData(typeCastExtension.Module(), BuiltinType))
+	Builtin = Builtin.Set("type.chain", makeData(typeChainExtension.Module(), BuiltinType))
 }
 
 type Extension struct {
