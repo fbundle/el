@@ -76,6 +76,7 @@ var program = `
 	_ (print "f 1 = " (curry2 f 1))
 	_ (print "(f 1) 2 = " ((curry2 f 1) 2))
 
+	_ (print (type.of 1) (type.of (lambda x y {x + y})) (type.of add))
 	nil
 )`
 
