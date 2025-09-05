@@ -18,7 +18,7 @@ func NewBasicRuntime() (Runtime, Frame) {
 		ParseLiteral: func(lit string) adt.Result[Object] {
 			val, err := parseLiteral(lit)
 			return adt.Result[Object]{
-				Val: val,
+				Val: makeTypedData(val),
 				Err: err,
 			}
 		},
@@ -69,11 +69,11 @@ func unwrapArgs(args []Object) ([]Object, error) {
 		unwrappedArgs := make([]Object, 0, len(args))
 		for len(args) > 0 {
 			head := args[0]
-			if _, ok := head.(Unwrap); ok {
+			if _, ok := head.Data().(Unwrap); ok {
 				if len(args) <= 1 {
 					return unwrappedArgs, unwrapped, errors.New("unwrapping argument empty")
 				}
-				switch next := args[1].(type) {
+				switch next := args[1].Data().(type) {
 				case List:
 					unwrappedArgs = append(unwrappedArgs, next.Repr()...)
 					args = args[2:]
@@ -106,7 +106,7 @@ func unwrapArgs(args []Object) ([]Object, error) {
 
 var ErrorEmptyLiteral = errors.New("empty literal")
 
-func parseLiteral(lit string) (Object, error) {
+func parseLiteral(lit string) (TypedData, error) {
 	if len(lit) == 0 {
 		return nil, ErrorEmptyLiteral
 	}
