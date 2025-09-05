@@ -3,7 +3,7 @@
 github.com/fbundle/lab_public/lab/go_util/pkg/adt
 github.com/fbundle/lab_public/lab/go_util/pkg/persistent/ordered_map
 github.com/fbundle/lab_public/lab/go_util/pkg/persistent/seq
-# github.com/fbundle/sorts v0.0.0-20250905061605-a023be34557c
+# github.com/fbundle/sorts v0.0.0-20250905091405-add9e4071e0c
 ## explicit; go 1.25.0
 github.com/fbundle/sorts/adt
-github.com/fbundle/sorts/sorts/v1
+github.com/fbundle/sorts/sorts_v1
