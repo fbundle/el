@@ -11,6 +11,9 @@ import (
 type Object = runtime.Object
 type Data = runtime.Data
 
+// TypedData -
+// the reason why we don't include TypedData in core runtime since functions are Data but don't have a type name,
+// hence we handle it by _object{data, sort, parent} where parent (data type) is created as a sort
 type TypedData interface {
 	Data
 	TypeName() string
