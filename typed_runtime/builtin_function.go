@@ -3,7 +3,6 @@ package runtime
 import (
 	"context"
 	"el/ast"
-	"el/sorts"
 	"errors"
 	"fmt"
 	"reflect"
@@ -23,45 +22,7 @@ func (f FuncData) String() string {
 	return f.repr
 }
 
-type Extension struct {
-	Name Name
-	Man  string
-	Exec func(ctx context.Context, values ...Object) adt.Result[Object]
-}
-
-func (ext Extension) Module() FuncData {
-	return FuncData{
-		repr: ext.Man,
-		exec: func(r Runtime, ctx context.Context, frame Frame, argExprList []ast.Expr) adt.Result[Object] {
-			var args []Object
-			if err := r.stepAndUnwrapArgs(ctx, frame, argExprList).Unwrap(&args); err != nil {
-				return resultErr(err)
-			}
-
-			return ext.Exec(ctx, args...)
-		},
-	}
-}
-
 var ErrorTooManyArguments = errors.New("too many arguments")
-
-var BuiltinFrame Frame
-
-func init() {
-	builtinObject := map[Name]Object{
-		sorts.Unit:     NilType,
-		sorts.Any:      AnyType,
-		"builtin_type": BuiltinType,
-		"let":          makeData(letFunc, BuiltinType),
-		"match":        makeData(matchFunc, BuiltinType),
-		"lambda":       makeData(lambdaFunc, BuiltinType),
-	}
-	frame := Frame{}
-	for name, object := range builtinObject {
-		frame = frame.Set(name, object)
-	}
-	BuiltinFrame = frame
-}
 
 var letFunc = FuncData{
 	repr: "{builtin: (let x 3 4) - assign value 3 to local variable x then return 4}",
