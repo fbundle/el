@@ -4,6 +4,7 @@ import (
 	"context"
 	"el/ast"
 	"el/sorts"
+	"fmt"
 
 	"github.com/fbundle/lab_public/lab/go_util/pkg/adt"
 )
@@ -54,7 +55,8 @@ var typeCastExtension = Extension{
 		parent, object := values[0], values[1]
 		var newObject Object
 		if ok := object.Cast(parent).Unwrap(&newObject); !ok {
-			return resultErrStrf("cannot cast object %s of type %s into type %s", object, object.Type(), parent)
+			fmt.Printf("cannot cast object %s of type %s into type %s\n", object, object.Type(), parent)
+			return resultData(nil, NilType)
 		}
 		return resultObj(newObject)
 	},
