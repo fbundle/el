@@ -78,7 +78,7 @@ var program = `
 
 	_ (inspect 1 (lambda x y {x + y}) add)
 
-
+	_ (print {int -> int -> int})
 	nil
 )`
 
@@ -141,6 +141,8 @@ map (lambda l f (match (len l)
 # curry
 curry2  {f x => {y => (f x y)}}
 
+# type chain
+-> type.chain
 
 %s
 
