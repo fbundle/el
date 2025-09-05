@@ -20,5 +20,5 @@ type Object interface {
 
 var BuiltinType = makeType("builtin_type")
 
-var NilType = makeType(sorts.Initial)
-var AnyType = makeType(sorts.Terminal)
+var NilType = makeType(sorts.Unit)
+var AnyType = makeType(sorts.Any)

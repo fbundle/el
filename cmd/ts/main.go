@@ -35,9 +35,9 @@ func strongestType(length int) sorts.Sort {
 	}
 	var ss []sorts.Sort
 	for i := 0; i < length-1; i++ {
-		ss = append(ss, sorts.MustAtom(typeLevel, sorts.Initial, nil))
+		ss = append(ss, sorts.MustAtom(typeLevel, sorts.Unit, nil))
 	}
-	ss = append(ss, sorts.MustAtom(typeLevel, sorts.Terminal, nil))
+	ss = append(ss, sorts.MustAtom(typeLevel, sorts.Any, nil))
 
 	return sorts.MustArrow(ss...)
 }
@@ -49,16 +49,16 @@ func weakestType(length int) sorts.Sort {
 	}
 	var ss []sorts.Sort
 	for i := 0; i < length-1; i++ {
-		ss = append(ss, sorts.MustAtom(typeLevel, sorts.Terminal, nil))
+		ss = append(ss, sorts.MustAtom(typeLevel, sorts.Any, nil))
 	}
-	ss = append(ss, sorts.MustAtom(typeLevel, sorts.Initial, nil))
+	ss = append(ss, sorts.MustAtom(typeLevel, sorts.Unit, nil))
 
 	return sorts.MustArrow(ss...)
 }
 
 func main() {
-	fmt.Printf("anything can be cast into [%s]\n", sorts.Terminal)
-	fmt.Printf("[%s] can be cast into anything\n", sorts.Initial)
+	fmt.Printf("anything can be cast into [%s]\n", sorts.Any)
+	fmt.Printf("[%s] can be cast into anything\n", sorts.Unit)
 
 	intType := makeNameType("int")
 	boolType := makeNameType("bool")

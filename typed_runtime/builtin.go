@@ -49,8 +49,8 @@ var BuiltinFrame Frame
 
 func init() {
 	builtinObject := map[Name]Object{
-		sorts.Initial:  NilType,
-		sorts.Terminal: AnyType,
+		sorts.Unit:     NilType,
+		sorts.Any:      AnyType,
 		"builtin_type": BuiltinType,
 		"let":          makeData(letFunc, BuiltinType),
 		"match":        makeData(matchFunc, BuiltinType),

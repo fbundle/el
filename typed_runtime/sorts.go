@@ -35,9 +35,9 @@ func makeWeakestType(numParams int) Object {
 	}
 	var ss []sorts.Sort
 	for i := 0; i < numParams; i++ {
-		ss = append(ss, sorts.MustAtom(_typeLevel, sorts.Terminal, nil))
+		ss = append(ss, sorts.MustAtom(_typeLevel, sorts.Any, nil))
 	}
-	ss = append(ss, sorts.MustAtom(_typeLevel, sorts.Initial, nil))
+	ss = append(ss, sorts.MustAtom(_typeLevel, sorts.Unit, nil))
 	s := sorts.MustArrow(ss...)
 
 	// convert sort to object

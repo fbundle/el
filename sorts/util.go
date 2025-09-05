@@ -1,10 +1,10 @@
 package sorts
 
 const (
-	// Initial - Initial can be cast into any type, it has a no value or a atom zero value depends on the category
-	Initial = "unit"
-	// Terminal - every type can be cast into Terminal, it is like Any
-	Terminal = "any"
+	// Unit - Unit can be cast into any type (initial object), it has a unique zero value
+	Unit = "unit"
+	// Any - every type can be cast into Any (terminal object)
+	Any = "any"
 )
 
 type rule struct {
@@ -19,7 +19,7 @@ func AddRule(src string, dst string) {
 }
 
 func le(src string, dst string) bool {
-	if src == Initial || dst == Terminal {
+	if src == Unit || dst == Any {
 		return true
 	}
 	if src == dst {
