@@ -63,8 +63,8 @@ func (s arrow) LessEqual(dst Sort) bool {
 	if s.Length() != dst.Length() || s.Level() != dst.Level() {
 		return false
 	}
-	var d arrow
-	if ok := adt.Cast[arrow](dst).Unwrap(&d); !ok {
+	d, ok := dst.(arrow)
+	if !ok {
 		return false
 	}
 	length := len(s.params.Repr())
