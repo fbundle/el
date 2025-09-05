@@ -78,6 +78,7 @@ var program = `
 
 	_ (inspect 1 (lambda x y {x + y}) add)
 
+
 	nil
 )`
 
