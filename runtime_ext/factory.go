@@ -42,7 +42,7 @@ func NewBasicRuntime() (Runtime, Frame) {
 			Load("true", makeTypedData(True)).Load("false", makeTypedData(False)).
 			LoadExtension(eqExtension, neExtension, ltExtension, leExtension, gtExtension, geExtension).
 			LoadExtension(addExtension, subExtension, mulExtension, divExtension, modExtension).
-			LoadExtension(printExtension)
+			LoadExtension(printExtension, inspectExtension)
 
 	return r, f.frame
 }

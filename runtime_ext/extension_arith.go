@@ -31,7 +31,7 @@ func makeArithExtension(name string, f func(...Int) (Int, error)) Extension {
 			}
 			return resultTypedData(output)
 		},
-		Man: fmt.Sprintf("{arithmetic_extension: %s}", name),
+		Man: fmt.Sprintf("{arith_ext_%s}", name),
 	}
 }
 
