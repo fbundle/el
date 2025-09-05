@@ -5,7 +5,7 @@ import (
 	"el/ast"
 	"el/parser"
 	runtime "el/runtime"
-	runtime_ext "el/typed_runtime_ext"
+	runtime_ext "el/runtime_ext"
 	"fmt"
 )
 

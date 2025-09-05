@@ -19,9 +19,11 @@ func makeArithExtension(name string, f func(...Int) (Int, error)) Extension {
 		Exec: func(ctx context.Context, values ...Object) adt.Result[Object] {
 			vs := make([]Int, len(values))
 			for i, val := range values {
-				if ok := adt.Cast[Int](val).Unwrap(&vs[i]); !ok {
+				v, ok := val.Data().(Int)
+				if !ok {
 					return resultErrStrf(fmt.Sprintf("%s argument must be an integer", name))
 				}
+				vs[i] = v
 			}
 			output, err := f(vs...)
 			if err != nil {

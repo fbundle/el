@@ -25,8 +25,8 @@ var lenExtension = Extension{
 		if len(values) != 1 {
 			return resultErrStrf("len requires 1 argument")
 		}
-		var l List
-		if ok := adt.Cast[List](values[0]).Unwrap(&l); !ok {
+		l, ok := values[0].Data().(List)
+		if !ok {
 			return resultErrStrf("len argument must be a list")
 		}
 		return resultTypedData(Int{l.Len()})
@@ -40,18 +40,18 @@ var sliceExtension = Extension{
 		if len(values) != 2 {
 			return resultErrStrf("slice requires 2 arguments")
 		}
-		var l List
-		if ok := adt.Cast[List](values[0]).Unwrap(&l); !ok {
+		l, ok := values[0].Data().(List)
+		if !ok {
 			return resultErrStrf("slice first argument must be a list")
 		}
-		var i List
-		if ok := adt.Cast[List](values[1]).Unwrap(&i); !ok {
+		i, ok := values[1].Data().(List)
+		if !ok {
 			return resultErrStrf("slice second argument must be a list of integers")
 		}
 		output := List{}
 		for _, o := range i.Iter {
-			var index Int
-			if ok := adt.Cast[Int](o).Unwrap(&index); !ok {
+			index, ok := o.Data().(Int)
+			if !ok {
 				return resultErrStrf("slice second argument must be a list of integers")
 			}
 			v := l.Get(index.Val)
@@ -68,11 +68,12 @@ var rangeExtension = Extension{
 		if len(values) != 2 {
 			return resultErrStrf("range requires 2 arguments")
 		}
-		var i, j Int
-		if ok := adt.Cast[Int](values[0]).Unwrap(&i); !ok {
+		i, ok := values[0].Data().(Int)
+		if !ok {
 			return resultErrStrf("range beg must be an integer")
 		}
-		if ok := adt.Cast[Int](values[1]).Unwrap(&j); !ok {
+		j, ok := values[1].Data().(Int)
+		if !ok {
 			return resultErrStrf("range end must be an integer")
 		}
 		output := List{}
