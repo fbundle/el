@@ -76,13 +76,15 @@ var program = `
 	_ (print "f 1 = " (curry2 f 1))
 	_ (print "(f 1) 2 = " ((curry2 f 1) 2))
 
-	_ (inspect 1 (lambda x y {x + y}) add)
+	_ (inspect "inspect some objects ==> " 1 (lambda x y {x + y}) add)
 
-	f {x y => {x + y}}
-	new_type (type_chain int_type int_type int_type)
-	_ (print new_type)
+	_ (print "-----------------")
+	f {x y => {x + y}}								 # f is of type {any -> any -> unit}
+	_ (inspect "f is {data:type} ==> " f)
+	new_type (type_chain int_type int_type int_type) # make type int -> int -> int # infix operator for this has issue
+	_ (print "casting f into ==> " new_type)
 	g (type_cast new_type f)
-	_ (inspect g)
+	_ (inspect "g is {data:type} ==> " g) 									 # g is of type {int -> int -> int} 
 	nil
 )`
 

@@ -27,7 +27,13 @@ var inspectExtension = Extension{
 	Name: "inspect",
 	Man:  "{builtin: (inspect 1 2 (lambda x (add x 1))) - print object with type}",
 	Exec: func(ctx context.Context, values ...Object) adt.Result[Object] {
-		for i, v := range values {
+		if len(values) < 1 {
+			return resultErrStrf("inspect requires a welcoming message")
+		}
+		msgObj := values[0]
+		fmt.Print(msgObj)
+		for i := 1; i < len(values); i++ {
+			v := values[i]
 			fmt.Printf("{%s : %s}", v, v.Type())
 			if i < len(values)-1 {
 				fmt.Print(" ")
