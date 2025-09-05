@@ -93,10 +93,21 @@ func processSugar(argList []ast.Expr) (ast.Expr, error) {
 	}
 
 	// No arrow function or type cast, process as regular infix
-	argList, cmd, right := argList[:len(argList)-2], argList[len(argList)-2], argList[len(argList)-1]
-	left, err := processSugar(argList)
-	if err != nil {
-		return nil, err
+	if ok && string(secondLastName) == "->" {
+		// right to left
+		left, cmd, argList := argList[0], argList[1], argList[1:]
+		right, err := processSugar(argList)
+		if err != nil {
+			return nil, err
+		}
+		return ast.Lambda([]ast.Expr{cmd, left, right}), nil
+	} else {
+		// left to right
+		argList, cmd, right := argList[:len(argList)-2], argList[len(argList)-2], argList[len(argList)-1]
+		left, err := processSugar(argList)
+		if err != nil {
+			return nil, err
+		}
+		return ast.Lambda([]ast.Expr{cmd, left, right}), nil
 	}
-	return ast.Lambda([]ast.Expr{cmd, left, right}), nil
 }
