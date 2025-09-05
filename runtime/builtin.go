@@ -161,6 +161,8 @@ func makeLambdaExec(paramList []Name, body ast.Expr, closure Frame) Exec {
 			closure = closure.Set(param, arg)
 		}
 
+		// 2. // TODO add type checking here
+
 		if len(argList) > len(paramList) {
 			return resultErrStrf("too many arguments to lambda")
 		} else if len(argList) == len(paramList) {
