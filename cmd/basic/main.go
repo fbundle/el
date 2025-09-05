@@ -78,7 +78,11 @@ var program = `
 
 	_ (inspect 1 (lambda x y {x + y}) add)
 
-	_ (print (type_chain int_type int_type int_type))
+	f {x y => {x + y}}
+	new_type (type_chain int_type int_type int_type)
+	_ (print new_type)
+	g (type_cast new_type f)
+	_ (inspect g)
 	nil
 )`
 

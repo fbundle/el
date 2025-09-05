@@ -89,6 +89,6 @@ func (o _object) Cast(newParent Object) adt.Option[Object] {
 	return adt.Some[Object](_object{
 		data:   o.data,
 		sort:   o.sort,
-		parent: o.parent.Parent(),
+		parent: newParent.Sort(),
 	})
 }
