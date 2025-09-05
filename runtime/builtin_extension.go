@@ -34,7 +34,7 @@ func (ext Extension) Module() FuncData {
 }
 
 var typeOfExtension = Extension{
-	Name: "type.of",
+	Name: "type_of",
 	Man:  "{builtin: (type.of 1) - return the type of an object}",
 	Exec: func(ctx context.Context, values ...Object) adt.Result[Object] {
 		if len(values) != 1 {
@@ -45,7 +45,7 @@ var typeOfExtension = Extension{
 }
 
 var typeCastExtension = Extension{
-	Name: "type.cast",
+	Name: "type_cast",
 	Man:  "{builtin: (type.of int true) - cast an object into another type}",
 	Exec: func(ctx context.Context, values ...Object) adt.Result[Object] {
 		if len(values) != 2 {
@@ -61,7 +61,7 @@ var typeCastExtension = Extension{
 }
 
 var typeChainExtension = Extension{
-	Name: "type.chain",
+	Name: "type_chain",
 	Man:  "{builtin: (type.chain int bool any) - make arrow type}",
 	Exec: func(ctx context.Context, values ...Object) adt.Result[Object] {
 		if len(values) == 0 {

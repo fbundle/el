@@ -40,9 +40,9 @@ func NewBasicRuntime() (Runtime, Frame) {
 		(&frameHelper{frame: runtime.Builtin}).
 			LoadExtension(listExtension, lenExtension, sliceExtension, rangeExtension).
 			Load("true", makeTypedData(True)).Load("false", makeTypedData(False)).
-			Load("int", runtime.MakeType("int")).
-			Load("list", runtime.MakeType("list")).
-			Load("string", runtime.MakeType("string")).
+			Load("int_type", runtime.MakeType("int")).
+			Load("list_type", runtime.MakeType("list")).
+			Load("string_type", runtime.MakeType("string")).
 			LoadExtension(eqExtension, neExtension, ltExtension, leExtension, gtExtension, geExtension).
 			LoadExtension(addExtension, subExtension, mulExtension, divExtension, modExtension).
 			LoadExtension(printExtension, inspectExtension)

@@ -78,7 +78,7 @@ var program = `
 
 	_ (inspect 1 (lambda x y {x + y}) add)
 
-	_ (print {int -> int -> int})
+	_ (print {int_type -> int_type -> int_type})
 	nil
 )`
 
