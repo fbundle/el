@@ -22,3 +22,7 @@ var BuiltinType = MakeType("builtin_type")
 
 var NilType = MakeType(sorts.Unit)
 var AnyType = MakeType(sorts.Any)
+
+type Nil struct{}
+
+func (Nil) String() string { return "nil" }

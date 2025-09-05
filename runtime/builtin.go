@@ -18,6 +18,7 @@ func init() {
 	Builtin = Builtin.Set(sorts.Unit, NilType)
 	Builtin = Builtin.Set(sorts.Any, AnyType)
 	Builtin = Builtin.Set("builtin_type", BuiltinType)
+	Builtin = Builtin.Set("nil", MakeData(Nil{}, NilType))
 	Builtin = Builtin.Set("let", MakeData(letFunc, BuiltinType))
 	Builtin = Builtin.Set("match", MakeData(matchFunc, BuiltinType))
 	Builtin = Builtin.Set("lambda", MakeData(lambdaFunc, BuiltinType))
