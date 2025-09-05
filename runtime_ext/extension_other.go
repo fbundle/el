@@ -2,7 +2,6 @@ package runtime_ext
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	"github.com/fbundle/lab_public/lab/go_util/pkg/adt"
@@ -13,31 +12,34 @@ var printExtension = Extension{
 	Man:  "{builtin: (print 1 2 (lambda x (add x 1))) - print}",
 	Exec: func(ctx context.Context, values ...Object) adt.Result[Object] {
 		for i, v := range values {
+			// fmt.Printf("{%s : %s}", v, v.Type())
 			fmt.Print(v)
 			if i < len(values)-1 {
 				fmt.Print(" ")
 			}
 		}
 		fmt.Println()
-		return value(nil)
+		return resultObj(nil)
 	},
 }
 
-var typeExtension = Extension{
-	Name: "type",
-	Man:  "{builtin: (print 1 2 (lambda x (add x 1))) - get type in string}",
+var inspectExtension = Extension{
+	Name: "inspect",
+	Man:  "{builtin: (inspect 1 2 (lambda x (add x 1))) - print object with type}",
 	Exec: func(ctx context.Context, values ...Object) adt.Result[Object] {
-		return errValue(errors.New("not implemented"))
-		/*
-			(type int int bool) or {int -> int -> bool}  			# make type
-			(typeof 1) 												# int
-			(typeof (lambda x y {x + y})) 							# {any -> any -> int}
-			(let
-				f {(lambda x y {x + y}) : {int -> int -> int} }		# decorate anything with type
-				(typeof f)											# {int -> int -> int}
-			)
-			(f 1 2)													# type check before execution
-
-		*/
+		if len(values) < 1 {
+			return resultErrStrf("inspect requires a welcoming message")
+		}
+		msgObj := values[0]
+		fmt.Print(msgObj)
+		for i := 1; i < len(values); i++ {
+			v := values[i]
+			fmt.Printf("{%s : %s}", v, v.Type())
+			if i < len(values)-1 {
+				fmt.Print(" ")
+			}
+		}
+		fmt.Println()
+		return resultObj(nil)
 	},
 }

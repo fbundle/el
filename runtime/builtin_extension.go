@@ -1,0 +1,80 @@
+package runtime
+
+import (
+	"context"
+	"el/ast"
+	"el/sorts"
+
+	"github.com/fbundle/lab_public/lab/go_util/pkg/adt"
+)
+
+func init() {
+	Builtin = Builtin.Set("type_of", MakeData(typeOfExtension.Module(), BuiltinType))
+	Builtin = Builtin.Set("type_cast", MakeData(typeCastExtension.Module(), BuiltinType))
+	Builtin = Builtin.Set("type_chain", MakeData(typeChainExtension.Module(), BuiltinType))
+}
+
+type Extension struct {
+	Name Name
+	Man  string
+	Exec func(ctx context.Context, values ...Object) adt.Result[Object]
+}
+
+func (ext Extension) Module() FuncData {
+	return FuncData{
+		repr: ext.Man,
+		exec: func(r Runtime, ctx context.Context, frame Frame, argExprList []ast.Expr) adt.Result[Object] {
+			var argList []Object
+			if err := r.stepAndUnwrapArgs(ctx, frame, argExprList).Unwrap(&argList); err != nil {
+				return resultErr(err)
+			}
+			return ext.Exec(ctx, argList...)
+		},
+	}
+}
+
+var typeOfExtension = Extension{
+	Name: "type_of",
+	Man:  "{builtin: (type.of 1) - return the type of an object}",
+	Exec: func(ctx context.Context, values ...Object) adt.Result[Object] {
+		if len(values) != 1 {
+			return resultErrStrf("type.of expected 1 argument")
+		}
+		return resultObj(values[0].Type())
+	},
+}
+
+var typeCastExtension = Extension{
+	Name: "type_cast",
+	Man:  "{builtin: (type.of int true) - cast an object into another type}",
+	Exec: func(ctx context.Context, values ...Object) adt.Result[Object] {
+		if len(values) != 2 {
+			return resultErrStrf("type.cast expected 2 arguments")
+		}
+		parent, object := values[0], values[1]
+		var newObject Object
+		if ok := object.Cast(parent).Unwrap(&newObject); !ok {
+			return resultErrStrf("cannot cast object %s of type %s into type %s", object, object.Type(), parent)
+		}
+		return resultObj(newObject)
+	},
+}
+
+var typeChainExtension = Extension{
+	Name: "type_chain",
+	Man:  "{builtin: (type.chain int bool any) - make arrow type}",
+	Exec: func(ctx context.Context, values ...Object) adt.Result[Object] {
+		if len(values) == 0 {
+			return resultErrStrf("type.chain expected at least 1 argument")
+		}
+		sortList := make([]sorts.Sort, 0, len(values))
+		for _, value := range values {
+			sortList = append(sortList, value.Sort())
+		}
+		var newSort sorts.Sort
+		if ok := sorts.Arrow(sortList...).Unwrap(&newSort); !ok {
+			return resultErrStrf("cannot make sort from %s", sortList)
+		}
+		return resultObj(MakeSort(newSort))
+	},
+}

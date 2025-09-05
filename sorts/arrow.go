@@ -1,4 +1,4 @@
-package ts
+package sorts
 
 import (
 	"strings"
@@ -6,15 +6,15 @@ import (
 	"github.com/fbundle/lab_public/lab/go_util/pkg/adt"
 )
 
-func MustChain(sorts ...Sort) Sort {
+func MustArrow(sorts ...Sort) Sort {
 	var sort Sort
-	if ok := Chain(sorts...).Unwrap(&sort); !ok {
+	if ok := Arrow(sorts...).Unwrap(&sort); !ok {
 		panic("type_error")
 	}
 	return sort
 }
 
-func Chain(sorts ...Sort) adt.Option[Sort] {
+func Arrow(sorts ...Sort) adt.Option[Sort] {
 	if len(sorts) == 0 {
 		return adt.None[Sort]()
 	}
@@ -25,17 +25,13 @@ func Chain(sorts ...Sort) adt.Option[Sort] {
 	return adt.Some[Sort](sort)
 }
 
-// chain - represent arrow type A -> B -> C
-type chain struct {
+// arrow - represent arrow type A -> B -> C
+type arrow struct {
 	params adt.NonEmptySlice[Sort]
 	body   Sort
 }
 
-func (s chain) Data() adt.Option[Data] {
-	return adt.None[Data]()
-}
-
-func (s chain) Level() int {
+func (s arrow) Level() int {
 	level := s.body.Level()
 	for _, param := range s.params.Repr() {
 		level = max(level, param.Level())
@@ -43,7 +39,7 @@ func (s chain) Level() int {
 	return level
 }
 
-func (s chain) String() string {
+func (s arrow) String() string {
 	strList := make([]string, 0, len(s.params.Repr())+1)
 	for _, param := range s.params.Repr() {
 		strList = append(strList, param.String())
@@ -52,46 +48,41 @@ func (s chain) String() string {
 	return "{" + strings.Join(strList, " -> ") + "}"
 }
 
-func (s chain) Type() Sort {
-	return singleName{
+func (s arrow) Parent() Sort {
+	return atom{
 		level: s.Level() + 1,
 		name:  DefaultSortName,
 	}
 }
 
-func (s chain) Cast(parent Sort) adt.Option[Sort] {
-	// cannot cast sort of chain
-	return adt.None[Sort]()
-}
-
-func (s chain) Len() int {
+func (s arrow) Length() int {
 	return len(s.params.Repr()) + 1
 }
 
-func (s chain) le(dst Sort) bool {
-	if s.Len() != dst.Len() || s.Level() != dst.Level() {
+func (s arrow) LessEqual(dst Sort) bool {
+	if s.Length() != dst.Length() || s.Level() != dst.Level() {
 		return false
 	}
-	var d chain
-	if ok := adt.Cast[chain](dst).Unwrap(&d); !ok {
+	d, ok := dst.(arrow)
+	if !ok {
 		return false
 	}
 	length := len(s.params.Repr())
 	for i := 0; i < length; i++ {
 		sParam := s.params.Repr()[i]
 		dParam := d.params.Repr()[i]
-		if !dParam.le(sParam) {
+		if !dParam.LessEqual(sParam) {
 			// reverse cast - similar to contravariant functor
 			// {int} can be cast into {any}
 			// {any -> int} can be cast into {int -> int}
 			return false
 		}
 	}
-	return s.body.le(d.body)
+	return s.body.LessEqual(d.body)
 }
 
-func (s chain) prepend(param Sort) Sort {
-	return chain{
+func (s arrow) prepend(param Sort) Sort {
+	return arrow{
 		params: adt.MustNonEmpty[Sort](append([]Sort{param}, s.params.Repr()...)),
 		body:   s.body,
 	}

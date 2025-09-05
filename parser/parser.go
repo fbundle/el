@@ -3,8 +3,6 @@ package parser
 import (
 	"el/ast"
 	"errors"
-
-	"github.com/fbundle/lab_public/lab/go_util/pkg/adt"
 )
 
 func pop(tokenList []Token) ([]Token, Token, error) {
@@ -63,6 +61,7 @@ func Parse(tokenList []Token) (ast.Expr, []Token, error) {
 // processSugar - handles both arithmetic infix and lambda syntax
 // {1 + 2 + 3} -> (add (add 1 2) 3)
 // {x y => (add x y)} -> (lambda x y (add x y))
+// {x : type1} -> (type.cast type1 x)
 func processSugar(argList []ast.Expr) (ast.Expr, error) {
 	if len(argList) == 0 {
 		return ast.Lambda(nil), nil
@@ -70,8 +69,8 @@ func processSugar(argList []ast.Expr) (ast.Expr, error) {
 	if len(argList) == 1 {
 		return argList[0], nil
 	}
-	var arrow ast.Name
-	if ok := adt.Cast[ast.Name](argList[len(argList)-2]).Unwrap(&arrow); ok && string(arrow) == "=>" {
+	secondLastName, ok := argList[len(argList)-2].(ast.Name)
+	if ok && string(secondLastName) == "=>" {
 		// arrow function syntax: {x y => expr}
 		paramList := argList[:len(argList)-2]
 		body := argList[len(argList)-1]
@@ -83,12 +82,32 @@ func processSugar(argList []ast.Expr) (ast.Expr, error) {
 
 		return ast.Lambda(lambdaArgList), nil
 	}
-
-	// No arrow function found, process as regular infix
-	argList, cmd, right := argList[:len(argList)-2], argList[len(argList)-2], argList[len(argList)-1]
-	left, err := processSugar(argList)
-	if err != nil {
-		return nil, err
+	if ok && string(secondLastName) == ":" {
+		// type cast syntax
+		typeCastArgList := []ast.Expr{
+			ast.Name("type.cast"),
+			argList[len(argList)-1],
+		}
+		typeCastArgList = append(typeCastArgList, argList[:len(argList)-2]...)
+		return ast.Lambda(typeCastArgList), nil
 	}
-	return ast.Lambda([]ast.Expr{cmd, left, right}), nil
+
+	// No arrow function or type cast, process as regular infix
+	if ok && string(secondLastName) == "->" {
+		// right to left
+		left, cmd, argList := argList[0], argList[1], argList[1:]
+		right, err := processSugar(argList)
+		if err != nil {
+			return nil, err
+		}
+		return ast.Lambda([]ast.Expr{cmd, left, right}), nil
+	} else {
+		// left to right
+		argList, cmd, right := argList[:len(argList)-2], argList[len(argList)-2], argList[len(argList)-1]
+		left, err := processSugar(argList)
+		if err != nil {
+			return nil, err
+		}
+		return ast.Lambda([]ast.Expr{cmd, left, right}), nil
+	}
 }

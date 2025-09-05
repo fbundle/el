@@ -1,29 +1,28 @@
 package runtime
 
 import (
-	"context"
-	"el/ast"
+	"el/sorts"
 
 	"github.com/fbundle/lab_public/lab/go_util/pkg/adt"
 )
 
-type Exec = func(r Runtime, ctx context.Context, frame Frame, argExprList []ast.Expr) adt.Result[Object]
-
-type Object interface {
+type Data interface {
 	String() string
 }
 
-type Function struct {
-	exec Exec
-	repr string
+type Object interface {
+	Data() Data
+	String() string
+	Sort() Sort
+	Type() Object
+	Cast(dtype Object) adt.Option[Object]
 }
 
-func (f Function) String() string {
-	return f.repr
-}
+var BuiltinType = MakeType("builtin_type")
+
+var NilType = MakeType(sorts.Unit)
+var AnyType = MakeType(sorts.Any)
 
 type Nil struct{}
 
-func (Nil) String() string {
-	return "nil"
-}
+func (Nil) String() string { return "nil" }

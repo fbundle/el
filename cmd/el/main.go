@@ -126,7 +126,7 @@ func executeProgram(program string) error {
 
 func startREPL() {
 	fmt.Printf("EL Programming Language REPL v%s\n", version)
-	fmt.Println("Type 'help' for commands, 'quit' or 'exit' to exit")
+	fmt.Println("TypeName 'help' for commands, 'quit' or 'exit' to exit")
 	fmt.Println()
 
 	r, s := runtime_ext.NewBasicRuntime()
