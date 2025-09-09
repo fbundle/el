@@ -2,7 +2,7 @@ package runtime
 
 import (
 	"github.com/fbundle/lab_public/lab/go_util/pkg/adt"
-	"github.com/fbundle/sorts/sorts_v1"
+	"github.com/fbundle/sorts/sorts/sorts_v1"
 )
 
 const _typeLevel = 1

@@ -1,4 +1,4 @@
-github.com/fbundle/lab_public/lab/go_util v0.0.0-20250904125457-29e6ace6b836 h1:xI1ggY1t3rZz/6liy5ezmxtHCA+uQNAPv3RpFE/PoxI=
-github.com/fbundle/lab_public/lab/go_util v0.0.0-20250904125457-29e6ace6b836/go.mod h1:DFtXwNWST7iB8ulaMSlNwDXizrsadXMBNlX+SibhU+Y=
-github.com/fbundle/sorts v0.0.0-20250905091405-add9e4071e0c h1:xFPgkdkMUMKV7kNByHtWxndTlBD7zdLwhDWKs++QQbI=
-github.com/fbundle/sorts v0.0.0-20250905091405-add9e4071e0c/go.mod h1:kF6K3gFNz/Lw+CqI8QAJHan4XRwS5fCQWo+6tFy1XgI=
+github.com/fbundle/lab_public/lab/go_util v0.0.0-20250905183237-d2f97bba2875 h1:lfP7zS30mx7BJevlof73bZABTUJhhJufnCopVSIfljs=
+github.com/fbundle/lab_public/lab/go_util v0.0.0-20250905183237-d2f97bba2875/go.mod h1:DFtXwNWST7iB8ulaMSlNwDXizrsadXMBNlX+SibhU+Y=
+github.com/fbundle/sorts v0.0.0-20250909204241-1ea09577f27c h1:2sLxrDqlcS/p64fQt7VlxrqsXhkTOZh2adOagQ5OF+o=
+github.com/fbundle/sorts v0.0.0-20250909204241-1ea09577f27c/go.mod h1:KgV+rAzfCtnWxliAYvsPMihytckN+H569xVV9A9tINI=
